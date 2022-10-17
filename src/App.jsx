@@ -1,9 +1,10 @@
-import { MantineProvider, Text } from "@mantine/core";
+import { Text } from "@mantine/core";
+import Layout from "./components/Layouts";
 
 export default function App() {
   return (
-    <MantineProvider withGlobalStyles withNormalizeCSS>
-      <Text color='teal'>Welcome to Mantine!</Text>
-    </MantineProvider>
+    <Layout>
+      <Text>heiiii</Text>
+    </Layout>
   );
 }

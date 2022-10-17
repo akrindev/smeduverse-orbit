@@ -10,6 +10,7 @@ specifiers:
   '@mantine/modals': ^5.5.5
   '@mantine/notifications': ^5.5.5
   '@mantine/nprogress': ^5.5.5
+  '@tabler/icons': ^1.104.0
   '@types/react': ^18.0.17
   '@types/react-dom': ^18.0.6
   '@vitejs/plugin-react': ^2.1.0
@@ -28,6 +29,7 @@ dependencies:
   '@mantine/modals': 5.5.5_sboc75uudxrw5k7gcptvtad4eq
   '@mantine/notifications': 5.5.5_sboc75uudxrw5k7gcptvtad4eq
   '@mantine/nprogress': 5.5.5_sboc75uudxrw5k7gcptvtad4eq
+  '@tabler/icons': 1.104.0_biqbaboplfbrettd7655fr4n2y
   dayjs: 1.11.5
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
@@ -749,6 +751,21 @@ packages:
     dependencies:
       '@babel/runtime': 7.19.4
       react: 18.2.0
+    dev: false
+
+  /@tabler/icons/1.104.0_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-5AOrHjay37RmpxLpo/Cm4sHCEWuPG/pBFqJE2d4JvILXKwFa4ROTlH6G9bnAZ+yGttEW8KF0DuIKLNgvcI78Ww==}
+    peerDependencies:
+      react: ^16.x || 17.x || 18.x
+      react-dom: ^16.x || 17.x || 18.x
+    peerDependenciesMeta:
+      react:
+        optional: true
+      react-dom:
+        optional: true
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
     dev: false
 
   /@types/parse-json/4.0.0:
