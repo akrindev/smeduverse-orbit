@@ -2,6 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@tabler/core': 1.0.0-beta15
+  '@tabler/icons': ^1.111.0
   bootstrap: ^5.2.2
   next: 13.0.3
   react: 18.2.0
@@ -10,6 +11,7 @@ specifiers:
 
 dependencies:
   '@tabler/core': 1.0.0-beta15_biqbaboplfbrettd7655fr4n2y
+  '@tabler/icons': 1.111.0_biqbaboplfbrettd7655fr4n2y
   bootstrap: 5.2.2
   next: 13.0.3_biqbaboplfbrettd7655fr4n2y
   react: 18.2.0

@@ -8,7 +8,7 @@ export default function Header({ children }) {
   const handleShowNavbar = () => setShowNavbar(!showNavbar);
 
   return (
-    <div classNameName='mb-3'>
+    <div className='mb-3'>
       <NavHeader onClick={handleShowNavbar} />
       <Navbar showNavbar={showNavbar} />
     </div>

@@ -5,10 +5,6 @@ export default class _Document extends Document {
     return (
       <Html lang='id'>
         <Head>
-          <meta
-            name='viewport'
-            content='width=device-width, initial-scale=1, viewport-fit=cover'
-          />
           <meta name='msapplication-TileColor' content='' />
           <meta name='theme-color' content='' />
           <meta
