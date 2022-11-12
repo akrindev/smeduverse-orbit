@@ -1,27 +1,7 @@
-import Head from "next/head";
-import { MantineProvider } from "@mantine/core";
+import "@tabler/core/dist/css/tabler.min.css";
 
-export default function App(props) {
-  const { Component, pageProps } = props;
-
-  return (
-    <>
-      <Head>
-        <meta
-          name='viewport'
-          content='minimum-scale=1, initial-scale=1, width=device-width'
-        />
-      </Head>
-
-      <MantineProvider
-        withGlobalStyles
-        withNormalizeCSS
-        theme={{
-          /** Put your mantine theme override here */
-          colorScheme: "light",
-        }}>
-        <Component {...pageProps} />
-      </MantineProvider>
-    </>
-  );
+function MyApp({ Component, pageProps }) {
+  return <Component {...pageProps} />;
 }
+
+export default MyApp;
