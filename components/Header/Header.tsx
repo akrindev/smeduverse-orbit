@@ -2,7 +2,7 @@ import { useState } from "react";
 import Navbar from "./Navbar";
 import NavHeader from "./NavHeader";
 
-export default function Header({ children }) {
+export default function Header() {
   const [showNavbar, setShowNavbar] = useState(false);
 
   const handleShowNavbar = () => setShowNavbar(!showNavbar);

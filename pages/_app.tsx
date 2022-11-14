@@ -1,5 +1,5 @@
 import type { AppProps } from "next/app";
-import "@tabler/core/dist/css/tabler.min.css";
+import "@tabler/core/src/scss/tabler.scss";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return <Component {...pageProps} />;

@@ -5,6 +5,7 @@ export default class _Document extends Document {
     return (
       <Html lang='id'>
         <Head>
+          <title>Orbit - Smeduverse</title>
           <meta name='msapplication-TileColor' content='' />
           <meta name='theme-color' content='' />
           <meta

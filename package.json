@@ -19,6 +19,9 @@
   },
   "devDependencies": {
     "@types/node": "18.11.9",
+    "autoprefixer": "^10.4.13",
+    "postcss": "^8.4.19",
+    "sass": "^1.56.1",
     "typescript": "4.8.4"
   }
 }
