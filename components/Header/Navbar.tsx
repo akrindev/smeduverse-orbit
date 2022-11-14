@@ -10,10 +10,12 @@ const NavbarItem = ({ title, icon, link }) => {
   return (
     <li className={`nav-item ${router.asPath === link && "active"}`}>
       <Link className='nav-link' href={link}>
-        <span className='nav-link-icon d-md-none d-lg-inline-block'>
-          {icon}
-        </span>
-        <span className='nav-link-title'>{title}</span>
+        <>
+          <span className='nav-link-icon d-md-none d-lg-inline-block'>
+            {icon}
+          </span>
+          <span className='nav-link-title'>{title}</span>
+        </>
       </Link>
     </li>
   );
