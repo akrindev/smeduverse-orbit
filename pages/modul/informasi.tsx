@@ -1,4 +1,5 @@
 import { IconCalendar, IconMessage, IconPlus } from "@tabler/icons";
+import { useRouter } from "next/router";
 import Layout from "../../components/Layout";
 import ModulInformation from "../../components/Pages/Modul/ModulInformation";
 
@@ -36,6 +37,12 @@ export default function Informasi() {
                   href='#'>
                   Materi
                   <small className='text-muted ms-auto'>9</small>
+                </a>
+                <a
+                  className='list-group-item list-group-item-action d-flex align-items-center'
+                  href='#'>
+                  Presensi
+                  <small className='text-muted ms-auto'>5</small>
                 </a>
                 <a
                   className='list-group-item list-group-item-action d-flex align-items-center'
