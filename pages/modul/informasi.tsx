@@ -1,9 +1,22 @@
-import { IconCalendar, IconMessage, IconPlus } from "@tabler/icons";
-import { useRouter } from "next/router";
+import { useState } from "react";
+import { IconPlus } from "@tabler/icons";
 import Layout from "../../components/Layout";
 import ModulInformation from "../../components/Pages/Modul/ModulInformation";
+import Tugas from "../../components/Pages/Modul/Tab/Tugas";
+import Materi from "../../components/Pages/Modul/Tab/Materi";
+import Presensi from "../../components/Pages/Modul/Tab/Presensi";
+import Siswa from "../../components/Pages/Modul/Tab/Siswa";
 
 export default function Informasi() {
+  const [tab, setTab] = useState<string>("tugas");
+
+  const tabs = {
+    tugas: <Tugas />,
+    materi: <Materi />,
+    presensi: <Presensi />,
+    siswa: <Siswa />,
+  };
+
   return (
     <Layout>
       <Layout.Header>
@@ -28,62 +41,44 @@ export default function Informasi() {
             <div className='mb-2'>
               <div className='list-group list-group-transparent mb-3'>
                 <a
-                  className='list-group-item list-group-item-action d-flex align-items-center active'
-                  href='#'>
+                  className={`list-group-item list-group-item-action d-flex align-items-center ${
+                    tab == "tugas" && "active"
+                  }`}
+                  href='#'
+                  onClick={() => setTab("tugas")}>
                   Tugas<small className='text-muted ms-auto'>4</small>
                 </a>
                 <a
-                  className='list-group-item list-group-item-action d-flex align-items-center'
-                  href='#'>
+                  className={`list-group-item list-group-item-action d-flex align-items-center ${
+                    tab == "materi" && "active"
+                  }`}
+                  href='#'
+                  onClick={() => setTab("materi")}>
                   Materi
                   <small className='text-muted ms-auto'>9</small>
                 </a>
                 <a
-                  className='list-group-item list-group-item-action d-flex align-items-center'
-                  href='#'>
+                  className={`list-group-item list-group-item-action d-flex align-items-center ${
+                    tab == "presensi" && "active"
+                  }`}
+                  href='#'
+                  onClick={() => setTab("presensi")}>
                   Presensi
                   <small className='text-muted ms-auto'>5</small>
                 </a>
                 <a
-                  className='list-group-item list-group-item-action d-flex align-items-center'
-                  href='#'>
+                  className={`list-group-item list-group-item-action d-flex align-items-center ${
+                    tab == "siswa" && "active"
+                  }`}
+                  href='#'
+                  onClick={() => setTab("siswa")}>
                   Siswa
                   <small className='text-muted ms-auto'>32</small>
                 </a>
               </div>
             </div>
           </div>
-          <div className='col-12 col-md-9'>
-            <div className='card'>
-              <div className='card-header'>
-                <h3 className='card-title'>Tugas </h3>
-              </div>
-              <div className='table-responsive'>
-                <table className='table card-table table-vcenter'>
-                  <tbody>
-                    {[1, 2, 3, 4, 5, 6].map((i) => (
-                      <tr key={i}>
-                        <td className='w-100'>
-                          <a href='#' className='text-reset'>
-                            Simple Present Tense
-                          </a>
-                        </td>
-                        <td className='text-nowrap text-muted'>
-                          <IconCalendar className='icon mr-2' />
-                          August 05, 2022
-                        </td>
-                        <td className='text-nowrap'>
-                          <a href='#' className='text-muted'>
-                            <IconMessage className='icon mr-2' /> 3
-                          </a>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+          <div className='col-12 col-md-9'>{tabs[tab]}</div>
         </div>
       </Layout.Body>
     </Layout>
