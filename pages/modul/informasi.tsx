@@ -1,4 +1,4 @@
-import { IconCalendar, IconMessage } from "@tabler/icons";
+import { IconCalendar, IconMessage, IconPlus } from "@tabler/icons";
 import Layout from "../../components/Layout";
 import ModulInformation from "../../components/Pages/Modul/ModulInformation";
 
@@ -18,25 +18,31 @@ export default function Informasi() {
           <div className='col-12 col-md-3'>
             <div className='mb-2'>
               <div className='mb-2'>
-                <div className='list-group list-group-transparent mb-3'>
-                  <a
-                    className='list-group-item list-group-item-action d-flex align-items-center active'
-                    href='#'>
-                    Tugas<small className='text-muted ms-auto'>4</small>
-                  </a>
-                  <a
-                    className='list-group-item list-group-item-action d-flex align-items-center'
-                    href='#'>
-                    Materi
-                    <small className='text-muted ms-auto'>9</small>
-                  </a>
-                  <a
-                    className='list-group-item list-group-item-action d-flex align-items-center'
-                    href='#'>
-                    Siswa
-                    <small className='text-muted ms-auto'>32</small>
-                  </a>
-                </div>
+                <button className='btn btn-primary w-100'>
+                  <IconPlus />
+                  Tambah Presensi
+                </button>
+              </div>
+            </div>
+            <div className='mb-2'>
+              <div className='list-group list-group-transparent mb-3'>
+                <a
+                  className='list-group-item list-group-item-action d-flex align-items-center active'
+                  href='#'>
+                  Tugas<small className='text-muted ms-auto'>4</small>
+                </a>
+                <a
+                  className='list-group-item list-group-item-action d-flex align-items-center'
+                  href='#'>
+                  Materi
+                  <small className='text-muted ms-auto'>9</small>
+                </a>
+                <a
+                  className='list-group-item list-group-item-action d-flex align-items-center'
+                  href='#'>
+                  Siswa
+                  <small className='text-muted ms-auto'>32</small>
+                </a>
               </div>
             </div>
           </div>
@@ -49,7 +55,7 @@ export default function Informasi() {
                 <table className='table card-table table-vcenter'>
                   <tbody>
                     {[1, 2, 3, 4, 5, 6].map((i) => (
-                      <tr>
+                      <tr key={i}>
                         <td className='w-100'>
                           <a href='#' className='text-reset'>
                             Simple Present Tense
