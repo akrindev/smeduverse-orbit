@@ -2,13 +2,13 @@ import { useState } from "react";
 import Navbar from "./Navbar";
 import NavHeader from "./NavHeader";
 
-export default function Header({ children }) {
+export default function Header() {
   const [showNavbar, setShowNavbar] = useState(false);
 
   const handleShowNavbar = () => setShowNavbar(!showNavbar);
 
   return (
-    <div classNameName='mb-3'>
+    <div className='mb-3'>
       <NavHeader onClick={handleShowNavbar} />
       <Navbar showNavbar={showNavbar} />
     </div>
