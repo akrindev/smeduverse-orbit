@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { IconFileAnalytics } from "@tabler/icons";
 import { IconBook2 } from "@tabler/icons";
 import { IconHome } from "@tabler/icons";
@@ -7,8 +8,13 @@ import { useRouter } from "next/router";
 const NavbarItem = ({ title, icon, link }) => {
   const router = useRouter();
 
+  const isActive = useMemo(
+    () => router.pathname.split("/")[1] == link.replace("/", ""),
+    [router, link]
+  );
+
   return (
-    <li className={`nav-item ${router.asPath === link && "active"}`}>
+    <li className={`nav-item ${isActive && "active"}`}>
       <Link className='nav-link' href={link}>
         <>
           <span className='nav-link-icon d-md-none d-lg-inline-block'>
