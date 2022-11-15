@@ -1,5 +1,6 @@
-import { IconCheck } from "@tabler/icons";
+import { IconCalendar, IconMessage } from "@tabler/icons";
 import Layout from "../../components/Layout";
+import ModulInformation from "../../components/Pages/Modul/ModulInformation";
 
 export default function Informasi() {
   return (
@@ -11,50 +12,62 @@ export default function Informasi() {
         </div>
       </Layout.Header>
       <Layout.Body>
-        <div className='card'>
-          <div className='card-header'>
-            <h3 className='card-title'>Informasi Dasar</h3>
+        <ModulInformation />
+
+        <div className='mt-2 row g-4'>
+          <div className='col-12 col-md-3'>
+            <div className='mb-2'>
+              <div className='mb-2'>
+                <div className='list-group list-group-transparent mb-3'>
+                  <a
+                    className='list-group-item list-group-item-action d-flex align-items-center active'
+                    href='#'>
+                    Tugas<small className='text-muted ms-auto'>4</small>
+                  </a>
+                  <a
+                    className='list-group-item list-group-item-action d-flex align-items-center'
+                    href='#'>
+                    Materi
+                    <small className='text-muted ms-auto'>9</small>
+                  </a>
+                  <a
+                    className='list-group-item list-group-item-action d-flex align-items-center'
+                    href='#'>
+                    Siswa
+                    <small className='text-muted ms-auto'>32</small>
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className='card-body'>
-            <div className='datagrid'>
-              <div className='datagrid-item'>
-                <div className='datagrid-title'>Guru</div>
-                <div className='datagrid-content'>Roch Imaniwati</div>
+          <div className='col-12 col-md-9'>
+            <div className='card'>
+              <div className='card-header'>
+                <h3 className='card-title'>Tugas </h3>
               </div>
-              <div className='datagrid-item'>
-                <div className='datagrid-title'>Modul / Mata Pelajaran</div>
-                <div className='datagrid-content'>Bahasa Inggris</div>
-              </div>
-              <div className='datagrid-item'>
-                <div className='datagrid-title'>Tingkat Kelas</div>
-                <div className='datagrid-content'>X (10)</div>
-              </div>
-              <div className='datagrid-item'>
-                <div className='datagrid-title'>Nama Kelas</div>
-                <div className='datagrid-content'>X TJKT</div>
-              </div>
-              <div className='datagrid-item'>
-                <div className='datagrid-title'>Jurusan</div>
-                <div className='datagrid-content'>
-                  Teknik Jaringan Komputer dan Telekomunikasi
-                </div>
-              </div>
-              <div className='datagrid-item'>
-                <div className='datagrid-title'>Wali Kelas</div>
-                <div className='datagrid-content'>Ninda Agustiarsih</div>
-              </div>
-              <div className='datagrid-item'>
-                <div className='datagrid-title'>Status Modul</div>
-                <div className='datagrid-content'>
-                  <span className='status status-green'>Active</span>
-                </div>
-              </div>
-              <div className='datagrid-item'>
-                <div className='datagrid-title'>Tahun Ajaran</div>
-                <div className='datagrid-content'>
-                  <IconCheck className='icon text-green' />
-                  2022/2023 - Genap
-                </div>
+              <div className='table-responsive'>
+                <table className='table card-table table-vcenter'>
+                  <tbody>
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                      <tr>
+                        <td className='w-100'>
+                          <a href='#' className='text-reset'>
+                            Simple Present Tense
+                          </a>
+                        </td>
+                        <td className='text-nowrap text-muted'>
+                          <IconCalendar className='icon mr-2' />
+                          August 05, 2022
+                        </td>
+                        <td className='text-nowrap'>
+                          <a href='#' className='text-muted'>
+                            <IconMessage className='icon mr-2' /> 3
+                          </a>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
