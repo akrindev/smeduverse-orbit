@@ -2,6 +2,7 @@ import { useState } from "react";
 import { IconPlus } from "@tabler/icons";
 import { Button, Modal } from "react-bootstrap";
 import Layout from "../../components/Layout";
+import ModulSection from "../../components/Pages/Modul/ModulSection";
 
 export default function Modul() {
   const [showAssignModul, setShowAssignModul] = useState(false);
@@ -47,7 +48,9 @@ export default function Modul() {
           </div>
         </div>
       </Layout.Header>
-      <Layout.Body>Modul</Layout.Body>
+      <Layout.Body>
+        <ModulSection />
+      </Layout.Body>
 
       {/* modal */}
       <Modal
