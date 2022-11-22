@@ -9,13 +9,14 @@ export default function ModulSection() {
         <ModulSectionSide />
       </div>
       <div className='col-12 col-md-9'>
-        <div className='row row-cards'>
+        <div className='row row-cards g-4'>
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((item) => (
-            <ModulGrid />
+            <ModulGrid key={item} />
           ))}
-
-          <Pagination />
         </div>
+      </div>
+      <div className='col-12'>
+        <Pagination />
       </div>
     </div>
   );
