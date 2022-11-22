@@ -15,10 +15,10 @@ export default function ModulGrid() {
             {/* <span
                 className='avatar me-3 rounded'
                 style='background-image: url(./static/avatars/000m.jpg)'></span> */}
-            {/* <div> */}
-            <div>Bahasa Inggris</div>
-            <div className='text-muted'>Roch Imaniwati - X</div>
-            {/* </div> */}
+            <div>
+              <div>Bahasa Inggris</div>
+              <div className='text-muted'>Roch Imaniwati - X</div>
+            </div>
           </div>
         </div>
       </div>

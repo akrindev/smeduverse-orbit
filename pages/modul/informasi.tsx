@@ -30,14 +30,7 @@ export default function Informasi() {
 
         <div className='mt-2 row g-4'>
           <div className='col-12 col-md-3'>
-            <div className='mb-2'>
-              <div className='mb-2'>
-                <button className='btn btn-primary w-100'>
-                  <IconPlus />
-                  Tambah Presensi
-                </button>
-              </div>
-            </div>
+            <div className='subheader'>aksi</div>
             <div className='mb-2'>
               <div className='list-group list-group-transparent mb-3'>
                 <a
