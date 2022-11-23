@@ -1,9 +1,17 @@
 export default function Head() {
   return (
     <>
-      <title></title>
-      <meta content="width=device-width, initial-scale=1" name="viewport" />
-      <link rel="icon" href="/favicon.ico" />
+      <title>Orbit - Smeduverse</title>
+      <meta name='msapplication-TileColor' content='' />
+      <meta name='theme-color' content='' />
+      <meta
+        name='apple-mobile-web-app-status-bar-style'
+        content='black-translucent'
+      />
+      <meta name='apple-mobile-web-app-capable' content='yes' />
+      <meta name='mobile-web-app-capable' content='yes' />
+      <meta name='HandheldFriendly' content='True' />
+      <meta name='MobileOptimized' content='320' />
     </>
-  )
+  );
 }

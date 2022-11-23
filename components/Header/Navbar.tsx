@@ -1,16 +1,18 @@
+"use client";
+
 import { useMemo } from "react";
 import { IconFileAnalytics } from "@tabler/icons";
 import { IconBook2 } from "@tabler/icons";
 import { IconHome } from "@tabler/icons";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { usePathname } from "next/navigation";
 
 const NavbarItem = ({ title, icon, link }) => {
-  const router = useRouter();
+  const pathname = usePathname();
 
   const isActive = useMemo(
-    () => router.pathname.split("/")[1] == link.replace("/", ""),
-    [router, link]
+    () => pathname.split("/")[1] == link.replace("/", ""),
+    [pathname, link]
   );
 
   return (
