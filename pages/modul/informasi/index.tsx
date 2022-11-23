@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { IconPlus } from "@tabler/icons";
-import Layout from "../../components/Layout";
-import ModulInformation from "../../components/Pages/Modul/ModulInformation";
-import Tugas from "../../components/Pages/Modul/Tab/Tugas";
-import Materi from "../../components/Pages/Modul/Tab/Materi";
-import Presensi from "../../components/Pages/Modul/Tab/Presensi";
-import Siswa from "../../components/Pages/Modul/Tab/Siswa";
+import Layout from "../../../components/Layout";
+import ModulInformation from "../../../components/Pages/Modul/ModulInformation";
+import Tugas from "../../../components/Pages/Modul/Tab/Tugas";
+import Materi from "../../../components/Pages/Modul/Tab/Materi";
+import Presensi from "../../../components/Pages/Modul/Tab/Presensi";
+import Siswa from "../../../components/Pages/Modul/Tab/Siswa";
 
 export default function Informasi() {
   const [tab, setTab] = useState<string>("tugas");
@@ -30,14 +30,7 @@ export default function Informasi() {
 
         <div className='mt-2 row g-4'>
           <div className='col-12 col-md-3'>
-            <div className='mb-2'>
-              <div className='mb-2'>
-                <button className='btn btn-primary w-100'>
-                  <IconPlus />
-                  Tambah Presensi
-                </button>
-              </div>
-            </div>
+            <div className='subheader'>aksi</div>
             <div className='mb-2'>
               <div className='list-group list-group-transparent mb-3'>
                 <a

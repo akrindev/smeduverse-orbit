@@ -1,10 +1,16 @@
+"use client";
+
+import Footer from "./Footer/Footer";
 import Header from "./Header/Header";
 
 export default function Layout({ children }) {
   return (
     <div className='page'>
       <Header />
-      <div className='page-wrapper'>{children}</div>
+      <div className='page-wrapper'>
+        {children}
+        <Footer />
+      </div>
     </div>
   );
 }

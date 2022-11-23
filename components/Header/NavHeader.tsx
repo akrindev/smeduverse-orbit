@@ -1,3 +1,5 @@
+"use client";
+
 export default function NavHeader({ onClick }) {
   return (
     <header className='navbar navbar-expand-md navbar-light d-print-none'>
