@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { IconPlus } from "@tabler/icons";
-import Layout from "../../components/Layout";
-import ModulInformation from "../../components/Pages/Modul/ModulInformation";
-import Tugas from "../../components/Pages/Modul/Tab/Tugas";
-import Materi from "../../components/Pages/Modul/Tab/Materi";
-import Presensi from "../../components/Pages/Modul/Tab/Presensi";
-import Siswa from "../../components/Pages/Modul/Tab/Siswa";
+import Layout from "../../../components/Layout";
+import ModulInformation from "../../../components/Pages/Modul/ModulInformation";
+import Tugas from "../../../components/Pages/Modul/Tab/Tugas";
+import Materi from "../../../components/Pages/Modul/Tab/Materi";
+import Presensi from "../../../components/Pages/Modul/Tab/Presensi";
+import Siswa from "../../../components/Pages/Modul/Tab/Siswa";
 
 export default function Informasi() {
   const [tab, setTab] = useState<string>("tugas");
