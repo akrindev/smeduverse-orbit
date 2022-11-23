@@ -68,7 +68,7 @@ const ActionStatus = ({ name }: { name: string }) => {
           id={`action-status-${id}`}
           checked
         />
-        <label type='button' htmlFor={`action-status-${id}`} className='btn'>
+        <label htmlFor={`action-status-${id}`} className='btn'>
           Hadir
         </label>
         <input
@@ -77,7 +77,7 @@ const ActionStatus = ({ name }: { name: string }) => {
           name={`action-status-${id}`}
           id={`action-status-${id}`}
         />
-        <label type='button' htmlFor={`action-status-${id}`} className='btn'>
+        <label htmlFor={`action-status-${id}`} className='btn'>
           Izin
         </label>
         <input
@@ -86,7 +86,7 @@ const ActionStatus = ({ name }: { name: string }) => {
           name={`action-status-${id}`}
           id={`action-status-${id}`}
         />
-        <label type='button' htmlFor={`action-status-${id}`} className='btn'>
+        <label htmlFor={`action-status-${id}`} className='btn'>
           Sakit
         </label>
         <input
@@ -95,7 +95,7 @@ const ActionStatus = ({ name }: { name: string }) => {
           name={`action-status-${id}`}
           id={`action-status-${id}`}
         />
-        <label type='button' htmlFor={`action-status-${id}`} className='btn'>
+        <label htmlFor={`action-status-${id}`} className='btn'>
           Alpa
         </label>
       </div>
