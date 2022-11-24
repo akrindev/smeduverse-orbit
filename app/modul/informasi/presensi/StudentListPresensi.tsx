@@ -30,6 +30,7 @@ export default function StudentListPresensi() {
             <tr>
               <th>Nama</th>
               <th>Status Kehadiran</th>
+              <th>Updated</th>
             </tr>
           </thead>
           <tbody>
@@ -50,6 +51,9 @@ export default function StudentListPresensi() {
                 </td>
                 <td>
                   <ActionStatus name={name} key={name} />
+                </td>
+                <td>
+                  <div className='text-muted small'>22 November 2022 07:15</div>
                 </td>
               </tr>
             ))}
