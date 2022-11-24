@@ -29,7 +29,7 @@ export default function Presensi() {
             </thead>
             <tbody>
               {[1, 2, 3, 4, 5].map((id) => (
-                <tr>
+                <tr key={id}>
                   <td>
                     <div className='d-flex py-1 align-items-center'>
                       <div className='flex-fill'>

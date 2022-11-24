@@ -1,7 +1,7 @@
 "use client";
 
 import Layout from "../../../../components/Layout";
-import ListSiswa from "../../../../components/Pages/Presensi/ListSiswa";
+import StudentListPresensi from "./StudentListPresensi";
 
 export default function PresensiIndex() {
   return (
@@ -51,7 +51,7 @@ export default function PresensiIndex() {
             </form>
           </div>
           <div className='col-md-8'>
-            <ListSiswa />
+            <StudentListPresensi key={`list-presensi-siswa`} />
           </div>
         </div>
       </Layout.Body>
