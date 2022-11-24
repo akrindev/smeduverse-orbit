@@ -1,13 +1,26 @@
 "use client";
 
+import { IconChevronLeft } from "@tabler/icons";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Layout from "../../../../components/Layout";
 import StudentListPresensi from "./StudentListPresensi";
 
 export default function PresensiIndex() {
+  const router = useRouter();
+
   return (
     <>
       <Layout.Header>
         <div className='col'>
+          <Link
+            href={`/modul/informasi`}
+            className='page-pretitle'
+            style={{
+              cursor: `pointer`,
+            }}>
+            <IconChevronLeft className='icon inline-icon' /> KEMBALI
+          </Link>
           <h2 className='page-title'>Presensi</h2>
         </div>
       </Layout.Header>
