@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { IconPlus } from "@tabler/icons";
 import Layout from "../../../components/Layout";
@@ -18,7 +20,7 @@ export default function Informasi() {
   };
 
   return (
-    <Layout>
+    <>
       <Layout.Header>
         <div className='col'>
           {/* <div className='page-pretitle'>Overview</div> */}
@@ -74,6 +76,6 @@ export default function Informasi() {
           <div className='col-12 col-md-9'>{tabs[tab]}</div>
         </div>
       </Layout.Body>
-    </Layout>
+    </>
   );
 }
