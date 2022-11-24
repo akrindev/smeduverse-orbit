@@ -1,6 +1,6 @@
 "use client";
 
-import "@tabler/core/src/scss/tabler.scss";
+import "@tabler/core/dist/css/tabler.min.css";
 import Layout from "../components/Layout";
 
 export default function RootLayout({

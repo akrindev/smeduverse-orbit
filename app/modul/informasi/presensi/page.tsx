@@ -1,9 +1,11 @@
+"use client";
+
 import Layout from "../../../../components/Layout";
 import ListSiswa from "../../../../components/Pages/Presensi/ListSiswa";
 
 export default function PresensiIndex() {
   return (
-    <Layout>
+    <>
       <Layout.Header>
         <div className='col'>
           <h2 className='page-title'>Presensi</h2>
@@ -53,6 +55,6 @@ export default function PresensiIndex() {
           </div>
         </div>
       </Layout.Body>
-    </Layout>
+    </>
   );
 }

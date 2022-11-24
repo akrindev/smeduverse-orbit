@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { IconPlus, IconUserCheck } from "@tabler/icons";
 
 export default function Presensi() {
@@ -6,10 +7,14 @@ export default function Presensi() {
       <div className='col g-2 mb-2'>
         <div className='col-auto ms-auto d-print-none'>
           <div className='btn-list'>
-            <a href='#' className='btn btn-outline-primary'>
-              <IconPlus className='icon icon-inline' />
-              Buat Presensi
-            </a>
+            <Link
+              href={`/modul/informasi/presensi`}
+              className='btn btn-outline-primary'>
+              <>
+                <IconPlus className='icon icon-inline' />
+                Buat Presensi
+              </>
+            </Link>
           </div>
         </div>
       </div>
