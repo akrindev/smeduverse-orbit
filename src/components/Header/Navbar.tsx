@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { IconFileAnalytics } from "@tabler/icons-react";
+import { IconFileAnalytics, IconSettings } from "@tabler/icons-react";
 import { IconBook2 } from "@tabler/icons-react";
 import { IconHome } from "@tabler/icons-react";
 import Link from "next/link";
@@ -43,6 +43,11 @@ export default function Navbar({ showNavbar }: { showNavbar: boolean }) {
       title: "Rekap Penilaian",
       icon: <IconFileAnalytics />,
       link: "/rekap-penilaian",
+    },
+    {
+      title: "Pengaturan",
+      icon: <IconSettings />,
+      link: "/pengaturan",
     },
   ];
 

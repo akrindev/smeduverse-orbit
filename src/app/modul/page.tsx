@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { IconPlus } from "@tabler/icons-react";
-import Layout from "@/components/Layout";
+import { LayoutHeader } from "@/components/Layout";
 import ModulSection from "@/components/Pages/Modul/ModulSection";
 
 export default function Modul() {
@@ -13,7 +13,7 @@ export default function Modul() {
 
   return (
     <>
-      <Layout.Header>
+      <LayoutHeader>
         <div className='row g-2 align-items-center'>
           <div className='col'>
             <div className='page-pretitle'>Overview</div>
@@ -49,10 +49,9 @@ export default function Modul() {
             </div>
           </div>
         </div>
-      </Layout.Header>
-      <Layout.Body>
-        <ModulSection />
-      </Layout.Body>
+      </LayoutHeader>
+
+      <ModulSection />
     </>
   );
 }

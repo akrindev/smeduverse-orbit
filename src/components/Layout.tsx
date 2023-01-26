@@ -9,20 +9,16 @@ export default function Layout({ children }: PropsWithChildren) {
     <div className='page'>
       <Header />
       <div className='page-wrapper'>
-        {children}
+        <div className='page-body'>
+          <div className='container-xl'>{children}</div>
+        </div>
         <Footer />
       </div>
     </div>
   );
 }
 
-Layout.Body = ({ children }: PropsWithChildren) => (
-  <div className='page-body'>
-    <div className='container-xl'>{children}</div>
-  </div>
-);
-
-Layout.Header = ({ children }: PropsWithChildren) => (
+export const LayoutHeader = ({ children }: PropsWithChildren) => (
   <div className='page-header d-print-none'>
     <div className='container-xl'>{children}</div>
   </div>
