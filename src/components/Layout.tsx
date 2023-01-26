@@ -19,7 +19,5 @@ export default function Layout({ children }: PropsWithChildren) {
 }
 
 export const LayoutHeader = ({ children }: PropsWithChildren) => (
-  <div className='page-header d-print-none'>
-    <div className='container-xl'>{children}</div>
-  </div>
+  <div className='mb-3'>{children}</div>
 );
