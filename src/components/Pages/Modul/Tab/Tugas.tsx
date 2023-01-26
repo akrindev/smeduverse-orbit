@@ -1,4 +1,4 @@
-import { IconBook2, IconClock } from "@tabler/icons";
+import { IconBook2, IconClock } from "@tabler/icons-react";
 
 const tugas = [
   "Buatlah 5 contoh Noun Phrase",

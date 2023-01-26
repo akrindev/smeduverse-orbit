@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { IconPlus, IconUserCheck } from "@tabler/icons";
+import { IconPlus, IconUserCheck } from "@tabler/icons-react";
 
 export default function Presensi() {
   return (

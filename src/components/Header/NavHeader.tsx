@@ -1,6 +1,4 @@
-"use client";
-
-export default function NavHeader({ onClick }) {
+export default function NavHeader({ onClick }: {onClick: React.MouseEventHandler}) {
   return (
     <header className='navbar navbar-expand-md navbar-light d-print-none'>
       <div className='container-xl'>

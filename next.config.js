@@ -3,10 +3,6 @@ const nextConfig = {
   experimental: {
     appDir: true,
   },
-  reactStrictMode: true,
-  typescript: {
-    ignoreBuildErrors: true,
-  },
 };
 
 module.exports = nextConfig;

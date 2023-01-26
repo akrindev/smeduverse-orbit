@@ -1,17 +1,23 @@
 "use client";
 
 import { useMemo } from "react";
-import { IconFileAnalytics } from "@tabler/icons";
-import { IconBook2 } from "@tabler/icons";
-import { IconHome } from "@tabler/icons";
+import { IconFileAnalytics } from "@tabler/icons-react";
+import { IconBook2 } from "@tabler/icons-react";
+import { IconHome } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const NavbarItem = ({ title, icon, link }) => {
-  const pathname = usePathname();
+interface INavbarItem {
+  title: string;
+  icon: React.ReactNode | undefined;
+  link: string;
+}
+
+const NavbarItem = ({ title, icon, link }: INavbarItem) => {
+  const pathname: string | null = usePathname();
 
   const isActive = useMemo(
-    () => pathname.split("/")[1] == link.replace("/", ""),
+    () => pathname && pathname.split("/")[1] == link.replace("/", ""),
     [pathname, link]
   );
 
@@ -28,8 +34,9 @@ const NavbarItem = ({ title, icon, link }) => {
     </li>
   );
 };
-export default function Navbar({ showNavbar }) {
-  const routes = [
+
+export default function Navbar({ showNavbar }: { showNavbar: boolean }) {
+  const routes: Array<INavbarItem> = [
     { title: "Home", icon: <IconHome />, link: "/" },
     { title: "Modul", icon: <IconBook2 />, link: "/modul" },
     {

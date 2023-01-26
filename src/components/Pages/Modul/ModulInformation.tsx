@@ -1,4 +1,4 @@
-import { IconCheck } from "@tabler/icons";
+import { IconCheck } from "@tabler/icons-react";
 
 export default function ModulInformation() {
   return (

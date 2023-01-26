@@ -1,6 +1,6 @@
 "use client";
 
-import { IconChevronLeft } from "@tabler/icons";
+import { IconChevronLeft } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Layout from "../../../../components/Layout";
