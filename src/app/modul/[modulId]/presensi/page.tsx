@@ -1,26 +1,19 @@
 "use client";
 
+import { IModulParams } from "@/types/modul-page";
 import { IconChevronLeft } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LayoutHeader } from "../../../../components/Layout";
 import StudentListPresensi from "./StudentListPresensi";
 
-export default function PresensiIndex() {
+export default function PresensiIndex({ params }: IModulParams) {
   const router = useRouter();
 
   return (
     <>
       <LayoutHeader>
         <div className='col'>
-          <Link
-            href={`/modul/informasi`}
-            className='page-pretitle'
-            style={{
-              cursor: `pointer`,
-            }}>
-            <IconChevronLeft className='icon inline-icon' /> KEMBALI
-          </Link>
           <h2 className='page-title'>Presensi</h2>
         </div>
       </LayoutHeader>

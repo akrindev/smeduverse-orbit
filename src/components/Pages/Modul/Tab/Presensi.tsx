@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { IconPlus, IconUserCheck } from "@tabler/icons-react";
 
-export default function Presensi() {
+export default function Presensi({ modulId }: { modulId: string | number }) {
   return (
     <>
       <div className='col g-2 mb-2'>
         <div className='col-auto ms-auto d-print-none'>
           <div className='btn-list'>
             <Link
-              href={`/modul/informasi/presensi`}
+              href={`/modul/${modulId}/presensi`}
               className='btn btn-outline-primary'>
               <>
                 <IconPlus className='icon icon-inline' />
@@ -33,9 +33,11 @@ export default function Presensi() {
                   <td>
                     <div className='d-flex py-1 align-items-center'>
                       <div className='flex-fill'>
-                        <a href='#' className='font-weight-medium'>
+                        <Link
+                          href={`/modul/${modulId}/presensi?presensiId=${id}`}
+                          className='font-weight-medium'>
                           #{id} presensi 22 November 2022
-                        </a>
+                        </Link>
                         <div className='text-muted'>
                           <span className='text-reset'>22 November 2022</span>
                         </div>
