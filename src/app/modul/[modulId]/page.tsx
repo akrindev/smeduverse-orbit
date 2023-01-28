@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { IconPlus } from "@tabler/icons-react";
 import { LayoutHeader } from "@/components/Layout";
 import ModulInformation from "@/components/Pages/Modul/ModulInformation";
@@ -10,20 +10,37 @@ import Presensi from "@/components/Pages/Modul/Tab/Presensi";
 import Siswa from "@/components/Pages/Modul/Tab/Siswa";
 import { IModulParams } from "@/types/modul-page";
 
-export default function InformasiModulPage({
-  params,
-  searchParams,
-}: IModulParams) {
-  const [tab, setTab] = useState<string>("presensi");
+type Tab = {
+  title: string;
+  component: React.ReactNode;
+  count?: number | string | null;
+};
 
-  const tabs = {
-    tugas: <Tugas />,
-    materi: <Materi />,
-    presensi: (
-      <Presensi modulId={params.modulId} presensiId={searchParams.presensiId} />
-    ),
-    siswa: <Siswa />,
-  };
+export default function InformasiModulPage({ params }: IModulParams) {
+  const [tab, setTab] = useState<number>(0);
+
+  const tabs: Array<Tab> = [
+    {
+      title: "Presensi",
+      component: <Presensi modulId={params.modulId} />,
+      count: 21,
+    },
+    {
+      title: "Materi",
+      component: <Materi modulId={params.modulId} />,
+      count: 21,
+    },
+    {
+      title: "Tugas",
+      component: <Tugas />,
+      count: 21,
+    },
+    {
+      title: "Anggota (Siswa)",
+      component: <Siswa />,
+      count: 21,
+    },
+  ];
 
   return (
     <>
@@ -41,41 +58,20 @@ export default function InformasiModulPage({
           <div className='subheader'>MENU</div>
           <div className='mb-2'>
             <div className='list-group list-group-transparent mb-3'>
-              <span
-                className={`list-group-item list-group-item-action d-flex align-items-center ${
-                  tab == "presensi" && "active"
-                }`}
-                onClick={() => setTab("presensi")}>
-                Presensi
-                <small className='text-muted ms-auto'>5</small>
-              </span>
-              <span
-                className={`list-group-item list-group-item-action d-flex align-items-center ${
-                  tab == "tugas" && "active"
-                }`}
-                onClick={() => setTab("tugas")}>
-                Tugas<small className='text-muted ms-auto'>4</small>
-              </span>
-              <span
-                className={`list-group-item list-group-item-action d-flex align-items-center ${
-                  tab == "materi" && "active"
-                }`}
-                onClick={() => setTab("materi")}>
-                Materi
-                <small className='text-muted ms-auto'>9</small>
-              </span>
-              <span
-                className={`list-group-item list-group-item-action d-flex align-items-center ${
-                  tab == "siswa" && "active"
-                }`}
-                onClick={() => setTab("siswa")}>
-                Siswa
-                <small className='text-muted ms-auto'>32</small>
-              </span>
+              {tabs.map((item, index) => (
+                <span
+                  className={`list-group-item list-group-item-action d-flex align-items-center cursor-pointer ${
+                    index == tab && "active"
+                  }`}
+                  onClick={() => setTab(index)}>
+                  {item.title}
+                  <small className='text-muted ms-auto'>{item.count}</small>
+                </span>
+              ))}
             </div>
           </div>
         </div>
-        <div className='col-12 col-md-9'>{tabs[tab]}</div>
+        <div className='col-12 col-md-9'>{tabs[tab].component}</div>
       </div>
     </>
   );
