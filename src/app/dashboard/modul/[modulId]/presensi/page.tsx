@@ -4,7 +4,7 @@ import { IModulParams } from "@/types/modul-page";
 import { IconChevronLeft } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LayoutHeader } from "../../../../components/Layout";
+import { LayoutHeader } from "../../../../../components/Layout";
 import StudentListPresensi from "./StudentListPresensi";
 
 export default function PresensiIndex({ params }: IModulParams) {

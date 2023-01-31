@@ -8,7 +8,7 @@ export default function MateriTab({ modulId }: { modulId: string | number }) {
         <div className='col-auto ms-auto d-print-none'>
           <div className='btn-list'>
             <Link
-              href={`/modul/${modulId}/tambah-materi`}
+              href={`/dashboard/modul/${modulId}/tambah-materi`}
               className='btn btn-outline-primary'>
               <>
                 <IconPlus className='icon icon-inline' />
@@ -34,7 +34,7 @@ export default function MateriTab({ modulId }: { modulId: string | number }) {
                     <div className='d-flex py-1 align-items-center'>
                       <div className='flex-fill'>
                         <Link
-                          href={`/modul/${modulId}/materi?materiId=${id}`}
+                          href={`/dashboard/modul/${modulId}/materi?materiId=${id}`}
                           className='font-weight-medium'>
                           #{id} Procedure Text
                         </Link>
