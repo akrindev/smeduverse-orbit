@@ -1,7 +1,6 @@
 import { Inter } from "@next/font/google";
 import "./globals.css";
 import "@tabler/core/dist/css/tabler.css";
-import Layout from "../components/Layout";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,9 +12,7 @@ export default function RootLayout({
   return (
     <html>
       <head />
-      <body className={inter.className}>
-        <Layout>{children}</Layout>
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }

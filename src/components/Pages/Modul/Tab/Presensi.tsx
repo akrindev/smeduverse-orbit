@@ -8,7 +8,7 @@ export default function Presensi({ modulId }: { modulId: string | number }) {
         <div className='col-auto ms-auto d-print-none'>
           <div className='btn-list'>
             <Link
-              href={`/modul/${modulId}/presensi`}
+              href={`/dashboard/modul/${modulId}/presensi`}
               className='btn btn-outline-primary'>
               <>
                 <IconPlus className='icon icon-inline' />
@@ -34,7 +34,7 @@ export default function Presensi({ modulId }: { modulId: string | number }) {
                     <div className='d-flex py-1 align-items-center'>
                       <div className='flex-fill'>
                         <Link
-                          href={`/modul/${modulId}/presensi?presensiId=${id}`}
+                          href={`/dashboard/modul/${modulId}/presensi?presensiId=${id}`}
                           className='font-weight-medium'>
                           #{id} presensi 22 November 2022
                         </Link>

@@ -60,6 +60,7 @@ export default function InformasiModulPage({ params }: IModulParams) {
             <div className='list-group list-group-transparent mb-3'>
               {tabs.map((item, index) => (
                 <span
+                  key={item.title}
                   className={`list-group-item list-group-item-action d-flex align-items-center cursor-pointer ${
                     index == tab && "active"
                   }`}

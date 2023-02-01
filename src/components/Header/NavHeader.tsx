@@ -1,4 +1,10 @@
-export default function NavHeader({ onClick }: {onClick: React.MouseEventHandler}) {
+import Image from "next/image";
+
+export default function NavHeader({
+  onClick,
+}: {
+  onClick: React.MouseEventHandler;
+}) {
   return (
     <header className='navbar navbar-expand-md navbar-light d-print-none'>
       <div className='container-xl'>
@@ -7,14 +13,14 @@ export default function NavHeader({ onClick }: {onClick: React.MouseEventHandler
         </button>
         <h1 className='navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3'>
           <a href='.'>
-            {/* <img
-                src='./static/logo-small.svg'
-                width='32'
-                height='32'
-                alt='Tabler'
-                className='navbar-brand-image me-3'
-              /> */}
-            Orbit
+            <Image
+              src={`/orbit.png`}
+              width='32'
+              height='32'
+              alt='Smeduverse Orbit'
+              className='navbar-brand-image me-3'
+            />
+            Smeduverse Orbit
           </a>
         </h1>
         <div className='navbar-nav flex-row order-md-last'>
