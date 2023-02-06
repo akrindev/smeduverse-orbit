@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { IconPlus, IconUserCheck } from "@tabler/icons-react";
+import { IconCalendarTime, IconPlus, IconUserCheck } from "@tabler/icons-react";
 
 export default function Presensi({ modulId }: { modulId: string | number }) {
   return (
@@ -13,6 +13,14 @@ export default function Presensi({ modulId }: { modulId: string | number }) {
               <>
                 <IconPlus className='icon icon-inline' />
                 Buat Presensi
+              </>
+            </Link>
+            <Link
+              href={`/dashboard/modul/${modulId}/rekap-presensi`}
+              className='btn btn-outline-primary'>
+              <>
+                <IconCalendarTime className='icon icon-inline' />
+                Rekap Presensi
               </>
             </Link>
           </div>
