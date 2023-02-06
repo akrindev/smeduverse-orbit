@@ -21,7 +21,7 @@ export default function PresensiIndex({ params }: IModulParams) {
         <div className='col-md-4'>
           <form className='card'>
             <div className='card-header'>
-              <h3 className='card-title'>Horizontal form</h3>
+              <h3 className='card-title'>Informasi Umum</h3>
             </div>
             <div className='card-body'>
               <div className='mb-3'>
