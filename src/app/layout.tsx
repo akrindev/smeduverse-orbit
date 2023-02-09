@@ -1,6 +1,9 @@
+"use client";
+
 import { Inter } from "@next/font/google";
 import "./globals.css";
 import "@tabler/core/dist/css/tabler.css";
+import { SessionProvider } from "next-auth/react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -12,7 +15,9 @@ export default function RootLayout({
   return (
     <html>
       <head />
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <SessionProvider>{children}</SessionProvider>
+      </body>
     </html>
   );
 }
