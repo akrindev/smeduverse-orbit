@@ -6,10 +6,8 @@ export default function DashboardPage() {
   const { data, status } = useSession();
 
   if (status == "loading") {
-    return "loading dulu cuy";
+    return "mendapatkan data";
   }
-
-  console.log(data);
 
   return <>Hello Smeduverse Orbit Dashboard {data && data.user.email}</>;
 }

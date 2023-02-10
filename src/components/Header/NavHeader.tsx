@@ -1,5 +1,7 @@
-import { signOut } from "next-auth/react";
+import { ISession } from "@/types/session";
+import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
+import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 
 export default function NavHeader({
@@ -8,6 +10,7 @@ export default function NavHeader({
   onClick: React.MouseEventHandler;
 }) {
   const [show, setShow] = useState(false);
+  const { data, status } = useSession();
 
   const trigger = useRef(null);
   const dropdown = useRef(null);
@@ -45,7 +48,7 @@ export default function NavHeader({
   });
 
   useEffect(() => {
-    console.log(sidebarExpanded);
+    // console.log(sidebarExpanded);
   }, [sidebarExpanded]);
 
   return (
@@ -67,35 +70,39 @@ export default function NavHeader({
           </a>
         </h1>
         <div className='navbar-nav flex-row order-md-last'>
-          <div className='nav-item dropdown'>
-            <a
-              ref={trigger}
-              onClick={(e) => setShow(!show)}
-              href='#'
-              data-bs-toggle='dropdown'
-              className={`nav-link d-flex lh-1 text-reset p-0 ${
-                show && "show"
-              }`}>
-              <span className='avatar avatar-sm'></span>
-              <div className='d-none d-xl-block ps-2'>
-                <div>Kellie Skingley</div>
-                <div className='mt-1 small text-muted'>Teacher</div>
+          {status == "loading" ? (
+            "loading"
+          ) : (
+            <div className='nav-item dropdown'>
+              <a
+                ref={trigger}
+                onClick={(e) => setShow(!show)}
+                href='#'
+                data-bs-toggle='dropdown'
+                className={`nav-link d-flex lh-1 text-reset p-0 ${
+                  show && "show"
+                }`}>
+                <span className='avatar avatar-sm'></span>
+                <div className='d-none d-xl-block ps-2'>
+                  <div>{data.user?.username || "name"}</div>
+                  <div className='mt-1 small text-muted'>Teacher</div>
+                </div>
+              </a>
+              <div
+                ref={dropdown}
+                className={`dropdown-menu dropdown-menu-end dropdown-menu-arrow ${
+                  show && "show"
+                }`}>
+                {/* <div className='dropdown-divider'></div> */}
+                <Link href='/dashboard/pengaturan' className='dropdown-item'>
+                  Settings
+                </Link>
+                <a href='#' onClick={() => signOut()} className='dropdown-item'>
+                  Logout
+                </a>
               </div>
-            </a>
-            <div
-              ref={dropdown}
-              className={`dropdown-menu dropdown-menu-end dropdown-menu-arrow ${
-                show && "show"
-              }`}>
-              {/* <div className='dropdown-divider'></div> */}
-              <a href='./settings.html' className='dropdown-item'>
-                Settings
-              </a>
-              <a href='#' onClick={() => signOut()} className='dropdown-item'>
-                Logout
-              </a>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </header>

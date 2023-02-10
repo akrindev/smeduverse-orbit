@@ -2,16 +2,6 @@ import NextAuth, { DefaultSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import type { NextAuthOptions } from "next-auth";
 
-interface ISession extends DefaultSession {
-  user?: {
-    name?: string | null;
-    fullname?: string | null;
-    email?: string | null;
-    niy?: string | null;
-    roles?: Array<string> | string | null;
-  };
-}
-
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   // enabe JWT
@@ -82,7 +72,7 @@ export const authOptions: NextAuthOptions = {
     },
 
     // Extending session object
-    async session({ session, token, user }): Promise<ISession> {
+    async session({ session, token, user }) {
       session.user = token.user;
       return session;
     },
