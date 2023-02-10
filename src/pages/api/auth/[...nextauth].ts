@@ -1,7 +1,23 @@
-import NextAuth from "next-auth";
+import NextAuth, { DefaultSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import type { NextAuthOptions } from "next-auth";
 
-export const authOptions = {
+interface ISession extends DefaultSession {
+  user?: {
+    name?: string | null;
+    fullname?: string | null;
+    email?: string | null;
+    niy?: string | null;
+    roles?: Array<string> | string | null;
+  };
+}
+
+export const authOptions: NextAuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET,
+  // enabe JWT
+  session: {
+    strategy: "jwt",
+  },
   providers: [
     CredentialsProvider({
       // The name to display on the sign in form (e.g. 'Sign in with...')
@@ -34,7 +50,15 @@ export const authOptions = {
           }
         );
 
-        const user = await res.json();
+        const { access_token } = await res.json();
+
+        const user = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+            "Content-Type": "application/json",
+          },
+        }).then((res) => res.json());
 
         // If no error and we have user data, return it
         if (res.ok && user) {
@@ -47,6 +71,22 @@ export const authOptions = {
     }),
   ],
 
+  callbacks: {
+    // Assigning encoded token from API to token created in the session
+    async jwt({ token, user, account, profile }) {
+      if (user) {
+        token.user = user;
+        token.accessToken = account.access_token;
+      }
+      return token;
+    },
+
+    // Extending session object
+    async session({ session, token, user }): Promise<ISession> {
+      session.user = token.user;
+      return session;
+    },
+  },
   pages: {
     signIn: "/login",
   },

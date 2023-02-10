@@ -41,7 +41,7 @@ export default function LoginPage() {
     }).then((res) => {
       // set loading btn to idle
       setState((s) => "idle");
-      // console.log(res);
+      // console.log("signIn", res);
       if (res.ok) {
         router.push("/dashboard");
       } else {
