@@ -1,10 +1,53 @@
+import { signOut } from "next-auth/react";
 import Image from "next/image";
+import { useState, useEffect, useRef } from "react";
 
 export default function NavHeader({
   onClick,
 }: {
   onClick: React.MouseEventHandler;
 }) {
+  const [show, setShow] = useState(false);
+
+  const trigger = useRef(null);
+  const dropdown = useRef(null);
+
+  const storedSidebarExpanded = null;
+  const [sidebarExpanded, setSidebarExpanded] = useState(
+    storedSidebarExpanded === null ? false : storedSidebarExpanded === "true"
+  );
+
+  // close on click outside
+  useEffect(() => {
+    const clickHandler = ({ target }) => {
+      if (!dropdown.current || !trigger.current) return;
+      if (
+        !show ||
+        dropdown.current.contains(target) ||
+        trigger.current.contains(target)
+      )
+        // console.log("outside");
+        setShow(false);
+      // return;
+    };
+    document.addEventListener("click", clickHandler);
+    return () => document.removeEventListener("click", clickHandler);
+  });
+
+  // close if the esc key is pressed
+  useEffect(() => {
+    const keyHandler = ({ keyCode }) => {
+      if (!show || keyCode !== 27) return;
+      setShow(false);
+    };
+    document.addEventListener("keydown", keyHandler);
+    return () => document.removeEventListener("keydown", keyHandler);
+  });
+
+  useEffect(() => {
+    console.log(sidebarExpanded);
+  }, [sidebarExpanded]);
+
   return (
     <header className='navbar navbar-expand-md navbar-light d-print-none'>
       <div className='container-xl'>
@@ -25,28 +68,30 @@ export default function NavHeader({
         </h1>
         <div className='navbar-nav flex-row order-md-last'>
           <div className='nav-item dropdown'>
-            <a href='#' className='nav-link d-flex lh-1 text-reset p-0'>
+            <a
+              ref={trigger}
+              onClick={(e) => setShow(!show)}
+              href='#'
+              data-bs-toggle='dropdown'
+              className={`nav-link d-flex lh-1 text-reset p-0 ${
+                show && "show"
+              }`}>
               <span className='avatar avatar-sm'></span>
               <div className='d-none d-xl-block ps-2'>
                 <div>Kellie Skingley</div>
                 <div className='mt-1 small text-muted'>Teacher</div>
               </div>
             </a>
-            <div className='dropdown-menu dropdown-menu-end dropdown-menu-arrow'>
-              <a href='#' className='dropdown-item'>
-                Status
-              </a>
-              <a href='#' className='dropdown-item'>
-                Profile
-              </a>
-              <a href='#' className='dropdown-item'>
-                Feedback
-              </a>
-              <div className='dropdown-divider'></div>
+            <div
+              ref={dropdown}
+              className={`dropdown-menu dropdown-menu-end dropdown-menu-arrow ${
+                show && "show"
+              }`}>
+              {/* <div className='dropdown-divider'></div> */}
               <a href='./settings.html' className='dropdown-item'>
                 Settings
               </a>
-              <a href='./sign-in.html' className='dropdown-item'>
+              <a href='#' onClick={() => signOut()} className='dropdown-item'>
                 Logout
               </a>
             </div>
