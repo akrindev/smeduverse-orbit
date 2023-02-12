@@ -89,7 +89,7 @@ export default function LoginPage() {
                     <div className='mb-3'>
                       <label className='form-label'>NIY / Email</label>
                       <input 
-                        type='email'
+                        type='text'
                         name='email'
                         className='form-control'
                         placeholder='NIY / Email'

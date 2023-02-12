@@ -10,7 +10,12 @@ export default function NavHeader({
   onClick: React.MouseEventHandler;
 }) {
   const [show, setShow] = useState(false);
-  const { data, status } = useSession();
+  // get data and status from useSession
+  // overwrite typescript useSession to match the data from ISession
+  const { data, status } = useSession() as {
+    data: ISession;
+    status: "loading" | "authenticated" | "unauthenticated";
+  };
 
   const trigger = useRef(null);
   const dropdown = useRef(null);
@@ -82,9 +87,11 @@ export default function NavHeader({
                 className={`nav-link d-flex lh-1 text-reset p-0 ${
                   show && "show"
                 }`}>
-                <span className='avatar avatar-sm'></span>
+                <span className='avatar avatar-sm' style={{
+                  backgroundImage: `url(${data.user?.data.teacher.photo || "/avatar.png"})`
+                }}></span>
                 <div className='d-none d-xl-block ps-2'>
-                  <div>{data.user?.username || "name"}</div>
+                  <div>{data.user?.data.name || "name"}</div>
                   <div className='mt-1 small text-muted'>Teacher</div>
                 </div>
               </a>

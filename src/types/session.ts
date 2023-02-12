@@ -1,11 +1,23 @@
-import { DefaultSession } from "next-auth";
+import { DefaultSession, ISODateString } from "next-auth";
 
-export interface ISession extends DefaultSession {
-  user?: {
+interface IUserSession {
+  data?: {
+    id: string | null;
     name?: string | null;
-    fullname?: string | null;
     email?: string | null;
-    niy?: string | null;
     roles?: Array<string> | string | null;
+    teacher?: {
+      id: string
+      fullname: string
+      niy: string
+      photo: string
+      jenis_kelamin: string
+      tempat_lahir: string
+      tanggal_lahir: string
+    }
   };
+}
+export interface ISession {
+  user?: IUserSession;
+  expires: ISODateString;
 }
