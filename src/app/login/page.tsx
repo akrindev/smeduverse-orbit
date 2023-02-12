@@ -11,6 +11,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [csrfToken, setCsrfToken] = useState("");
   const [state, setState] = useState("idle");
+  const [error, setError] = useState(false);
 
   const router = useRouter();
 
@@ -46,6 +47,7 @@ export default function LoginPage() {
         router.push("/dashboard");
       } else {
         setPassword((p) => "");
+        setError((p) => true);
       }
     });
   };
@@ -73,6 +75,11 @@ export default function LoginPage() {
                   <h2 className='h2 text-center mb-4'>
                     Login to your orbit account
                   </h2>
+                  {error && (
+                    <div className='alert alert-danger'>
+                      <strong>Oops!</strong> NIY / Email atau password salah.
+                    </div>
+                  )}
                   <form onSubmit={handleSubmit} method='post'>
                     <input
                       type='hidden'
@@ -81,7 +88,7 @@ export default function LoginPage() {
                     />
                     <div className='mb-3'>
                       <label className='form-label'>NIY / Email</label>
-                      <input
+                      <input 
                         type='email'
                         name='email'
                         className='form-control'
