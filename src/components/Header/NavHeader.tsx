@@ -1,10 +1,61 @@
+import { ISession } from "@/types/session";
+import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
+import Link from "next/link";
+import { useState, useEffect, useRef } from "react";
 
 export default function NavHeader({
   onClick,
 }: {
   onClick: React.MouseEventHandler;
 }) {
+  const [show, setShow] = useState(false);
+  // get data and status from useSession
+  // overwrite typescript useSession to match the data from ISession
+  const { data, status } = useSession() as {
+    data: ISession;
+    status: "loading" | "authenticated" | "unauthenticated";
+  };
+
+  const trigger = useRef(null);
+  const dropdown = useRef(null);
+
+  const storedSidebarExpanded = null;
+  const [sidebarExpanded, setSidebarExpanded] = useState(
+    storedSidebarExpanded === null ? false : storedSidebarExpanded === "true"
+  );
+
+  // close on click outside
+  useEffect(() => {
+    const clickHandler = ({ target }) => {
+      if (!dropdown.current || !trigger.current) return;
+      if (
+        !show ||
+        dropdown.current.contains(target) ||
+        trigger.current.contains(target)
+      )
+        // console.log("outside");
+        setShow(false);
+      // return;
+    };
+    document.addEventListener("click", clickHandler);
+    return () => document.removeEventListener("click", clickHandler);
+  });
+
+  // close if the esc key is pressed
+  useEffect(() => {
+    const keyHandler = ({ keyCode }) => {
+      if (!show || keyCode !== 27) return;
+      setShow(false);
+    };
+    document.addEventListener("keydown", keyHandler);
+    return () => document.removeEventListener("keydown", keyHandler);
+  });
+
+  useEffect(() => {
+    // console.log(sidebarExpanded);
+  }, [sidebarExpanded]);
+
   return (
     <header className='navbar navbar-expand-md navbar-light d-print-none'>
       <div className='container-xl'>
@@ -24,33 +75,41 @@ export default function NavHeader({
           </a>
         </h1>
         <div className='navbar-nav flex-row order-md-last'>
-          <div className='nav-item dropdown'>
-            <a href='#' className='nav-link d-flex lh-1 text-reset p-0'>
-              <span className='avatar avatar-sm'></span>
-              <div className='d-none d-xl-block ps-2'>
-                <div>Kellie Skingley</div>
-                <div className='mt-1 small text-muted'>Teacher</div>
+          {status == "loading" ? (
+            "loading"
+          ) : (
+            <div className='nav-item dropdown'>
+              <a
+                ref={trigger}
+                onClick={(e) => setShow(!show)}
+                href='#'
+                data-bs-toggle='dropdown'
+                className={`nav-link d-flex lh-1 text-reset p-0 ${
+                  show && "show"
+                }`}>
+                <span className='avatar avatar-sm' style={{
+                  backgroundImage: `url(${data.user?.data.teacher.photo || "/avatar.png"})`
+                }}></span>
+                <div className='d-none d-xl-block ps-2'>
+                  <div>{data.user?.data.name || "name"}</div>
+                  <div className='mt-1 small text-muted'>Teacher</div>
+                </div>
+              </a>
+              <div
+                ref={dropdown}
+                className={`dropdown-menu dropdown-menu-end dropdown-menu-arrow ${
+                  show && "show"
+                }`}>
+                {/* <div className='dropdown-divider'></div> */}
+                <Link href='/dashboard/pengaturan' className='dropdown-item'>
+                  Settings
+                </Link>
+                <a href='#' onClick={() => signOut()} className='dropdown-item'>
+                  Logout
+                </a>
               </div>
-            </a>
-            <div className='dropdown-menu dropdown-menu-end dropdown-menu-arrow'>
-              <a href='#' className='dropdown-item'>
-                Status
-              </a>
-              <a href='#' className='dropdown-item'>
-                Profile
-              </a>
-              <a href='#' className='dropdown-item'>
-                Feedback
-              </a>
-              <div className='dropdown-divider'></div>
-              <a href='./settings.html' className='dropdown-item'>
-                Settings
-              </a>
-              <a href='./sign-in.html' className='dropdown-item'>
-                Logout
-              </a>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </header>
