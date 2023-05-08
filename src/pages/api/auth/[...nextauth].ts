@@ -31,11 +31,14 @@ export const authOptions: NextAuthOptions = {
         // e.g. return { id: 1, name: 'J Smith', email: 'jsmith@example.com' }
         // You can also use the `req` object to obtain additional parameters
         // (i.e., the request IP address)
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
-          method: "POST",
-          body: JSON.stringify(credentials),
-          headers: { "Content-Type": "application/json" },
-        });
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+          {
+            method: "POST",
+            body: JSON.stringify(credentials),
+            headers: { "Content-Type": "application/json" },
+          }
+        );
 
         const { access_token } = await res.json();
 
@@ -61,7 +64,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     // Assigning encoded token from API to token created in the session
     async jwt({ token, user, account, profile }) {
-      if (user) {
+      if (user && account) {
         token.user = user;
         token.accessToken = account.access_token;
       }
@@ -70,6 +73,7 @@ export const authOptions: NextAuthOptions = {
 
     // Extending session object
     async session({ session, token, user }) {
+      // @ts-expect-error
       session.user = token.user;
       return session;
     },

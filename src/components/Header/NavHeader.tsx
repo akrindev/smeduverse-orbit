@@ -1,4 +1,3 @@
-import { ISession } from "@/types/session";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,10 +11,8 @@ export default function NavHeader({
   const [show, setShow] = useState(false);
   // get data and status from useSession
   // overwrite typescript useSession to match the data from ISession
-  const { data, status } = useSession() as {
-    data: ISession;
-    status: "loading" | "authenticated" | "unauthenticated";
-  };
+
+  const { data, status } = useSession();
 
   const trigger = useRef<HTMLAnchorElement>(null);
   const dropdown = useRef<HTMLDivElement>(null);
@@ -90,11 +87,11 @@ export default function NavHeader({
                   className='avatar avatar-sm'
                   style={{
                     backgroundImage: `url(${
-                      data.user?.data.teacher.photo || "/avatar.png"
+                      data?.user?.data.teacher.photo || "/avatar.png"
                     })`,
                   }}></span>
                 <div className='d-none d-xl-block ps-2'>
-                  <div>{data.user?.data.name || "name"}</div>
+                  <div>{data?.user?.data.name || "name"}</div>
                   <div className='mt-1 small text-muted'>Teacher</div>
                 </div>
               </a>

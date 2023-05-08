@@ -2,14 +2,14 @@
 
 import { IconEye } from "@tabler/icons-react";
 import Image from "next/image";
-import { getCsrfToken, signIn } from "next-auth/react";
+import { SignInResponse, getCsrfToken, signIn } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [csrfToken, setCsrfToken] = useState("");
+  const [csrfToken, setCsrfToken] = useState<string | undefined>("");
   const [state, setState] = useState("idle");
   const [error, setError] = useState(false);
 
@@ -39,7 +39,7 @@ export default function LoginPage() {
       email,
       password,
       redirect: false,
-    }).then((res) => {
+    }).then((res: SignInResponse) => {
       // set loading btn to idle
       setState((s) => "idle");
       // console.log("signIn", res);
