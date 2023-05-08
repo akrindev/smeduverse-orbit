@@ -43,6 +43,7 @@ export default function LoginPage() {
       // set loading btn to idle
       setState((s) => "idle");
       // console.log("signIn", res);
+
       if (res.ok) {
         router.push("/dashboard");
       } else {
@@ -88,7 +89,7 @@ export default function LoginPage() {
                     />
                     <div className='mb-3'>
                       <label className='form-label'>NIY / Email</label>
-                      <input 
+                      <input
                         type='text'
                         name='email'
                         className='form-control'
