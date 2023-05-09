@@ -1,4 +1,3 @@
-import { ISession } from "@/types/session";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,13 +11,11 @@ export default function NavHeader({
   const [show, setShow] = useState(false);
   // get data and status from useSession
   // overwrite typescript useSession to match the data from ISession
-  const { data, status } = useSession() as {
-    data: ISession;
-    status: "loading" | "authenticated" | "unauthenticated";
-  };
 
-  const trigger = useRef(null);
-  const dropdown = useRef(null);
+  const { data, status } = useSession();
+
+  const trigger = useRef<HTMLAnchorElement>(null);
+  const dropdown = useRef<HTMLDivElement>(null);
 
   const storedSidebarExpanded = null;
   const [sidebarExpanded, setSidebarExpanded] = useState(
@@ -34,10 +31,9 @@ export default function NavHeader({
         dropdown.current.contains(target) ||
         trigger.current.contains(target)
       )
-        // console.log("outside");
         setShow(false);
-      // return;
     };
+
     document.addEventListener("click", clickHandler);
     return () => document.removeEventListener("click", clickHandler);
   });
@@ -87,11 +83,15 @@ export default function NavHeader({
                 className={`nav-link d-flex lh-1 text-reset p-0 ${
                   show && "show"
                 }`}>
-                <span className='avatar avatar-sm' style={{
-                  backgroundImage: `url(${data.user?.data.teacher.photo || "/avatar.png"})`
-                }}></span>
+                <span
+                  className='avatar avatar-sm'
+                  style={{
+                    backgroundImage: `url(${
+                      data?.user?.data.teacher.photo || "/avatar.png"
+                    })`,
+                  }}></span>
                 <div className='d-none d-xl-block ps-2'>
-                  <div>{data.user?.data.name || "name"}</div>
+                  <div>{data?.user?.data.name || "name"}</div>
                   <div className='mt-1 small text-muted'>Teacher</div>
                 </div>
               </a>
@@ -104,7 +104,13 @@ export default function NavHeader({
                 <Link href='/dashboard/pengaturan' className='dropdown-item'>
                   Settings
                 </Link>
-                <a href='#' onClick={() => signOut()} className='dropdown-item'>
+                <a
+                  href='#'
+                  onClick={(e) => {
+                    e.preventDefault();
+                    signOut();
+                  }}
+                  className='dropdown-item'>
                   Logout
                 </a>
               </div>

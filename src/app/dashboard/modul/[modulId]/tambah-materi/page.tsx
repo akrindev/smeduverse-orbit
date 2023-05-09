@@ -81,7 +81,7 @@ export default function MateriBaruPage() {
               <div className='mb-3'>
                 <FilePond
                   files={files}
-                  onupdatefiles={setFiles}
+                  // onupdatefiles={setFiles}
                   allowMultiple={true}
                   maxFiles={3}
                   server='/api'
