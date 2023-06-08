@@ -36,9 +36,16 @@ export const authOptions: NextAuthOptions = {
           {
             method: "POST",
             body: JSON.stringify(credentials),
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            cache: "no-store",
           }
-        );
+        ); //.then((res) => res.json());
+
+        // Any error will do
+        if (res.status !== 200) return null;
 
         const { access_token } = await res.json();
 
@@ -48,6 +55,7 @@ export const authOptions: NextAuthOptions = {
             Authorization: `Bearer ${access_token}`,
             "Content-Type": "application/json",
           },
+          cache: "no-store",
         }).then((res) => res.json());
 
         // If no error and we have user data, return it
@@ -83,4 +91,6 @@ export const authOptions: NextAuthOptions = {
   },
 };
 
-export default NextAuth(authOptions);
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };
