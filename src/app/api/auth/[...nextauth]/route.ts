@@ -85,6 +85,11 @@ export const authOptions: NextAuthOptions = {
       session.user = token.user;
       return session;
     },
+    // Redirect to home page after signin
+    async redirect({ url, baseUrl }) {
+      // console.log("redirect", url, baseUrl);
+      return `${baseUrl}/dashboard`;
+    },
   },
   pages: {
     signIn: "/login",
