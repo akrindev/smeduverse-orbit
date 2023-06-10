@@ -13,33 +13,31 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MD5 } from "crypto-js"; // import the MD5 function from the crypto-js library
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
-const email = "hi@syakirinamin.com";
-const hash = MD5(email.trim().toLowerCase()).toString(); // use the MD5 function to generate the hash and convert it to a string
-const avatarUrl = `https://www.gravatar.com/avatar/${hash}?s=200&d=identicon&r=pg`;
-
-// ...
-
-<AvatarImage src={avatarUrl} alt="@shadcn" />;
 export function UserNav() {
+  const { data } = useSession();
+
+  const user = data?.user;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
-            <AvatarImage src={avatarUrl} alt="@syakirinam" />
-            <AvatarFallback>SA</AvatarFallback>
+            <AvatarImage src={user?.teacher.photo} alt={user?.name!} />
+            <AvatarFallback>SM</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">Syakirin Amin</p>
+            <p className="text-sm font-medium leading-none">
+              {user?.teacher.fullname}
+            </p>
             <p className="text-xs leading-none text-muted-foreground">
-              hi@syakirinamin.com
+              NIY: {user?.teacher.niy}
             </p>
           </div>
         </DropdownMenuLabel>
