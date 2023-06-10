@@ -6,12 +6,20 @@ import { Button } from "@/components/ui/button";
 import {
   IconGridPattern,
   IconListDetails,
-  IconMicrophone,
   IconMusic,
   IconPlayerPlay,
+  IconReportAnalytics,
 } from "@tabler/icons-react";
+import { usePathname } from "next/navigation";
 
 export function Sidebar({ className }) {
+  const pathname = usePathname();
+  // change variant to default when the page is active
+  // this will highlight the menu item
+  function isActive(path) {
+    return pathname.startsWith(path) ? "default" : "ghost";
+  }
+
   return (
     <div className={cn("pb-12", className)}>
       <div className="space-y-4 py-4">
@@ -21,20 +29,28 @@ export function Sidebar({ className }) {
           </h2>
           <div className="space-y-1">
             <Button
-              variant="secondary"
+              variant={isActive("/dashboard")}
               size="sm"
               className="w-full justify-start"
             >
               <IconPlayerPlay className="mr-2 h-4 w-4" />
-              Listen Now
+              Dashboard
             </Button>
-            <Button variant="ghost" size="sm" className="w-full justify-start">
+            <Button
+              variant={isActive("/modul")}
+              size="sm"
+              className="w-full justify-start"
+            >
               <IconGridPattern className="mr-2 h-4 w-4" />
-              Browse
+              Modul
             </Button>
-            <Button variant="ghost" size="sm" className="w-full justify-start">
-              <IconMicrophone className="mr-2 h-4 w-4" />
-              Radio
+            <Button
+              variant={isActive("/rekap")}
+              size="sm"
+              className="w-full justify-start"
+            >
+              <IconReportAnalytics className="mr-2 h-4 w-4" />
+              Rekap Laporan
             </Button>
           </div>
         </div>

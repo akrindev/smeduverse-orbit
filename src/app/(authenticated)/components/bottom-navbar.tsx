@@ -11,10 +11,18 @@ import {
   IconGridPattern,
   IconMicrophone,
   IconPlayerPlay,
+  IconReportAnalytics,
 } from "@tabler/icons-react";
 import { Separator } from "@/components/ui/separator";
+import { usePathname } from "next/navigation";
 
 export function BottomNavbar({ className }: { className?: string }) {
+  const pathname = usePathname();
+  // change variant to default when the page is active
+  // this will highlight the menu item
+  function isActive(path) {
+    return pathname.startsWith(path) ? "default" : "ghost";
+  }
   return (
     <div
       className={cn(
@@ -23,18 +31,30 @@ export function BottomNavbar({ className }: { className?: string }) {
       )}
     >
       <Separator />
-      <div className="flex justify-around py-4">
-        <Button variant="ghost" size="sm" className="w-full justify-center">
+      <div className="flex justify-around py-4 px-2 space-x-2">
+        <Button
+          variant={isActive("/dashboard")}
+          size="sm"
+          className="w-full justify-center"
+        >
           <IconPlayerPlay className="mr-2 h-4 w-4" />
-          Listen Now
+          Dashboard
         </Button>
-        <Button variant="ghost" size="sm" className="w-full justify-center">
+        <Button
+          variant={isActive("/modul")}
+          size="sm"
+          className="w-full justify-center"
+        >
           <IconGridPattern className="mr-2 h-4 w-4" />
-          Browse
+          Modul
         </Button>
-        <Button variant="ghost" size="sm" className="w-full justify-center">
-          <IconMicrophone className="mr-2 h-4 w-4" />
-          Radio
+        <Button
+          variant={isActive("/rekap")}
+          size="sm"
+          className="w-full justify-center"
+        >
+          <IconReportAnalytics className="mr-2 h-4 w-4" />
+          Rekap
         </Button>
       </div>
     </div>
