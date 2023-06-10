@@ -14,10 +14,12 @@ import {
   IconReportAnalytics,
 } from "@tabler/icons-react";
 import { Separator } from "@/components/ui/separator";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { menuList } from "./menu-list";
 
 export function BottomNavbar({ className }: { className?: string }) {
   const pathname = usePathname();
+  const router = useRouter();
   // change variant to default when the page is active
   // this will highlight the menu item
   function isActive(path) {
@@ -32,30 +34,18 @@ export function BottomNavbar({ className }: { className?: string }) {
     >
       <Separator />
       <div className="flex justify-around py-4 px-2 space-x-2">
-        <Button
-          variant={isActive("/dashboard")}
-          size="sm"
-          className="w-full justify-center"
-        >
-          <IconPlayerPlay className="mr-2 h-4 w-4" />
-          Dashboard
-        </Button>
-        <Button
-          variant={isActive("/modul")}
-          size="sm"
-          className="w-full justify-center"
-        >
-          <IconGridPattern className="mr-2 h-4 w-4" />
-          Modul
-        </Button>
-        <Button
-          variant={isActive("/rekap")}
-          size="sm"
-          className="w-full justify-center"
-        >
-          <IconReportAnalytics className="mr-2 h-4 w-4" />
-          Rekap
-        </Button>
+        {menuList.map((item) => (
+          <Button
+            key={item.name}
+            variant={isActive(item.path)}
+            size="sm"
+            className="w-full justify-center"
+            onClick={() => router.push(item.path)}
+          >
+            <item.icon className="mr-2 h-4 w-4" />
+            {item.name}
+          </Button>
+        ))}
       </div>
     </div>
   );
