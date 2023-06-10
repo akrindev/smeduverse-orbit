@@ -1,11 +1,14 @@
-"use client";
-
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import ModulCard from "../components/ModulCard";
+import { Metadata } from "next";
 
-export default function Page() {
+export const metadata: Metadata = {
+  title: "Modul",
+  description: "Daftar semua modul yang telah dibuat",
+};
+
+export default async function Page() {
   // yourModul dummy data has key owner, cover, class, name mapel, status
   // cover is image url from random unsplash image
   // status must be boolean
