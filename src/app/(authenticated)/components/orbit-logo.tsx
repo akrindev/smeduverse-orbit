@@ -1,7 +1,7 @@
 // this is a component to display the Orbit logo
 // it is used in the header
+"use client";
 
-import React from "react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 

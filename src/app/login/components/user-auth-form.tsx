@@ -1,12 +1,10 @@
 "use client";
 
-import * as React from "react";
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { IconBrandGithub, IconLoader } from "@tabler/icons-react";
+import { IconLoader } from "@tabler/icons-react";
 import { SignInResponse, getCsrfToken, signIn } from "next-auth/react";
 
 import { useEffect, useState } from "react";
