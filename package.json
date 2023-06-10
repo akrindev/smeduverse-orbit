@@ -39,6 +39,7 @@
     "autoprefixer": "^10.4.14",
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",
+    "crypto-js": "^4.1.1",
     "date-fns": "^2.29.3",
     "filepond": "^4.30.4",
     "lucide-react": "^0.241.0",
