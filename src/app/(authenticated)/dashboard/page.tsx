@@ -33,10 +33,17 @@ export default function Page() {
   // status must be boolean
   // owner is teacher name in this example there was 3 teacher
   // mapel is matematika, fisika, kimia, biologi, bahasa indonesia, bahasa inggris, pkn, sejarah, geografi, ekonomi, sosiologi
-  const yourModul = [
+  const yourModul: Array<{
+    id: string;
+    owner: string;
+    cover: string;
+    class: string;
+    mapel: string;
+    status: boolean;
+  }> = [
     {
       id: Math.random().toString(36),
-      owner: "Muhammad Fauzan",
+      owner: "Syakirin Amin",
       cover: "https://picsum.photos/seed/picsum/500/500",
       class: "XII IPA 2",
       mapel: "Matematika",
@@ -60,7 +67,7 @@ export default function Page() {
     },
     {
       id: Math.random().toString(36),
-      owner: "Muhammad Fauzan",
+      owner: "Syakirin Amin",
       cover: "https://picsum.photos/seed/picsum/500/500",
       class: "XII IPA 2",
       mapel: "Biologi",
@@ -84,7 +91,7 @@ export default function Page() {
     },
     {
       id: Math.random().toString(36),
-      owner: "Muhammad Fauzan",
+      owner: "Syakirin Amin",
       cover: "https://picsum.photos/seed/picsum/500/500",
       class: "XII IPA 2",
       mapel: "PKN",
@@ -153,13 +160,15 @@ export default function Page() {
           <div className="relative">
             <ScrollArea>
               <div className="grid grid-cols-12 gap-5">
-                {yourModul.map((modul) => (
-                  <ModulCard
-                    key={modul.mapel}
-                    modul={modul}
-                    className="cursor-pointer"
-                  />
-                ))}
+                {yourModul
+                  .filter((m) => m.owner === "Syakirin Amin")
+                  .map((modul) => (
+                    <ModulCard
+                      key={modul.mapel}
+                      modul={modul as any}
+                      className="cursor-pointer"
+                    />
+                  ))}
               </div>
               <ScrollBar orientation="horizontal" />
             </ScrollArea>
