@@ -50,26 +50,40 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       email,
       password,
       redirect: false,
-    }).then((res: SignInResponse) => {
-      // if there was an error
-      if (res.error) {
-        // show an error toast
-        toast({
-          title: "Error",
-          description: "Identitas masih salah",
-          variant: "destructive",
-        });
+    })
+      .then((res: SignInResponse) => {
+        // if there was an error
+        if (res.error) {
+          // show an error toast
+          toast({
+            title: "Error",
+            description: "Identitas masih salah",
+            variant: "destructive",
+          });
 
-        // then reset the password field
-        setPassword((prev) => "");
+          // then reset the password field
+          setPassword((prev) => "");
 
-        // then autofocus the password field
-        passwordRef.current?.focus();
-      }
+          // then autofocus the password field
+          passwordRef.current?.focus();
+        }
 
-      // reset the loading state
-      setIsLoading(false);
-    });
+        // if there was no error
+        if (!res.error) {
+          // show a success toast
+          toast({
+            title: "Success",
+            description: "Berhasil masuk",
+          });
+
+          // then redirect the user to the home page
+          router.push("/dashboard");
+        }
+      })
+      .finally(() => {
+        // reset the loading state
+        setIsLoading(false);
+      });
   }
 
   return (
