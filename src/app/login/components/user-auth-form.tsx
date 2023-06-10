@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { IconLoader } from "@tabler/icons-react";
 import { SignInResponse, getCsrfToken, signIn } from "next-auth/react";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -18,6 +18,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [csrfToken, setCsrfToken] = useState<string | undefined>("");
+
+  const passwordRef = useRef<HTMLInputElement>(null);
 
   const { toast } = useToast();
 
@@ -47,7 +49,6 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     signIn("credentials", {
       email,
       password,
-      callbackUrl: "/",
       redirect: false,
     }).then((res: SignInResponse) => {
       // if there was an error
@@ -58,9 +59,12 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
           description: "Identitas masih salah",
           variant: "destructive",
         });
-      } else {
-        // otherwise, redirect to the homepage
-        router.push("/dashboard");
+
+        // then reset the password field
+        setPassword((prev) => "");
+
+        // then autofocus the password field
+        passwordRef.current?.focus();
       }
 
       // reset the loading state
@@ -81,19 +85,23 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               id="email"
               placeholder="NIY atau Email"
               type="text"
+              autoFocus
               autoCapitalize="none"
               autoComplete="email"
               autoCorrect="off"
               onChange={(e) => setEmail(e.target.value)}
               disabled={isLoading}
+              value={email}
               required
             />
             <Input
+              ref={passwordRef}
               id="password"
               placeholder="password"
               type="password"
               onChange={(e) => setPassword(e.target.value)}
               disabled={isLoading}
+              value={password}
               required
             />
           </div>

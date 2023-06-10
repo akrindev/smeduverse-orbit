@@ -15,5 +15,6 @@ export default function Page() {
     return redirect("/login");
   }
 
-  return <>Smeduverse Orbit</>;
+  // if authenticated
+  return redirect("/dashboard");
 }

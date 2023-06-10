@@ -1,6 +1,6 @@
 "use client";
 
-import { CreditCard, LogOut, PlusCircle, Settings, User } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MD5 } from "crypto-js"; // import the MD5 function from the crypto-js library
+import { signOut } from "next-auth/react";
 
 const email = "hi@syakirinamin.com";
 const hash = MD5(email.trim().toLowerCase()).toString(); // use the MD5 function to generate the hash and convert it to a string
@@ -51,7 +52,7 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={() => signOut()}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>

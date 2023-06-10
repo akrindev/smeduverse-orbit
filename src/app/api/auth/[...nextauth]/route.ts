@@ -2,7 +2,7 @@ import NextAuth, { DefaultSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import type { NextAuthOptions } from "next-auth";
 
-export const authOptions: NextAuthOptions = {
+const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   // enabe JWT
   session: {
@@ -32,7 +32,7 @@ export const authOptions: NextAuthOptions = {
         // You can also use the `req` object to obtain additional parameters
         // (i.e., the request IP address)
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+          new URL(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`),
           {
             method: "POST",
             body: JSON.stringify(credentials),
@@ -49,14 +49,18 @@ export const authOptions: NextAuthOptions = {
 
         const { access_token } = await res.json();
 
-        const user = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${access_token}`,
-            "Content-Type": "application/json",
-          },
-          cache: "no-store",
-        }).then((res) => res.json());
+        const user = await fetch(
+          new URL(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`),
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${access_token}`,
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            cache: "no-store",
+          }
+        ).then((res) => res.json());
 
         // If no error and we have user data, return it
         if (res.ok && user) {
@@ -85,10 +89,9 @@ export const authOptions: NextAuthOptions = {
       session.user = token.user;
       return session;
     },
-    // Redirect to home page after signin
     async redirect({ url, baseUrl }) {
       // console.log("redirect", url, baseUrl);
-      return `${baseUrl}/dashboard`;
+      return url;
     },
   },
   pages: {
