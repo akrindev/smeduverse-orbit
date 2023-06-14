@@ -2,10 +2,12 @@ import { Separator } from "@/components/ui/separator";
 
 export default function Layout({
   children,
-  uuid,
+  params,
 }: {
   children: React.ReactNode;
-  uuid: string;
+  params: {
+    uuid: string;
+  };
 }) {
   return (
     <div className="h-full flex flex-col space-y-5">
