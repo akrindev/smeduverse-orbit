@@ -12,9 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/use-toast";
-import { api } from "@/lib/api";
 import { useSemester } from "@/store/useSemester";
 import { Semester } from "@/types/semester";
 import { IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
@@ -26,7 +24,7 @@ export default function DialogSemester({ semester }: { semester?: Semester }) {
   const [name, setName] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const refetchSemesters = useSemester((state) => state.refetch);
+  const [store, update] = useSemester((state) => [state.store, state.update]);
 
   const handleSemester = async () => {
     setIsLoading(true);
@@ -37,13 +35,10 @@ export default function DialogSemester({ semester }: { semester?: Semester }) {
     };
     // if semester is not null, update semester
     const response = semester
-      ? await api.put(`/semester/update/${semester.id}`, body)
-      : await api.post("/semester/store", body);
+      ? await update(semester.id, body)
+      : await store(body);
 
     if (response.status === 201) {
-      // refetch semesters
-      refetchSemesters();
-
       // reset input
       setName("");
 
@@ -55,9 +50,6 @@ export default function DialogSemester({ semester }: { semester?: Semester }) {
     }
 
     if (response.status === 200) {
-      // refetch semesters
-      refetchSemesters();
-
       // reset input
       setName("");
 
@@ -135,15 +127,14 @@ export function DialogDeleteSemester({ semester }: { semester: Semester }) {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const deleteSemester = useSemester((state) => state.delete);
+
   // handle delete semester
   const handleDeleteSemester = async () => {
     setIsLoading(true);
-    const response = await api.delete(`/semester/destroy/${semester.id}`);
+    const response = await deleteSemester(semester.id);
 
     if (response.status === 200) {
-      // refetch semesters
-      useSemester.getState().refetch();
-
       setIsLoading(false);
 
       // show toast
