@@ -2,14 +2,20 @@ import { Separator } from "@/components/ui/separator";
 import TableSemester from "./components/table-semester";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { IconInfoCircle } from "@tabler/icons-react";
+import DialogCreateSemester from "./components/dialog-create-semester";
 
 export default function SemesterPage() {
   return (
     <div className="h-full flex flex-col space-y-5">
       <div className="flex flex-col h-full">
-        <div className="mt-5 space-y-1">
-          <h2 className="text-2xl font-semibold tracking-tight">Semester</h2>
-          <p className="text-sm text-muted-foreground">Kelola data semester</p>
+        <div className="flex flex-col md:flex-row justify-between">
+          <div className="mt-5 space-y-1">
+            <h2 className="text-2xl font-semibold tracking-tight">Semester</h2>
+            <p className="text-sm text-muted-foreground">
+              Kelola data semester
+            </p>
+          </div>
+          <DialogCreateSemester />
         </div>
         <Separator className="my-4" />
         <Alert>

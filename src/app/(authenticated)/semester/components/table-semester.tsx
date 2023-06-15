@@ -9,11 +9,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { api } from "@/lib/api";
+import { useSemester } from "@/store/useSemester";
 import { Semester } from "@/types/semester";
 import { useEffect, useState } from "react";
 
 export default function TableSemester() {
-  const [semesters, setSemesters] = useState<Semester[]>([]);
+  const [semesters, setSemesters] = useSemester((state) => [
+    state.semesters,
+    state.setSemesters,
+  ]);
 
   useEffect(() => {
     const fetchSemesters = async () => {
