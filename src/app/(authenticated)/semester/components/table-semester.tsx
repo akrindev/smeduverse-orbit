@@ -11,7 +11,8 @@ import {
 import { api } from "@/lib/api";
 import { useSemester } from "@/store/useSemester";
 import { Semester } from "@/types/semester";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import DialogSemester from "./dialog-semester";
 
 export default function TableSemester() {
   const [semesters, setSemesters] = useSemester((state) => [
@@ -50,6 +51,7 @@ export default function TableSemester() {
             <TableRow>
               <TableHead>Judul</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -61,6 +63,11 @@ export default function TableSemester() {
                     <span className="text-green-500">Aktif</span>
                   ) : (
                     <span className="text-red-500">Tidak Aktif</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {semester.is_active === 1 && (
+                    <DialogSemester semester={semester} />
                   )}
                 </TableCell>
               </TableRow>

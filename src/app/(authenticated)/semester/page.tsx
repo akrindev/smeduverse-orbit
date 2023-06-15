@@ -2,7 +2,7 @@ import { Separator } from "@/components/ui/separator";
 import TableSemester from "./components/table-semester";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { IconInfoCircle } from "@tabler/icons-react";
-import DialogCreateSemester from "./components/dialog-create-semester";
+import DialogCreateSemester from "./components/dialog-semester";
 
 export default function SemesterPage() {
   return (

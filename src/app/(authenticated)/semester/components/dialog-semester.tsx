@@ -16,57 +16,87 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/use-toast";
 import { api } from "@/lib/api";
 import { useSemester } from "@/store/useSemester";
-import { IconPlus } from "@tabler/icons-react";
-import { set } from "date-fns";
+import { Semester } from "@/types/semester";
+import { IconEdit, IconPlus } from "@tabler/icons-react";
 import { Loader } from "lucide-react";
-import { SyntheticEvent, useState } from "react";
+import { useEffect, useState } from "react";
 
-export default function DialogCreateSemester() {
+export default function DialogSemester({ semester }: { semester?: Semester }) {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [name, setName] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const refetchSemesters = useSemester((state) => state.refetch);
 
-  const onStoreNewSemester = async () => {
+  const handleSemester = async () => {
     setIsLoading(true);
-    // store new semester
-    const response = await api
-      .post("/semester/store", {
-        name: name,
-        is_active: 1,
-      })
-      .then((res) => {
-        if (res.status === 201) {
-          // refetch semesters
-          refetchSemesters();
 
-          // reset input
-          setName("");
+    const body = {
+      name: name,
+      is_active: 1,
+    };
+    // if semester is not null, update semester
+    const response = semester
+      ? await api.put(`/semester/update/${semester.id}`, body)
+      : await api.post("/semester/store", body);
 
-          // show toast
-          toast({
-            title: "Yay",
-            description: "Semester baru berhasil ditambahkan",
-          });
-        }
-      })
-      .finally(() => setIsLoading(false));
+    if (response.status === 201) {
+      // refetch semesters
+      refetchSemesters();
+
+      // reset input
+      setName("");
+
+      // show toast
+      toast({
+        title: "Yay",
+        description: "Semester baru berhasil ditambahkan",
+      });
+    }
+
+    if (response.status === 200) {
+      // refetch semesters
+      refetchSemesters();
+
+      // reset input
+      setName("");
+
+      // show toast
+      toast({
+        title: "Yay",
+        description: "Semester berhasil diupdate",
+      });
+    }
+
+    setIsLoading(false);
 
     setDialogOpen(false);
   };
 
+  useEffect(() => {
+    setName(semester ? semester.name : "");
+  }, [semester, setName]);
+
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
-        <Button variant={`default`} className="flex gap-3">
-          <IconPlus className="w-5 h-5" />
-          <span>Buat Semester Baru</span>
+        <Button
+          variant={semester ? `outline` : `default`}
+          className="flex gap-3"
+        >
+          {semester ? (
+            <IconEdit className="w-4 h-4" />
+          ) : (
+            <IconPlus className="w-5 h-5" />
+          )}
+          <span>{semester ? "Edit" : "Buat Semester Baru"}</span>
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Buat Semester Baru</DialogTitle>
+          <DialogTitle>
+            {semester ? "Edit Semester" : "Buat Semester Baru"}
+          </DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
@@ -77,8 +107,9 @@ export default function DialogCreateSemester() {
               placeholder="contoh: 2022/2023-ganjil"
               disabled={isLoading}
               onKeyDown={(e: React.KeyboardEvent) => {
-                if (e.key === "Enter") onStoreNewSemester();
+                if (e.key === "Enter") handleSemester();
               }}
+              value={name}
               autoFocus
             />
             <div className="text-sm text-gray-400">
@@ -87,7 +118,7 @@ export default function DialogCreateSemester() {
           </div>
         </div>
         <DialogFooter>
-          <Button disabled={isLoading} onClick={onStoreNewSemester}>
+          <Button disabled={isLoading} onClick={handleSemester}>
             {isLoading && <Loader className="mr-2 h-4 w-4" />}
             Save
           </Button>
