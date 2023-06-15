@@ -17,7 +17,7 @@ import { toast } from "@/components/ui/use-toast";
 import { api } from "@/lib/api";
 import { useSemester } from "@/store/useSemester";
 import { Semester } from "@/types/semester";
-import { IconEdit, IconPlus } from "@tabler/icons-react";
+import { IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
 import { Loader } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -121,6 +121,69 @@ export default function DialogSemester({ semester }: { semester?: Semester }) {
           <Button disabled={isLoading} onClick={handleSemester}>
             {isLoading && <Loader className="mr-2 h-4 w-4" />}
             Save
+          </Button>
+          {/* add button delete */}
+          {semester && <DialogDeleteSemester semester={semester} />}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// dialog delete confirmation
+export function DialogDeleteSemester({ semester }: { semester: Semester }) {
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // handle delete semester
+  const handleDeleteSemester = async () => {
+    setIsLoading(true);
+    const response = await api.delete(`/semester/destroy/${semester.id}`);
+
+    if (response.status === 200) {
+      // refetch semesters
+      useSemester.getState().refetch();
+
+      setIsLoading(false);
+
+      // show toast
+      toast({
+        title: "Yay",
+        description: "Semester berhasil dihapus",
+      });
+    }
+  };
+
+  return (
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" className="flex gap-3">
+          <IconTrash className="w-4 h-4" />
+          <span>Hapus</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Hapus Semester</DialogTitle>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="grid gap-2">
+            <DialogDescription>
+              Apakah kamu yakin ingin menghapus semester ini?
+            </DialogDescription>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button
+            variant="destructive"
+            onClick={handleDeleteSemester}
+            disabled={isLoading}
+          >
+            {isLoading && <Loader className="mr-2 h-4 w-4" />}
+            Hapus
+          </Button>
+          <Button variant={`ghost`} onClick={() => setDialogOpen(false)}>
+            Batal
           </Button>
         </DialogFooter>
       </DialogContent>
