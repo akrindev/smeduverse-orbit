@@ -37,6 +37,7 @@
     "@radix-ui/react-tooltip": "^1.0.6",
     "@tabler/icons-react": "^2.1.1",
     "autoprefixer": "^10.4.14",
+    "axios": "^1.4.0",
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",
     "crypto-js": "^4.1.1",

@@ -1,5 +1,6 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import type { NextAuthOptions } from "next-auth";
+import { setAccessToken } from "./api";
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
@@ -48,6 +49,9 @@ export const authOptions: NextAuthOptions = {
 
         const { access_token } = await res.json();
 
+        // set access token to use in api
+        setAccessToken(access_token);
+
         const user = await fetch(
           new URL(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`),
           {
@@ -74,7 +78,7 @@ export const authOptions: NextAuthOptions = {
 
   callbacks: {
     // Assigning encoded token from API to token created in the session
-    async jwt({ token, user, account, profile }) {
+    async jwt({ token, user, account }) {
       if (user && account) {
         token.user = user;
         token.accessToken = account.access_token;

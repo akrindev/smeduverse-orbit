@@ -42,7 +42,12 @@ export function Sidebar({ className }) {
         <div className="px-4 py-2">
           <Separator className="my-2" />
           <div className="space-y-1">
-            <Button variant="ghost" size="sm" className="w-full justify-start">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start"
+              onClick={() => router.push("/semester")}
+            >
               <IconListDetails className="mr-2 h-4 w-4" />
               Semester
             </Button>
