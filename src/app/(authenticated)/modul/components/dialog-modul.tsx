@@ -14,6 +14,7 @@ import { IconPlus } from "@tabler/icons-react";
 import { useEffect } from "react";
 import SelectTeacher from "../../components/form/select-teacher";
 import SelectRombel from "../../components/form/select-rombel";
+import SelectMapel from "../../components/form/select-mapel";
 
 export default function DialogModul() {
   return (
@@ -41,7 +42,7 @@ export default function DialogModul() {
           </div>
           <div className="grid gap-2">
             <label htmlFor="name">Pilih Mapel</label>
-            {/*  */}
+            <SelectMapel />
           </div>
         </div>
       </DialogContent>

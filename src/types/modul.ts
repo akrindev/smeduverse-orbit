@@ -15,7 +15,7 @@ export interface Modul {
 }
 
 export interface Mapel {
-  id: number;
+  id: string | number;
   kode: string;
   nama: string;
   created_at: Date | string;
