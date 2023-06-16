@@ -15,19 +15,15 @@ import { useRombel } from "@/store/useRombel";
 import { Mapel, Rombel } from "@/types/modul";
 import { useEffect } from "react";
 
-export default function SelectMapel() {
+export default function SelectMapel({ onSelected }) {
   const [mapels, refetch] = useMapel((state) => [state.mapels, state.refetch]);
 
   useEffect(() => {
     refetch();
   }, []);
 
-  useEffect(() => {
-    console.log(mapels);
-  }, [mapels]);
-
   return (
-    <Select>
+    <Select onValueChange={onSelected}>
       <SelectTrigger className="w-full">
         <SelectValue placeholder="Pilih Mapel" />
       </SelectTrigger>
@@ -37,7 +33,7 @@ export default function SelectMapel() {
           <ScrollArea className="h-72">
             {mapels &&
               mapels.map((mapel: Mapel) => (
-                <SelectItem value={mapel.id as string}>
+                <SelectItem key={mapel.id} value={mapel.id as string}>
                   {mapel.kode} - {mapel.nama}
                 </SelectItem>
               ))}

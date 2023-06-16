@@ -14,7 +14,7 @@ import { useUser } from "@/store/useUser";
 import { Teacher } from "@/types/modul";
 import { useEffect } from "react";
 
-export default function SelectTeacher() {
+export default function SelectTeacher({ onSelected }) {
   const [teachers, refetch] = useUser((state) => [
     state.teachers,
     state.refetch,
@@ -24,12 +24,8 @@ export default function SelectTeacher() {
     refetch();
   }, []);
 
-  useEffect(() => {
-    console.log(teachers);
-  }, [teachers]);
-
   return (
-    <Select>
+    <Select onValueChange={onSelected}>
       <SelectTrigger className="w-full">
         <SelectValue placeholder="Pilih Guru" />
       </SelectTrigger>
@@ -39,7 +35,7 @@ export default function SelectTeacher() {
           <ScrollArea className="h-72">
             {teachers &&
               teachers.map((teacher: Teacher) => (
-                <SelectItem value={teacher.teacher_id}>
+                <SelectItem key={teacher.teacher_id} value={teacher.teacher_id}>
                   {teacher.fullname} ({teacher.niy})
                 </SelectItem>
               ))}

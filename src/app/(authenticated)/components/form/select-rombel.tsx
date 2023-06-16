@@ -14,7 +14,7 @@ import { useRombel } from "@/store/useRombel";
 import { Rombel } from "@/types/modul";
 import { useEffect } from "react";
 
-export default function SelectRombel() {
+export default function SelectRombel({ onSelected }) {
   const [rombels, refetch] = useRombel((state) => [
     state.rombels,
     state.refetch,
@@ -24,12 +24,8 @@ export default function SelectRombel() {
     refetch();
   }, []);
 
-  useEffect(() => {
-    console.log(rombels);
-  }, [rombels]);
-
   return (
-    <Select>
+    <Select onValueChange={onSelected}>
       <SelectTrigger className="w-full">
         <SelectValue placeholder="Pilih Rombel" />
       </SelectTrigger>
@@ -39,7 +35,9 @@ export default function SelectRombel() {
           <ScrollArea className="h-72">
             {rombels &&
               rombels.map((rombel: Rombel) => (
-                <SelectItem value={rombel.id}>{rombel.nama}</SelectItem>
+                <SelectItem key={rombel.id} value={rombel.id}>
+                  {rombel.nama}
+                </SelectItem>
               ))}
             <ScrollBar />
           </ScrollArea>
