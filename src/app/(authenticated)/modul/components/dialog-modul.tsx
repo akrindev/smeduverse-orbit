@@ -13,6 +13,7 @@ import { useUser } from "@/store/useUser";
 import { IconPlus } from "@tabler/icons-react";
 import { useEffect } from "react";
 import SelectTeacher from "../../components/form/select-teacher";
+import SelectRombel from "../../components/form/select-rombel";
 
 export default function DialogModul() {
   return (
@@ -32,7 +33,7 @@ export default function DialogModul() {
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
             <label htmlFor="name">Pilih Rombel</label>
-            {/*  */}
+            <SelectRombel />
           </div>
           <div className="grid gap-2">
             <label htmlFor="name">Pilih Guru</label>

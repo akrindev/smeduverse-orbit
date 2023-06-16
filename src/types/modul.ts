@@ -23,6 +23,8 @@ export interface Mapel {
   deleted_at?: Date | string | null;
 }
 
+export interface Jurusan extends Mapel {}
+
 export interface Rombel {
   id: string;
   nama: string;
@@ -34,14 +36,15 @@ export interface Rombel {
   status_aktif: number;
   created_at: Date | string;
   updated_at: Date | string;
-  jurusan: Mapel;
   wali_kelas: Teacher;
+  jurusan?: Jurusan;
 }
 
 export interface Teacher {
   teacher_id: string;
   fullname: string;
   niy: string;
+  photo?: string | null;
 }
 
 export interface Semester {
