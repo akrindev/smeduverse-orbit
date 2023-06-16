@@ -5,12 +5,20 @@ import { useModul } from "@/store/useModul";
 import { Modul } from "@/types/modul";
 import ModulCard from "../../components/ModulCard";
 import { useEffect } from "react";
+import { useSession } from "next-auth/react";
 
-export default function ModulList() {
-  const [moduls, refetch] = useModul((state) => [state.moduls, state.refetch]);
+export default function ModulList({ owned }: { owned?: boolean }) {
+  const [moduls, fetchOwned, refetch] = useModul((state) => [
+    state.moduls,
+    state.fetchOwned,
+    state.refetch,
+  ]);
+
+  const { data } = useSession();
 
   useEffect(() => {
-    refetch();
+    if (owned) fetchOwned(data?.user?.id);
+    else refetch();
   }, []);
 
   return (
