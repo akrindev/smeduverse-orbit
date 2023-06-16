@@ -16,6 +16,7 @@ import SelectMapel from "../../components/form/select-mapel";
 import { useEffect, useState } from "react";
 import { useModul } from "@/store/useModul";
 import { toast } from "@/components/ui/use-toast";
+import { Loader } from "lucide-react";
 
 export default function DialogModul() {
   // loading state
@@ -94,7 +95,10 @@ export default function DialogModul() {
         </div>
         {/* button submit */}
         <DialogFooter>
-          <Button onClick={handleSave}>Simpan</Button>
+          <Button disabled={isLoading} onClick={handleSave}>
+            {isLoading && <Loader className="mr-2" size={16} />}
+            Simpan
+          </Button>
           <Button variant={`ghost`} onClick={() => setOpen(false)}>
             Batal
           </Button>
