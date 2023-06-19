@@ -1,21 +1,38 @@
 import { Separator } from "@/components/ui/separator";
 import TablePresensi from "./components/table-presensi";
 import Information from "./components/information";
+import { api } from "@/lib/api";
+import { IAttendance } from "@/types/attendance";
 
-export default function PreseniPage({
+export async function getAttendance({
+  presensiUuid,
+}: {
+  presensiUuid: string;
+}): Promise<IAttendance> {
+  console.log(presensiUuid);
+  const { data } = await api.get(`/modul/presence/show/${presensiUuid}`);
+
+  return data;
+}
+
+export default async function PreseniPage({
   params,
 }: {
-  params: { presensiUuid: string };
+  params: { uuid: string; presensiUuid: string };
 }) {
+  const attendances = await getAttendance(params);
+
+  console.log(attendances);
+
   return (
     <div>
       <Information
-        title="Membuat Aplikasi Web"
-        description="Membuat aplikasi web dengan menggunakan ReactJS"
+        title={attendances.title}
+        description={attendances.description}
       />
       <Separator className="my-4" />
       <div className="rounded-md border">
-        <TablePresensi />
+        <TablePresensi attendances={attendances.attendances} />
       </div>
     </div>
   );

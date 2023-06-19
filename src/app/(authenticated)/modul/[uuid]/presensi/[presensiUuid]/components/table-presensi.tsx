@@ -1,3 +1,5 @@
+"use client";
+
 import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -9,36 +11,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { useAttendance } from "@/store/useAttendance";
+import { Attendance } from "@/types/attendance";
 import { ChevronDown } from "lucide-react";
+import { useEffect, useState } from "react";
 
-export default function TablePresensi() {
-  const dummyData = [
-    {
-      nis: "12345",
-      name: "Syakirin Amin",
-      status: "Hadir",
-    },
-    {
-      nis: "12346",
-      name: "Nanang Hermanto",
-      status: "Hadir",
-    },
-    {
-      nis: "12347",
-      name: "Rio Aprianto",
-      status: "Hadir",
-    },
-    {
-      nis: "12348",
-      name: "Leni Pratiwi",
-      status: "Hadir",
-    },
-    {
-      nis: "12349",
-      name: "Muhimmatul Iffadah",
-      status: "Hadir",
-    },
-  ];
+export default function TablePresensi({
+  attendances,
+}: {
+  attendances: Attendance[];
+}) {
+  console.log(attendances);
   return (
     <Table>
       <TableHeader>
@@ -51,12 +34,12 @@ export default function TablePresensi() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {dummyData.map((data, i) => (
-          <TableRow key={data.nis}>
+        {attendances.map((attendance: Attendance, i) => (
+          <TableRow key={attendance.student_id}>
             <TableCell className="w-[50px]">{i + 1}</TableCell>
-            <TableCell className="w-[110px]">{data.nis}</TableCell>
+            <TableCell className="w-[110px]">{attendance.nipd}</TableCell>
             <TableCell className="truncate max-w-[500px] font-medium">
-              {data.name}
+              {attendance.fullname}
             </TableCell>
             <TableCell>
               <div className="relative w-max">

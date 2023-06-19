@@ -39,7 +39,7 @@ export default function TableListPresensi({
   }, [modulUuid]);
 
   const handleViewPresence = (presence: Presence) => {
-    router.push(`/modul/${modulUuid}/presensi/${presence.orbit_modul_uuid}`);
+    router.push(`/modul/${modulUuid}/presensi/${presence.uuid}`);
   };
   return (
     <div className="border rounded-md">
