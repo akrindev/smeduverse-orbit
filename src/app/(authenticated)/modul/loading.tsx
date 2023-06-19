@@ -20,7 +20,7 @@ export default function Page() {
           <ScrollArea>
             <div className="grid grid-cols-12 gap-5">
               {Array.from({ length: 6 }).map((_, index) => (
-                <div className="space-y-1 col-span-6 md:col-span-3">
+                <div className="space-y-1 col-span-6 md:col-span-3" key={index}>
                   {/* cover */}
                   <div className="relative hover:scale-105 duration-500 rounded-md ">
                     <Skeleton className="w-full h-40 object-cover" />

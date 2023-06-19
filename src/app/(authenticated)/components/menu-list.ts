@@ -1,11 +1,20 @@
 import {
+  IconBooks,
   IconGridPattern,
+  IconListDetails,
   IconPlayerPlay,
   IconReportAnalytics,
 } from "@tabler/icons-react";
 
 // list of sidebar menu
-export const menuList = [
+interface MenuItem {
+  name: string;
+  icon: React.FC<React.SVGProps<SVGSVGElement>>;
+  path: string;
+  separator?: boolean;
+}
+
+export const menuList: MenuItem[] = [
   {
     name: "Dashboard",
     icon: IconPlayerPlay,
@@ -20,5 +29,21 @@ export const menuList = [
     name: "Rekap Laporan",
     icon: IconReportAnalytics,
     path: "/rekap",
+  },
+  {
+    name: "separator",
+    icon: IconPlayerPlay,
+    path: "/",
+    separator: true,
+  },
+  {
+    name: "Semester",
+    icon: IconListDetails,
+    path: "/semester",
+  },
+  {
+    name: "Mata Pelajaran",
+    icon: IconBooks,
+    path: "/mata-pelajaran",
   },
 ];
