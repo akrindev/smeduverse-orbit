@@ -1,6 +1,8 @@
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { IconInfoCircle } from "@tabler/icons-react";
+import DialogMataPelajaran from "./components/dialog-mata-pelajaran";
+import TableMataPelajaran from "./components/table-mata-pelajaran";
 
 export default function MataPelajaranPage() {
   return (
@@ -16,6 +18,7 @@ export default function MataPelajaranPage() {
             </p>
           </div>
           {/* dialog */}
+          <DialogMataPelajaran />
         </div>
         <Separator className="my-4" />
         <Alert>
@@ -25,6 +28,7 @@ export default function MataPelajaranPage() {
         </Alert>
         <div className="my-4"></div>
         {/* table */}
+        <TableMataPelajaran />
       </div>
     </div>
   );

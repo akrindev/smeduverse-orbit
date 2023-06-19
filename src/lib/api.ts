@@ -1,3 +1,4 @@
+import { toast } from "@/components/ui/use-toast";
 import Axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
 import { getSession } from "next-auth/react";
 import { cookies } from "next/dist/client/components/headers";
@@ -24,10 +25,22 @@ const api: AxiosInstance = Axios.create({
 // when error is 401, redirect to login page
 api.interceptors.response.use(
   (response) => response,
-  (error: AxiosError) => {
-    console.error(error.response);
+  (
+    error: AxiosError<{
+      message: string;
+    }>
+  ) => {
+    // console.error(error.response);
     if (error && error.response?.status === 401) {
       window.location.href = "/login";
+    }
+
+    if (error && error.response?.status === 422) {
+      toast({
+        title: "Error",
+        description: error.response?.data.message,
+        variant: "destructive",
+      });
     }
     return Promise.reject(error);
   }
