@@ -25,36 +25,24 @@ export function Sidebar({ className }) {
             Discover
           </h2>
           <div className="space-y-1">
-            {menuList.map((item) => (
-              <Button
-                key={item.name}
-                variant={isActive(item.path)}
-                size="sm"
-                className="w-full justify-start"
-                onClick={() => router.push(item.path)}
-              >
-                <item.icon className="mr-2 h-4 w-4" />
-                {item.name}
-              </Button>
-            ))}
-          </div>
-        </div>
-        <div className="px-4 py-2">
-          <Separator className="my-2" />
-          <div className="space-y-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start"
-              onClick={() => router.push("/semester")}
-            >
-              <IconListDetails className="mr-2 h-4 w-4" />
-              Semester
-            </Button>
-            <Button variant="ghost" size="sm" className="w-full justify-start">
-              <IconBooks className="mr-2 h-4 w-4" />
-              Mata Pelajaran
-            </Button>
+            {menuList.map((item) =>
+              item.separator === true ? (
+                <div className="py-2">
+                  <Separator className="my-2" />
+                </div>
+              ) : (
+                <Button
+                  key={item.name}
+                  variant={isActive(item.path)}
+                  size="sm"
+                  className="w-full justify-start"
+                  onClick={() => router.push(item.path)}
+                >
+                  <item.icon className="mr-2 h-4 w-4" />
+                  {item.name}
+                </Button>
+              )
+            )}
           </div>
         </div>
       </div>
