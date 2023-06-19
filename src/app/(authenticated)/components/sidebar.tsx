@@ -27,7 +27,7 @@ export function Sidebar({ className }) {
           <div className="space-y-1">
             {menuList.map((item) =>
               item.separator === true ? (
-                <div className="py-2">
+                <div className="py-2" key={item.path}>
                   <Separator className="my-2" />
                 </div>
               ) : (

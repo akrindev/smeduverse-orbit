@@ -53,20 +53,7 @@ export default function TableListPresensi({
         </TableHeader>
         <TableBody>
           {/* list of all presences */}
-          {presences.length <= 0 ? (
-            // skeleton
-            <TableRow>
-              <TableCell>
-                <Skeleton className="h-5 w-full bg-gray-300" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-5 w-full bg-gray-300" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-5 w-full bg-gray-300" />
-              </TableCell>
-            </TableRow>
-          ) : (
+          {presences.length ? (
             presences.map((presence: Presence) => (
               <TableRow
                 onClick={() => handleViewPresence(presence)}
@@ -88,6 +75,15 @@ export default function TableListPresensi({
                 </TableCell>
               </TableRow>
             ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={3}>
+                {/* desciption that the data is empty */}
+                <div className="flex flex-col items-center justify-center space-y-2">
+                  <p>Belum ada data presensi untuk ditampilkan</p>
+                </div>
+              </TableCell>
+            </TableRow>
           )}
         </TableBody>
       </Table>
