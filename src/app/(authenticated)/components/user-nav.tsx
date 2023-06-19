@@ -14,9 +14,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { signOut, useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
 
 export function UserNav() {
-  const { data } = useSession();
+  const { data, status } = useSession();
+
+  // if unauthenticated
+  if (status === "unauthenticated") {
+    redirect("/login");
+  }
 
   const user = data?.user;
 
