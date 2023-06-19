@@ -23,7 +23,7 @@ export default function SelectMapel({ onSelected }) {
   }, []);
 
   return (
-    <Select onValueChange={onSelected}>
+    <Select onValueChange={(value: string) => onSelected(value)}>
       <SelectTrigger className="w-full">
         <SelectValue placeholder="Pilih Mapel" />
       </SelectTrigger>
@@ -33,7 +33,7 @@ export default function SelectMapel({ onSelected }) {
           <ScrollArea className="h-72">
             {mapels &&
               mapels.map((mapel: Mapel) => (
-                <SelectItem key={mapel.id} value={mapel.id as string}>
+                <SelectItem key={mapel.id} value={mapel.id.toString()}>
                   {mapel.kode} - {mapel.nama}
                 </SelectItem>
               ))}

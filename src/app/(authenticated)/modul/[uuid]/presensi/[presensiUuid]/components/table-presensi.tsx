@@ -11,10 +11,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { useAttendance } from "@/store/useAttendance";
 import { Attendance } from "@/types/attendance";
 import { ChevronDown } from "lucide-react";
-import { useEffect, useState } from "react";
 
 export default function TablePresensi({
   attendances,

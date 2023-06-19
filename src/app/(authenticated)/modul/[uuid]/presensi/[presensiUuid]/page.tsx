@@ -4,12 +4,11 @@ import Information from "./components/information";
 import { api } from "@/lib/api";
 import { IAttendance } from "@/types/attendance";
 
-export async function getAttendance({
+async function getAttendance({
   presensiUuid,
 }: {
   presensiUuid: string;
 }): Promise<IAttendance> {
-  console.log(presensiUuid);
   const { data } = await api.get(`/modul/presence/show/${presensiUuid}`);
 
   return data;
