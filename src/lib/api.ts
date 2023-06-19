@@ -1,7 +1,5 @@
 import { toast } from "@/components/ui/use-toast";
-import Axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
-import { getSession } from "next-auth/react";
-import { cookies } from "next/dist/client/components/headers";
+import Axios, { AxiosError, AxiosInstance } from "axios";
 
 const api: AxiosInstance = Axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,

@@ -1,10 +1,5 @@
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import ModulCard from "../components/ModulCard";
 import { Metadata } from "next";
-import { Modul } from "@/types/modul";
-import { useModul } from "@/store/useModul";
-import { useEffect } from "react";
 import ModulList from "./components/modul-list";
 import DialogModul from "./components/dialog-modul";
 
