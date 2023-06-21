@@ -1,37 +1,40 @@
+"use client";
+
 import { Separator } from "@/components/ui/separator";
 import TablePresensi from "./components/table-presensi";
+import { usePresence } from "@/store/usePresence";
+import { useEffect } from "react";
+import { Presence } from "@/types/presence";
 import Information from "./components/information";
-import { api } from "@/lib/api";
-import { IAttendance } from "@/types/attendance";
 
-async function getAttendance({
-  presensiUuid,
-}: {
-  presensiUuid: string;
-}): Promise<IAttendance> {
-  const { data } = await api.get(`/modul/presence/show/${presensiUuid}`);
-
-  return data;
+interface PresensiPageProps {
+  params: {
+    uuid: string;
+    presensiUuid: string;
+  };
 }
 
-export default async function PreseniPage({
-  params,
-}: {
-  params: { uuid: string; presensiUuid: string };
-}) {
-  const attendances = await getAttendance(params);
+export default async function PreseniPage({ params }: PresensiPageProps) {
+  const [presence, showPresence] = usePresence<
+    [Presence, (uuid: string) => Promise<void>]
+  >((state) => [state.presence, state.showPresence]);
 
-  console.log(attendances);
+  useEffect(() => {
+    showPresence(params.presensiUuid);
+  }, []);
 
   return (
     <div>
       <Information
-        title={attendances.title}
-        description={attendances.description}
+        key={presence.updated_at}
+        modulUuid={params.uuid}
+        presenceUuid={params.presensiUuid}
+        title={presence?.title}
+        description={presence?.description}
       />
       <Separator className="my-4" />
       <div className="rounded-md border">
-        <TablePresensi attendances={attendances.attendances} />
+        <TablePresensi attendances={presence?.attendances ?? []} />
       </div>
     </div>
   );

@@ -14,27 +14,39 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { usePresence } from "@/store/usePresence";
-import { IconPlus } from "@tabler/icons-react";
-import { set } from "date-fns";
+import { IconEditCircle, IconPlus } from "@tabler/icons-react";
 import { Loader } from "lucide-react";
 import { FormEventHandler, useEffect, useState } from "react";
 
-export default function DialogCreatePresensi({
+export default function DialogPresensi({
   modulUuid,
+  data,
 }: {
   modulUuid: string;
+  data?: {
+    title: string;
+    description: string;
+    presenceUuid?: string;
+  };
 }) {
   const [open, setOpen] = useState<boolean>(false);
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [uuid, setUuid] = useState<string>("");
+  const [presenceUuid, setPresenceUuid] = useState<string>("");
 
-  const createPresence = usePresence((state) => state.createPresence);
+  const [createPresence, updatePresence, destroyPresence] = usePresence(
+    (state) => [
+      state.createPresence,
+      state.updatePresence,
+      state.destroyPresence,
+    ]
+  );
 
-  //   event on submit
+  // event on submit
   // must be prevent default
-  const handleCreatePresensi: FormEventHandler = async (e) => {
+  const handleSubmitPresensi: FormEventHandler = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
@@ -42,9 +54,13 @@ export default function DialogCreatePresensi({
       title: title,
       description: description,
       orbit_modul_uuid: uuid,
+      presence_uuid: presenceUuid,
     };
 
-    const response = await createPresence(body).finally(() => {
+    const response = await (data
+      ? updatePresence(body)
+      : createPresence(body)
+    ).finally(() => {
       setIsLoading(false);
     });
 
@@ -61,20 +77,30 @@ export default function DialogCreatePresensi({
 
   useEffect(() => {
     setUuid(modulUuid);
-  }, [modulUuid]);
+
+    if (data) {
+      setTitle(data.title);
+      setDescription(data.description);
+      setPresenceUuid(data.presenceUuid || "");
+    }
+  }, [modulUuid, data]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <IconPlus className="w-5 h-5 mr-2" />
-          Buat Presensi
+        <Button className="flex items-center">
+          {data ? (
+            <IconEditCircle className="w-4 h-4 mr-2" />
+          ) : (
+            <IconPlus className="w-4 h-4 mr-2" />
+          )}
+          {data ? "Edit" : "Buat"} Presensi
         </Button>
       </DialogTrigger>
       <DialogContent>
-        <form onSubmit={handleCreatePresensi}>
+        <form onSubmit={handleSubmitPresensi}>
           <DialogHeader>
-            <DialogTitle>Buat Presensi</DialogTitle>
+            <DialogTitle>{data ? "Edit" : "Buat"} Presensi</DialogTitle>
           </DialogHeader>
           <Separator />
           <div className="grid grid-cols-12 gap-4 py-4">
@@ -86,7 +112,7 @@ export default function DialogCreatePresensi({
                 placeholder="Judul Presensi"
                 disabled={isLoading}
                 onKeyDown={(e: React.KeyboardEvent) => {
-                  if (e.key === "Enter") handleCreatePresensi(e);
+                  if (e.key === "Enter") handleSubmitPresensi(e);
                 }}
                 value={title}
                 autoFocus
@@ -100,9 +126,6 @@ export default function DialogCreatePresensi({
                 onInput={(e) => setDescription(e.currentTarget.value)}
                 placeholder="Deskripsi Presensi"
                 disabled={isLoading}
-                onKeyDown={(e: React.KeyboardEvent) => {
-                  if (e.key === "Enter") handleCreatePresensi(e);
-                }}
                 value={description}
                 required
               />

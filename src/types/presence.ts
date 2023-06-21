@@ -1,3 +1,4 @@
+import { Attendance } from "@/types/attendance";
 // example response data
 // {
 //     "uuid": "dcfc8987-3e95-4406-a2d7-658a1b29f19b",
@@ -17,4 +18,5 @@ export interface Presence {
   created_at: string;
   updated_at: string;
   deleted_at?: string | null;
+  attendances?: Attendance[];
 }

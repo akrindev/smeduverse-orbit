@@ -1,7 +1,7 @@
 import { Separator } from "@/components/ui/separator";
 import TableListPresensi from "./components/table-list-presensi";
 import { getModulInfo } from "./layout";
-import DialogCreatePresensi from "./components/dialog-create-presensi";
+import DialogPresensi from "./components/dialog-presensi";
 
 export async function generateMetadata({ params }) {
   const { data } = await getModulInfo(params.uuid);
@@ -24,7 +24,7 @@ export default function ModulPage({ params }: { params: { uuid: string } }) {
           </p>
         </div>
         <div className="col-span-12 md:col-span-6 flex items-center justify-end">
-          <DialogCreatePresensi modulUuid={params.uuid} />
+          <DialogPresensi modulUuid={params.uuid} />
         </div>
       </div>
       <Separator />

@@ -53,10 +53,6 @@ export default function DialogModul() {
     setIsLoading(false);
   };
 
-  useEffect(() => {
-    console.log(selected);
-  }, [selected]);
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>

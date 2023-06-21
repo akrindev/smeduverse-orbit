@@ -19,7 +19,6 @@ export default function TablePresensi({
 }: {
   attendances: Attendance[];
 }) {
-  console.log(attendances);
   return (
     <Table>
       <TableHeader>
@@ -32,7 +31,7 @@ export default function TablePresensi({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {attendances.map((attendance: Attendance, i) => (
+        {attendances!.map((attendance: Attendance, i) => (
           <TableRow key={attendance.student_id}>
             <TableCell className="w-[50px]">{i + 1}</TableCell>
             <TableCell className="w-[110px]">{attendance.nipd}</TableCell>
