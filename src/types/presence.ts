@@ -19,4 +19,9 @@ export interface Presence {
   updated_at: string;
   deleted_at?: string | null;
   attendances?: Attendance[];
+  count_h: number; // count of attendances with status "h"
+  count_i: number; // count of attendances with status "i"
+  count_s: number; // count of attendances with status "s"
+  count_a: number; // count of attendances with status "a"
+  count_b: number; // count of attendances with status "b"
 }

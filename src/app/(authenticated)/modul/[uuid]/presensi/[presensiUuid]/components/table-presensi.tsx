@@ -31,7 +31,7 @@ export default function TablePresensi({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead></TableHead>
+          <TableHead className="hidden md:flex"></TableHead>
           <TableHead>Nama</TableHead>
           <TableHead>Status</TableHead>
           <TableHead>Note</TableHead>

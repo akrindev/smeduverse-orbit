@@ -3,9 +3,10 @@
 import { Separator } from "@/components/ui/separator";
 import TablePresensi from "./components/table-presensi";
 import { usePresence } from "@/store/usePresence";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { Presence } from "@/types/presence";
 import Information from "./components/information";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 interface PresensiPageProps {
   params: {
@@ -19,8 +20,13 @@ export default async function PreseniPage({ params }: PresensiPageProps) {
     [Presence, (uuid: string) => Promise<void>]
   >((state) => [state.presence, state.showPresence]);
 
+  const updatingPresence = useCallback(
+    () => showPresence(params.presensiUuid),
+    [params.presensiUuid]
+  );
+
   useEffect(() => {
-    showPresence(params.presensiUuid);
+    updatingPresence();
   }, []);
 
   return (
@@ -31,10 +37,15 @@ export default async function PreseniPage({ params }: PresensiPageProps) {
         presenceUuid={params.presensiUuid}
         title={presence?.title}
         description={presence?.description}
+        presence={presence}
+        onRefresh={updatingPresence}
       />
-      <Separator className="my-4" />
-      <div className="rounded-md border">
-        <TablePresensi attendances={presence?.attendances ?? []} />
+      {/* <Separator className="my-4" /> */}
+      <div className="relative w-full mt-5 rounded-md border">
+        <ScrollArea>
+          <TablePresensi attendances={presence?.attendances ?? []} />
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
       </div>
     </div>
   );
