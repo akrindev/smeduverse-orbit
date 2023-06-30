@@ -9,14 +9,17 @@ import { toast } from "@/components/ui/use-toast";
 // modul state
 type ModulState = {
   moduls: Modul[] | Array<any> | null;
+  modul: Modul | null;
   setModul: (modul: any) => void;
   refetch: () => Promise<void>;
   fetchOwned: (teacher_id: string | null | undefined) => Promise<void>;
+  fetchByUuid: (uuid: string | null | undefined) => Promise<void>;
   store: (body: any) => AxiosPromise<AxiosResponse>;
 };
 
 export const useModul = create<ModulState>((set, get) => ({
   moduls: [],
+  modul: null,
   setModul: (moduls) => set({ moduls }),
   refetch: async () => {
     const response = await api.get<Modul[]>("/modul/list");
@@ -29,6 +32,11 @@ export const useModul = create<ModulState>((set, get) => ({
     );
     const moduls = response.data;
     set({ moduls });
+  },
+  fetchByUuid: async (uuid) => {
+    const response = await api.get<Modul>(`/modul/show/${uuid}`);
+    const modul = response.data;
+    set({ modul });
   },
   store: async (body) => {
     const response = await api.post("/modul/store", body);
