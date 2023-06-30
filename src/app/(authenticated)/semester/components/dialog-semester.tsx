@@ -50,9 +50,6 @@ export default function DialogSemester({ semester }: { semester?: Semester }) {
     }
 
     if (response.status === 200) {
-      // reset input
-      setName("");
-
       // show toast
       toast({
         title: "Yay",
