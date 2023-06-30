@@ -2,7 +2,7 @@
 
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function SemesterPage() {
+export default function Loading() {
   return (
     <div className="h-full flex flex-col space-y-5">
       <div className="flex flex-col h-full">
