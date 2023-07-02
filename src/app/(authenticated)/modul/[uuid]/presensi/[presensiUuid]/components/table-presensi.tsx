@@ -27,6 +27,19 @@ export default function TablePresensi({
 }: {
   attendances: Attendance[];
 }) {
+  const generateRandomString = (length: number) => {
+    let result = "";
+    const characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+    const charactersLength = characters.length;
+
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+
+    return result;
+  };
+
   return (
     <Table>
       <TableHeader>
@@ -50,7 +63,7 @@ export default function TablePresensi({
             <TableCell className="p-2">
               <StatusAction
                 attendance={attendance}
-                key={attendance.student_id}
+                key={attendance.student_id + generateRandomString(15)}
               />
             </TableCell>
             <TableCell className="p-2">
