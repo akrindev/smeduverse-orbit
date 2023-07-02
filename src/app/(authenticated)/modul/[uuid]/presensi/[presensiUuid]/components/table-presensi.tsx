@@ -20,13 +20,35 @@ import { toast } from "@/components/ui/use-toast";
 import { usePresence } from "@/store/usePresence";
 import { Attendance } from "@/types/attendance";
 import { ChevronDown } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  BaseSyntheticEvent,
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
+import debounce from "lodash.debounce";
 
 export default function TablePresensi({
   attendances,
 }: {
   attendances: Attendance[];
 }) {
+  const generateRandomString = (length: number) => {
+    let result = "";
+    const characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+    const charactersLength = characters.length;
+
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+
+    return result;
+  };
+
   return (
     <Table>
       <TableHeader>
@@ -39,7 +61,7 @@ export default function TablePresensi({
       </TableHeader>
       <TableBody>
         {attendances!.map((attendance: Attendance, i) => (
-          <TableRow key={attendance.student_id}>
+          <TableRow key={attendance.student_id + generateRandomString(15)}>
             <TableCell className="p-2 w-[40px] hidden md:flex items-center justify-center">
               {i + 1}
             </TableCell>
@@ -50,11 +72,14 @@ export default function TablePresensi({
             <TableCell className="p-2">
               <StatusAction
                 attendance={attendance}
-                key={attendance.student_id}
+                key={attendance.student_id + generateRandomString(15)}
               />
             </TableCell>
             <TableCell className="p-2">
-              <Input type="text" placeholder="Note" className="min-w-[150px]" />
+              <NoteAction
+                attendance={attendance}
+                key={attendance.student_id + generateRandomString(15)}
+              />
             </TableCell>
           </TableRow>
         ))}
@@ -69,10 +94,7 @@ function StatusAction({ attendance }: { attendance: Attendance }) {
   );
   const [loading, setLoading] = useState(false);
 
-  const [presence, updateAttendance] = usePresence((state) => [
-    state.presence,
-    state.updateAttendance,
-  ]);
+  const updateAttendance = usePresence((state) => state.updateAttendance);
 
   function handleChange(status: string) {
     setStatus(status);
@@ -95,10 +117,6 @@ function StatusAction({ attendance }: { attendance: Attendance }) {
       });
   }
 
-  useEffect(() => {
-    console.log(attendance);
-  }, [attendance]);
-
   return (
     <div className="relative w-max">
       <Select value={status} onValueChange={handleChange} disabled={loading}>
@@ -116,5 +134,69 @@ function StatusAction({ attendance }: { attendance: Attendance }) {
 
       <ChevronDown className="absolute right-3 top-3 h-4 w-4 opacity-50" />
     </div>
+  );
+}
+
+function NoteAction({ attendance }: { attendance: Attendance }) {
+  const [notes, setNotes] = useState<null | string>(attendance.presence.notes);
+  const [debouncedValue, setDebouncedValue] = useState<string | null>(null);
+
+  // input ref
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const [loading, setLoading] = useState(false);
+
+  const updateAttendanceNotes = usePresence(
+    (state) => state.updateAttendanceNotes
+  );
+
+  function handleChange() {
+    const notes = debouncedValue;
+    setLoading(true);
+
+    updateAttendanceNotes({ attendance, notes })
+      .then((res) => {
+        if (res.status === 200) {
+          toast({
+            title: "Berhasil",
+            description: "Catatan kehadiran berhasil diubah",
+          });
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }
+
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      if (notes !== attendance.presence.notes) {
+        setDebouncedValue(notes);
+        // focus the input
+        inputRef.current?.focus();
+      }
+    }, 2500);
+
+    return () => {
+      clearTimeout(debounceTimer);
+    };
+  }, [notes]);
+
+  useEffect(() => {
+    if (debouncedValue) {
+      handleChange();
+    }
+  }, [debouncedValue]);
+
+  return (
+    // the input should have a value of notes
+    // and it should call doWriteNotes on change
+    <Input
+      ref={inputRef}
+      value={notes || ""}
+      onChange={(e: BaseSyntheticEvent) => setNotes(e.target.value)}
+      placeholder="Catatan Kehadiran"
+      disabled={loading}
+    />
   );
 }

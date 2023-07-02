@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -13,9 +14,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/components/ui/use-toast";
 import { usePresence } from "@/store/usePresence";
-import { IconEditCircle, IconPlus } from "@tabler/icons-react";
+import { IconEditCircle, IconPlus, IconTrash } from "@tabler/icons-react";
 import { Loader } from "lucide-react";
+import { redirect, useRouter } from "next/navigation";
+import { Router } from "next/router";
 import { FormEventHandler, useEffect, useState } from "react";
 
 export default function DialogPresensi({
@@ -43,6 +47,8 @@ export default function DialogPresensi({
       state.destroyPresence,
     ]
   );
+
+  const router = useRouter();
 
   // event on submit
   // must be prevent default
@@ -72,6 +78,27 @@ export default function DialogPresensi({
 
       // close dialog
       setOpen(false);
+    }
+  };
+
+  // handle delete presensi
+  const handleDeletePresensi = async () => {
+    setIsLoading(true);
+
+    const response = await destroyPresence(presenceUuid).finally(() => {
+      setIsLoading(false);
+    });
+
+    // is success
+    if (response.status !== 422) {
+      // add toast
+      toast({
+        title: "Berhasil menghapus presensi",
+        description: "Presensi berhasil dihapus",
+      });
+
+      // redirect to modul
+      router.push(`/modul/${modulUuid}`);
     }
   };
 
@@ -137,8 +164,54 @@ export default function DialogPresensi({
               Save
             </Button>
             {/* add button delete */}
+            {data && (
+              <DialogDeletePresensi
+                onDestroy={handleDeletePresensi}
+                isLoading={isLoading}
+              />
+            )}
           </DialogFooter>
         </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function DialogDeletePresensi({ onDestroy, isLoading }) {
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+
+  return (
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" className="flex gap-3">
+          <IconTrash className="w-4 h-4" />
+          <span>Hapus</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Hapus Presensi</DialogTitle>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="grid gap-2">
+            <DialogDescription>
+              Apakah kamu yakin ingin menghapus presensi ini?
+            </DialogDescription>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button
+            variant="destructive"
+            onClick={onDestroy}
+            disabled={isLoading}
+          >
+            {isLoading && <Loader className="mr-2 h-4 w-4" />}
+            Hapus
+          </Button>
+          <Button variant={`ghost`} onClick={() => setDialogOpen(false)}>
+            Batal
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

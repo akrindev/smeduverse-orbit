@@ -7,6 +7,9 @@ import { useCallback, useEffect } from "react";
 import { Presence } from "@/types/presence";
 import Information from "./components/information";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { AxiosPromise, AxiosResponse } from "axios";
+import { toast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 
 interface PresensiPageProps {
   params: {
@@ -17,7 +20,7 @@ interface PresensiPageProps {
 
 export default async function PreseniPage({ params }: PresensiPageProps) {
   const [presence, showPresence] = usePresence<
-    [Presence, (uuid: string) => Promise<void>]
+    [Presence, (uuid: string) => AxiosPromise<AxiosResponse>]
   >((state) => [state.presence, state.showPresence]);
 
   const updatingPresence = useCallback(
@@ -25,8 +28,19 @@ export default async function PreseniPage({ params }: PresensiPageProps) {
     [params.presensiUuid]
   );
 
+  const router = useRouter();
+
   useEffect(() => {
-    updatingPresence();
+    updatingPresence().catch((res) => {
+      if (res.response.status === 404) {
+        toast({
+          title: "Presensi tidak ditemukan",
+          description: "Presensi yang anda cari tidak ditemukan",
+        });
+
+        router.push(`/modul/${params.uuid}`);
+      }
+    });
   }, []);
 
   return (

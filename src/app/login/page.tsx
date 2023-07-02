@@ -33,8 +33,8 @@ export default function AuthenticationPage() {
             </div>
             <UserAuthForm />
             <p className="mt-5 px-8 text-center text-sm text-muted-foreground">
-              <strong>"Smeduverse Orbit"</strong> {" by"} Smeducative. <br />{" "}
-              Part of SMK Diponegoro Karanganyar Kab. Pekalongan
+              <strong>"Smeduverse Orbit"</strong> {" by"} SMK Diponegoro
+              Karanganyar Kab. Pekalongan
             </p>
           </div>
         </div>
