@@ -26,6 +26,13 @@ type PresenceState = {
     attendance: Attendance;
     status: string | "h" | "i" | "s" | "a" | "b";
   }) => AxiosPromise<AxiosResponse<{ message: string; in_status: string }>>;
+  updateAttendanceNotes: ({
+    attendance,
+    notes,
+  }: {
+    attendance: Attendance;
+    notes: string | null;
+  }) => AxiosPromise<AxiosResponse<{ message: string; in_notes: string }>>;
 };
 
 export const usePresence = create<PresenceState>((set, get) => ({
@@ -82,6 +89,26 @@ export const usePresence = create<PresenceState>((set, get) => ({
 
     const response = await api.patch(
       `/modul/presence/patch-attendance/${presenceUuid}`,
+      data
+    );
+
+    return response;
+  },
+  updateAttendanceNotes: async ({ attendance, notes }) => {
+    const presenceUuid = get().presence.uuid;
+
+    // if not presence uuid then throw error
+    if (!presenceUuid) {
+      throw new Error("Presence uuid not found");
+    }
+
+    const data = {
+      ...attendance,
+      notes,
+    };
+
+    const response = await api.patch(
+      `/modul/presence/patch-attendance/${presenceUuid}/notes`,
       data
     );
 
