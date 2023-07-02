@@ -5,6 +5,12 @@ export default function RekapPage() {
         <div className="flex flex-col md:flex-row justify-between">
           <div className="mt-5 space-y-1">rekap</div>
         </div>
+
+        <div>
+          - rekap presensi permodul <br />
+          - rekap presensi per siswa <br />
+          ditampilkan dalam bentuk tabel
+        </div>
       </div>
     </div>
   );
