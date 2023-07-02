@@ -3,6 +3,7 @@ import { create } from "zustand";
 import { api } from "@/lib/api";
 import { Presence } from "@/types/presence";
 import { AxiosPromise, AxiosResponse } from "axios";
+import { Attendance } from "@/types/attendance";
 
 type Data = Pick<Presence, "orbit_modul_uuid" | "title" | "description"> & {
   presence_uuid?: string;
@@ -18,6 +19,13 @@ type PresenceState = {
   destroyPresence: (
     data: Pick<Presence, "orbit_modul_uuid">
   ) => AxiosPromise<AxiosResponse>;
+  updateAttendance: ({
+    attendance,
+    status,
+  }: {
+    attendance: Attendance;
+    status: string | "h" | "i" | "s" | "a" | "b";
+  }) => AxiosPromise<AxiosResponse<{ message: string; in_status: string }>>;
 };
 
 export const usePresence = create<PresenceState>((set, get) => ({
@@ -54,6 +62,28 @@ export const usePresence = create<PresenceState>((set, get) => ({
     );
 
     get().fetchPresences(data.orbit_modul_uuid);
+
+    return response;
+  },
+  updateAttendance: async ({ attendance, status }) => {
+    const presenceUuid = get().presence.uuid;
+
+    // if not presence uuid then throw error
+    if (!presenceUuid) {
+      throw new Error("Presence uuid not found");
+    }
+
+    console.log("aa", attendance);
+
+    const data = {
+      ...attendance,
+      status,
+    };
+
+    const response = await api.patch(
+      `/modul/presence/patch-attendance/${presenceUuid}`,
+      data
+    );
 
     return response;
   },

@@ -11,20 +11,23 @@ import {
 import { api } from "@/lib/api";
 import { useSemester } from "@/store/useSemester";
 import { Semester } from "@/types/semester";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import DialogSemester from "./dialog-semester";
 
 export default function TableSemester() {
+  const [loading, setLoading] = useState<boolean>(false);
   const [semesters, setSemesters] = useSemester((state) => [
     state.semesters,
     state.setSemesters,
   ]);
 
   useEffect(() => {
+    setLoading(true);
     const fetchSemesters = async () => {
-      const response = await api.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/semester/list`
-      );
+      const response = await api
+        .get(`${process.env.NEXT_PUBLIC_API_URL}/semester/list`)
+        .finally(() => setLoading(false));
+
       setSemesters(response.data);
     };
 
@@ -34,7 +37,7 @@ export default function TableSemester() {
   return (
     <div className="border rounded-md">
       {/* show skeleton when semester is loading */}
-      {semesters.length === 0 ? (
+      {loading ? (
         <div className="animate-pulse p-5">
           <div className="space-y-1">
             <div className="h-4 bg-gray-300 rounded w-1/2"></div>
@@ -45,7 +48,7 @@ export default function TableSemester() {
             <div className="h-4 bg-gray-300 rounded w-1/4"></div>
           </div>
         </div>
-      ) : (
+      ) : semesters && semesters.length > 0 ? (
         <Table>
           <TableHeader>
             <TableRow>
@@ -74,6 +77,10 @@ export default function TableSemester() {
             ))}
           </TableBody>
         </Table>
+      ) : (
+        <div className="p-5">
+          Belum ada Data semester, silahkan tambahkan semester baru
+        </div>
       )}
     </div>
   );

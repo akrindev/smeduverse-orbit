@@ -7,7 +7,7 @@ export async function generateMetadata({ params }) {
   const { data } = await getModulInfo(params.uuid);
 
   return {
-    title: data.mapel.nama,
+    title: `Modul ${data.mapel.nama}`,
     // make summary of modul description
     description: `Modul oleh ${data.teacher.fullname} - ${data.rombel.nama}`,
   };

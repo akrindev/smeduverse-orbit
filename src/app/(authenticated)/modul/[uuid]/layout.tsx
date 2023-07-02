@@ -1,7 +1,5 @@
 import { Separator } from "@/components/ui/separator";
 import { api } from "@/lib/api";
-import { Modul } from "@/types/modul";
-import { AxiosPromise, AxiosResponse } from "axios";
 import { notFound } from "next/navigation";
 import { SidebarNav } from "./components/sidebar-nax";
 
@@ -34,6 +32,10 @@ export default async function Layout({
     {
       title: "Penilaian",
       href: `/modul/${params.uuid}/penilaian`,
+    },
+    {
+      title: "Informasi",
+      href: `/modul/${params.uuid}/informasi`,
     },
   ];
 

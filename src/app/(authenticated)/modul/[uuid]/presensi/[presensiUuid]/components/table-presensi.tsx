@@ -1,7 +1,13 @@
 "use client";
 
-import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -10,9 +16,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { cn } from "@/lib/utils";
+import { toast } from "@/components/ui/use-toast";
+import { usePresence } from "@/store/usePresence";
 import { Attendance } from "@/types/attendance";
 import { ChevronDown } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function TablePresensi({
   attendances,
@@ -23,8 +31,7 @@ export default function TablePresensi({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>No</TableHead>
-          <TableHead>NIS</TableHead>
+          <TableHead className="hidden md:flex"></TableHead>
           <TableHead>Nama</TableHead>
           <TableHead>Status</TableHead>
           <TableHead>Note</TableHead>
@@ -33,35 +40,81 @@ export default function TablePresensi({
       <TableBody>
         {attendances!.map((attendance: Attendance, i) => (
           <TableRow key={attendance.student_id}>
-            <TableCell className="w-[50px]">{i + 1}</TableCell>
-            <TableCell className="w-[110px]">{attendance.nipd}</TableCell>
-            <TableCell className="truncate max-w-[500px] font-medium">
+            <TableCell className="p-2 w-[40px] hidden md:flex items-center justify-center">
+              {i + 1}
+            </TableCell>
+            <TableCell className="p-2 truncate max-w-[500px] font-medium">
+              <span className="font-normal">{attendance.nipd}</span> -{" "}
               {attendance.fullname}
             </TableCell>
-            <TableCell>
-              <div className="relative w-max">
-                <select
-                  className={cn(
-                    buttonVariants({ variant: "outline" }),
-                    "w-[200px] appearance-none bg-transparent font-normal"
-                  )}
-                >
-                  <option value="h">Hadir</option>
-                  <option value="i">Izin</option>
-                  <option value="s">Sakit</option>
-                  <option value="a">Alpa</option>
-                  <option value="b">Bolos</option>
-                </select>
-
-                <ChevronDown className="absolute right-3 top-3 h-4 w-4 opacity-50" />
-              </div>
+            <TableCell className="p-2">
+              <StatusAction
+                attendance={attendance}
+                key={attendance.student_id}
+              />
             </TableCell>
-            <TableCell>
+            <TableCell className="p-2">
               <Input type="text" placeholder="Note" className="min-w-[150px]" />
             </TableCell>
           </TableRow>
         ))}
       </TableBody>
     </Table>
+  );
+}
+
+function StatusAction({ attendance }: { attendance: Attendance }) {
+  const [status, setStatus] = useState<string | "h" | "i" | "s" | "a" | "b">(
+    attendance.presence.status
+  );
+  const [loading, setLoading] = useState(false);
+
+  const [presence, updateAttendance] = usePresence((state) => [
+    state.presence,
+    state.updateAttendance,
+  ]);
+
+  function handleChange(status: string) {
+    setStatus(status);
+
+    setLoading(true);
+
+    updateAttendance({ attendance, status })
+      .then((res) => {
+        if (res.status === 200) {
+          // @ts-ignore
+          setStatus(res.data.in_status);
+          toast({
+            title: "Berhasil",
+            description: "Status kehadiran berhasil diubah",
+          });
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }
+
+  useEffect(() => {
+    console.log(attendance);
+  }, [attendance]);
+
+  return (
+    <div className="relative w-max">
+      <Select value={status} onValueChange={handleChange} disabled={loading}>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Status Kehadiran" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="h">Hadir</SelectItem>
+          <SelectItem value="i">Izin</SelectItem>
+          <SelectItem value="s">Sakit</SelectItem>
+          <SelectItem value="a">Alpa</SelectItem>
+          <SelectItem value="b">Bolos</SelectItem>
+        </SelectContent>
+      </Select>
+
+      <ChevronDown className="absolute right-3 top-3 h-4 w-4 opacity-50" />
+    </div>
   );
 }

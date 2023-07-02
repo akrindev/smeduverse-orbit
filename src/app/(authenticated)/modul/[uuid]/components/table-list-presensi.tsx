@@ -58,7 +58,7 @@ export default function TableListPresensi({
               <TableRow
                 key={presence.uuid}
                 onClick={() => handleViewPresence(presence)}
-                className="cursor-pointer hover:bg-gray-100"
+                className="cursor-pointer"
               >
                 <TableCell className="text-left max-w-[130px] truncate">
                   <TooltipText text={presence.title} />
