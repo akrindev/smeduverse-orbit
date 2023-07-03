@@ -1,3 +1,4 @@
+import ThemeSwitcher from "@/components/theme-switcher";
 import { BottomNavbar } from "./components/bottom-navbar";
 import { OrbitLogo } from "./components/orbit-logo";
 import { Sidebar } from "./components/sidebar";
@@ -12,6 +13,7 @@ export default function DashboardLayout({ children }) {
             <OrbitLogo />
             <div className="ml-auto flex items-center space-x-4">
               {/* <Search /> */}
+              <ThemeSwitcher />
               <UserNav />
             </div>
           </div>
