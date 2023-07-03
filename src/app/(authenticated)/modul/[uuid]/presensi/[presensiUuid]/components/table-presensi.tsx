@@ -20,16 +20,7 @@ import { toast } from "@/components/ui/use-toast";
 import { usePresence } from "@/store/usePresence";
 import { Attendance } from "@/types/attendance";
 import { ChevronDown } from "lucide-react";
-import {
-  BaseSyntheticEvent,
-  SyntheticEvent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-
-import debounce from "lodash.debounce";
+import { BaseSyntheticEvent, useEffect, useRef, useState } from "react";
 
 export default function TablePresensi({
   attendances,
@@ -90,7 +81,7 @@ export default function TablePresensi({
 
 function StatusAction({ attendance }: { attendance: Attendance }) {
   const [status, setStatus] = useState<string | "h" | "i" | "s" | "a" | "b">(
-    attendance.presence.status
+    attendance.presence!.status
   );
   const [loading, setLoading] = useState(false);
 
@@ -138,7 +129,7 @@ function StatusAction({ attendance }: { attendance: Attendance }) {
 }
 
 function NoteAction({ attendance }: { attendance: Attendance }) {
-  const [notes, setNotes] = useState<null | string>(attendance.presence.notes);
+  const [notes, setNotes] = useState<null | string>(attendance.presence!.notes);
   const [debouncedValue, setDebouncedValue] = useState<string | null>(null);
 
   // input ref
@@ -170,7 +161,7 @@ function NoteAction({ attendance }: { attendance: Attendance }) {
 
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
-      if (notes !== attendance.presence.notes) {
+      if (notes !== attendance.presence!.notes) {
         setDebouncedValue(notes);
         // focus the input
         inputRef.current?.focus();
