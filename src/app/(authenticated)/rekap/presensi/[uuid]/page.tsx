@@ -8,6 +8,8 @@ import TableAttendances from "./components/table-attendances";
 import { Button } from "@/components/ui/button";
 import { IconLink } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import TablePresences from "./components/table-presence";
 
 interface RekapPageProps {
   params: {
@@ -52,7 +54,18 @@ export default function RekapPage({ params }: RekapPageProps) {
         </div>
         <Separator className="my-4" />
         {/* table */}
-        <TableAttendances modulUuid={params.uuid} />
+        <Tabs defaultValue="rekap">
+          <TabsList className="max-w-md grid grid-cols-2">
+            <TabsTrigger value="rekap">Kehadiran</TabsTrigger>
+            <TabsTrigger value="presensi">Presensi</TabsTrigger>
+          </TabsList>
+          <TabsContent value="rekap">
+            <TableAttendances modulUuid={params.uuid} />
+          </TabsContent>
+          <TabsContent value="presensi">
+            <TablePresences modulUuid={params.uuid} />
+          </TabsContent>
+        </Tabs>
         {/* end: table */}
       </div>
     </div>

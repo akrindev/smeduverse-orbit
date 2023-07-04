@@ -1,5 +1,6 @@
 "use client";
 
+import BaseLoading from "@/components/base-loading";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
@@ -117,6 +118,8 @@ export default function TableAttendances({ modulUuid }: TableAttendancesProps) {
         console.log(error);
       });
   }, [modulUuid, getRecapAttendances, setData]);
+
+  if (!data.length) return <BaseLoading />;
 
   return (
     <div>
