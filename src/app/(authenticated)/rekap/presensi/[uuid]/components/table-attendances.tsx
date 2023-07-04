@@ -1,5 +1,7 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
   Table,
   TableBody,
@@ -8,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 import { useAttendance } from "@/store/useAttendance";
 import { Attendance, OrbitPresence } from "@/types/attendance";
 import {
@@ -32,53 +35,66 @@ export default function TableAttendances({ modulUuid }: TableAttendancesProps) {
     (state) => state.getRecapAttendances
   );
 
-  const columns: ColumnDef<Attendance>[] = [
-    {
-      header: "No",
-      cell: (cell) => cell.row.index + 1,
-      size: 1,
-    },
-    {
-      header: "Nama",
-      accessorKey: "fullname",
-      cell: (cell) =>
-        `${cell.row.original.nipd} - ${cell.row.original.fullname}`,
-    },
-    {
-      header: "Kehadiran",
-      columns: [
-        ...orbitPresence.map((presence, i) => ({
-          header: () => i + 1,
-          accessorKey: presence.uuid,
+  const columns: ColumnDef<Attendance>[] = useMemo(
+    () => [
+      {
+        header: "No",
+        cell: (cell) => cell.row.index + 1,
+        maxSize: 50,
+      },
+      {
+        header: "Nama",
+        accessorKey: "fullname",
+        cell: (cell) =>
+          `${cell.row.original.nipd} - ${cell.row.original.fullname}`,
+      },
+      ...orbitPresence.map((presence, i) => ({
+        header: () => i + 1,
+        accessorKey: presence.uuid,
 
-          //   the cell is the presence status coming from orbit_presence
-          cell: (cell) => {
-            const status =
-              cell.row.original.orbit_presence[
-                i
-              ]?.presence.status.toUpperCase() || "";
+        //   the cell is the presence status coming from orbit_presence
+        cell: (cell) => {
+          const status =
+            cell.row.original.orbit_presence[
+              i
+            ]?.presence.status.toUpperCase() || "";
 
-            // colors the status
-            const colors = [
-              { status: "H", color: "text-green-500" },
-              { status: "S", color: "text-yellow-500" },
-              { status: "I", color: "text-blue-500" },
-              { status: "A", color: "text-red-500" },
-              { status: "B", color: "text-red-500" },
-            ];
+          // colors the status
+          const colors = [
+            { status: "H", color: "text-green-500" },
+            { status: "S", color: "text-yellow-500" },
+            { status: "I", color: "text-blue-500" },
+            { status: "A", color: "text-red-500" },
+            { status: "B", color: "text-red-500" },
+          ];
 
-            const matchedColor = colors.find(
-              (color) => color.status === status
-            )?.color;
+          const matchedColor = colors.find(
+            (color) => color.status === status
+          )?.color;
 
-            return (
-              <div className={`${matchedColor} font-medium`}>{status}</div>
-            );
-          },
-        })),
-      ],
-    },
-  ];
+          return <div className={`${matchedColor} font-medium`}>{status}</div>;
+        },
+      })),
+      {
+        header: "Rekap",
+        accessorKey: "status_count",
+        cell: (cell) => {
+          return (
+            <div className="flex gap-3">
+              {Object.entries(cell.row.original.status_count!).map(
+                ([key, value]) => (
+                  <Badge variant={"outline"} key={key}>
+                    {key.toUpperCase()}: {value}
+                  </Badge>
+                )
+              )}
+            </div>
+          );
+        },
+      },
+    ],
+    [orbitPresence]
+  );
 
   const table = useReactTable({
     data,
@@ -104,13 +120,20 @@ export default function TableAttendances({ modulUuid }: TableAttendancesProps) {
 
   return (
     <div>
-      <div className="rounded-md border">
+      <ScrollArea className="rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead
+                    className="p-2"
+                    key={header.id}
+                    style={{
+                      width:
+                        header.getSize() !== 150 ? header.getSize() : undefined,
+                    }}
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -126,7 +149,12 @@ export default function TableAttendances({ modulUuid }: TableAttendancesProps) {
             {table.getRowModel().rows.map((row) => (
               <TableRow key={row.id}>
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
+                  <TableCell
+                    key={cell.id}
+                    className={cn({
+                      "p-2 whitespace-nowrap": true,
+                    })}
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
@@ -134,7 +162,8 @@ export default function TableAttendances({ modulUuid }: TableAttendancesProps) {
             ))}
           </TableBody>
         </Table>
-      </div>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
     </div>
   );
 }

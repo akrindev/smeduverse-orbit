@@ -2,8 +2,6 @@
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-
-import { IconBooks, IconListDetails } from "@tabler/icons-react";
 import { usePathname, useRouter } from "next/navigation";
 import { menuList } from "./menu-list";
 import { Separator } from "@/components/ui/separator";

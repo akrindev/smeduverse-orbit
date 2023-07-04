@@ -2,6 +2,10 @@ import { Separator } from "@/components/ui/separator";
 import TableListPresensi from "./components/table-list-presensi";
 import { getModulInfo } from "./layout";
 import DialogPresensi from "./components/dialog-presensi";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Icons } from "@/components/icons";
+import { FileText } from "lucide-react";
 
 export async function generateMetadata({ params }) {
   const { data } = await getModulInfo(params.uuid);
@@ -23,8 +27,13 @@ export default function ModulPage({ params }: { params: { uuid: string } }) {
             Daftar presensi yang telah dibuat
           </p>
         </div>
-        <div className="col-span-12 md:col-span-6 flex items-center justify-end">
+        <div className="col-span-12 md:col-span-6 flex items-center justify-end gap-3">
           <DialogPresensi modulUuid={params.uuid} />
+          <Link href={`/rekap/presensi/${params.uuid}`}>
+            <Button variant={`outline`}>
+              <FileText className="w-4 h-4" />
+            </Button>
+          </Link>
         </div>
       </div>
       <Separator />

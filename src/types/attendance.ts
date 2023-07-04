@@ -14,6 +14,13 @@ export interface Attendance {
   nisn: string;
   nipd: string;
   photo: string;
+  status_count?: {
+    s?: number;
+    i?: number;
+    a?: number;
+    h?: number;
+    b?: number;
+  };
   presence?: Presence;
   orbit_presence?: OrbitPresence[] | Array<any>;
   rombongan_belajar?: RombonganBelajar[];
