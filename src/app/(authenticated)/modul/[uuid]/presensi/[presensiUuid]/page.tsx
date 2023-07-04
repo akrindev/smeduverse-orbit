@@ -3,7 +3,7 @@
 import { Separator } from "@/components/ui/separator";
 import TablePresensi from "./components/table-presensi";
 import { usePresence } from "@/store/usePresence";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Presence } from "@/types/presence";
 import Information from "./components/information";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -18,15 +18,16 @@ interface PresensiPageProps {
   };
 }
 
-export default async function PreseniPage({ params }: PresensiPageProps) {
+export default function PreseniPage({ params }: PresensiPageProps) {
+  const [loading, setLoading] = useState(false);
   const [presence, showPresence] = usePresence<
     [Presence, (uuid: string) => AxiosPromise<AxiosResponse>]
   >((state) => [state.presence, state.showPresence]);
 
-  const updatingPresence = useCallback(
-    () => showPresence(params.presensiUuid),
-    [params.presensiUuid]
-  );
+  const updatingPresence = useCallback(() => {
+    setLoading(true);
+    return showPresence(params.presensiUuid).finally(() => setLoading(false));
+  }, [params.presensiUuid]);
 
   const router = useRouter();
 
@@ -53,6 +54,7 @@ export default async function PreseniPage({ params }: PresensiPageProps) {
         description={presence?.description}
         presence={presence}
         onRefresh={updatingPresence}
+        isLoading={loading}
       />
       {/* <Separator className="my-4" /> */}
       <div className="relative w-full mt-5 rounded-md border">

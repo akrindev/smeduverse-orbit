@@ -23,6 +23,7 @@ export default function Information({
   presenceUuid,
   presence,
   onRefresh,
+  isLoading,
 }: {
   title: string;
   description: string;
@@ -30,6 +31,7 @@ export default function Information({
   presenceUuid?: string;
   presence?: Presence;
   onRefresh?: () => void;
+  isLoading?: boolean;
 }) {
   // handle data state
   const [data, setData] = useState<{
@@ -97,7 +99,7 @@ export default function Information({
       </div>
       <div className="mt-3 flex items-center justify-end col-span-12 gap-3">
         <DialogPresensi modulUuid={modulUuid} data={data!} />
-        <Button variant={"outline"} onClick={onRefresh}>
+        <Button variant={"outline"} onClick={onRefresh} disabled={isLoading}>
           <IconReload className="w-5 h-5" />
           Refresh
         </Button>
