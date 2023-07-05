@@ -4,11 +4,22 @@ import { getModulInfo } from "./layout";
 import DialogPresensi from "./components/dialog-presensi";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Icons } from "@/components/icons";
 import { FileText } from "lucide-react";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
+
+export const runtime =
+  process.env.NODE_ENV !== "production" ? "nodejs" : "edge";
 
 export async function generateMetadata({ params }) {
   const { data } = await getModulInfo(params.uuid);
+  // if modul doesnt belongs to user, redirect to /modul/[uuid]
+  const session = await getServerSession(authOptions);
+
+  if (data.teacher.teacher_id !== session!.user.id) {
+    redirect(`/rekap/presensi/${params.uuid}`);
+  }
 
   return {
     title: `Modul ${data.mapel.nama}`,

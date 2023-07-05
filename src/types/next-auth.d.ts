@@ -9,7 +9,7 @@ declare module "next-auth" {
       id: string | null;
       name?: string | null;
       email?: string | null;
-      roles?: Array<string> | string | null;
+      roles?: Role[] | null;
       teacher: {
         id: string;
         fullname: string;
@@ -19,6 +19,19 @@ declare module "next-auth" {
         tempat_lahir: string;
         tanggal_lahir: string;
       };
+    };
+  }
+
+  interface Role {
+    id: number;
+    name: string;
+    guard_name: string;
+    created_at: string;
+    updated_at: string;
+    pivot: {
+      model_id: string;
+      role_id: number;
+      model_type: string;
     };
   }
 }

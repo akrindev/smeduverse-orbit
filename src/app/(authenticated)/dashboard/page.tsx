@@ -2,13 +2,14 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Metadata } from "next";
 import ModulList from "../modul/components/modul-list";
+import { hasRole, hasRoles } from "@/lib/auth-role";
 
 export const metadata: Metadata = {
   title: "Dashboard",
   description: "Halaman utama",
 };
 
-export default function Page() {
+export default async function Page() {
   const analitycs: Array<{
     name: string;
     value: number;
