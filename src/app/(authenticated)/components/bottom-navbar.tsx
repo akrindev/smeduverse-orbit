@@ -6,20 +6,21 @@
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-
-import {
-  IconGridPattern,
-  IconMicrophone,
-  IconPlayerPlay,
-  IconReportAnalytics,
-} from "@tabler/icons-react";
 import { Separator } from "@/components/ui/separator";
 import { usePathname, useRouter } from "next/navigation";
 import { menuList } from "./menu-list";
+import { useSession } from "next-auth/react";
 
 export function BottomNavbar({ className }: { className?: string }) {
   const pathname = usePathname();
   const router = useRouter();
+
+  const { data: session } = useSession({
+    required: true,
+  });
+
+  if (!session) return null;
+
   // change variant to default when the page is active
   // this will highlight the menu item
   function isActive(path, bool = false) {
@@ -31,6 +32,17 @@ export function BottomNavbar({ className }: { className?: string }) {
 
     return matched;
   }
+
+  // filtered menu based on user roles
+  const filteredMenu = menuList.filter((item) => {
+    // check if item.roles has session user roles
+    if (!item.roles) return true;
+
+    return item.roles.some((role) =>
+      session.user?.roles?.map((r) => r.name).includes(role)
+    );
+  });
+
   return (
     <div
       className={cn(
@@ -40,7 +52,7 @@ export function BottomNavbar({ className }: { className?: string }) {
     >
       <Separator />
       <div className="flex justify-around py-4 px-2 space-x-2">
-        {menuList.map(
+        {filteredMenu.map(
           (item) =>
             !item.separator && (
               <Button
