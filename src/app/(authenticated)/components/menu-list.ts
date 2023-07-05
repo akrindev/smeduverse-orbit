@@ -12,6 +12,7 @@ interface MenuItem {
   icon: React.FC<React.SVGProps<SVGSVGElement>>;
   path: string;
   separator?: boolean;
+  roles?: string[]; // role that can access this menu
 }
 
 export const menuList: MenuItem[] = [
@@ -35,15 +36,18 @@ export const menuList: MenuItem[] = [
     icon: IconPlayerPlay,
     path: "/",
     separator: true,
+    roles: ["waka kurikulum"],
   },
   {
     name: "Semester",
     icon: IconListDetails,
     path: "/semester",
+    roles: ["waka kurikulum"],
   },
   {
     name: "Mata Pelajaran",
     icon: IconBooks,
     path: "/mata-pelajaran",
+    roles: ["waka kurikulum"],
   },
 ];

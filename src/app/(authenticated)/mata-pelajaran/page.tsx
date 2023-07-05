@@ -3,8 +3,15 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { IconInfoCircle } from "@tabler/icons-react";
 import DialogMataPelajaran from "./components/dialog-mata-pelajaran";
 import TableMataPelajaran from "./components/table-mata-pelajaran";
+import { isWakaKurikulum } from "@/lib/auth-role";
+import { redirect } from "next/navigation";
 
-export default function MataPelajaranPage() {
+export default async function MataPelajaranPage() {
+  // only waka kurikulum can access this page
+  if (!(await isWakaKurikulum())) {
+    redirect("/dashboard");
+  }
+
   return (
     <div className="h-full flex flex-col space-y-5">
       <div className="flex flex-col h-full">

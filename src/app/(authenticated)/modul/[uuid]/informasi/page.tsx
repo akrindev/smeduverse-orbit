@@ -11,7 +11,7 @@ interface InformationProps {
   };
 }
 
-export default async function PreseniPage({ params }: InformationProps) {
+export default function PreseniPage({ params }: InformationProps) {
   const [modul, fetchByUuid] = useModul<
     [Modul | null, (uuid: string) => Promise<void>]
   >((state) => [state.modul, state.fetchByUuid]);

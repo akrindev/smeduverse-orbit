@@ -46,6 +46,7 @@ export default function TableListPresensi({
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="text-left w-10">No</TableHead>
             <TableHead className="text-left">Judul</TableHead>
             <TableHead className="text-left">Deskripsi</TableHead>
             <TableHead className="text-left">Tanggal</TableHead>
@@ -54,12 +55,13 @@ export default function TableListPresensi({
         <TableBody>
           {/* list of all presences */}
           {presences.length ? (
-            presences.map((presence: Presence) => (
+            presences.map((presence: Presence, i: number) => (
               <TableRow
                 key={presence.uuid}
                 onClick={() => handleViewPresence(presence)}
                 className="cursor-pointer"
               >
+                <TableCell>{presences.length - i}</TableCell>
                 <TableCell className="text-left max-w-[130px] truncate">
                   <TooltipText text={presence.title} />
                 </TableCell>

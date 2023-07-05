@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@badrap/bar-of-progress": "^0.2.2",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-alert-dialog": "^1.0.4",
     "@radix-ui/react-aspect-ratio": "^1.0.3",
@@ -35,17 +36,18 @@
     "@radix-ui/react-toast": "^1.1.4",
     "@radix-ui/react-toggle": "^1.0.3",
     "@radix-ui/react-tooltip": "^1.0.6",
-    "@tabler/icons-react": "^2.22.0",
+    "@tabler/icons-react": "^2.23.0",
+    "@tanstack/react-table": "^8.9.3",
     "autoprefixer": "^10.4.14",
     "axios": "^1.4.0",
-    "class-variance-authority": "^0.6.0",
+    "class-variance-authority": "^0.6.1",
     "clsx": "^1.2.1",
     "crypto-js": "^4.1.1",
     "date-fns": "^2.30.0",
     "filepond": "^4.30.4",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.241.0",
-    "next": "13.4.6",
+    "next": "13.4.8",
     "next-auth": "^4.22.1",
     "next-themes": "^0.2.1",
     "postcss": "^8.4.24",
@@ -53,11 +55,11 @@
     "react-day-picker": "^8.8.0",
     "react-dom": "18.2.0",
     "react-filepond": "^7.1.2",
-    "sass": "^1.63.4",
+    "sass": "^1.63.6",
     "tailwind-merge": "^1.13.2",
     "tailwindcss": "^3.3.2",
     "tailwindcss-animate": "^1.0.6",
-    "zustand": "^4.3.8"
+    "zustand": "^4.3.9"
   },
   "devDependencies": {
     "@types/node": "18.11.18",

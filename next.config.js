@@ -9,6 +9,16 @@ const nextConfig = {
   images: {
     domains: ["images.unsplash.com", "source.unsplash.com", "picsum.photos"],
   },
+  // redirect / to login
+  async redirects() {
+    return [
+      {
+        source: "/",
+        destination: "/login",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
