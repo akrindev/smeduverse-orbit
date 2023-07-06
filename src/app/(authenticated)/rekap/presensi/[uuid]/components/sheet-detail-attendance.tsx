@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Table,
@@ -60,35 +61,38 @@ export default function SheetDetailAttendance({
           </div>
         </div>
 
-        {attendance.orbit_presence ? (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Presensi</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Catatan</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {attendance.orbit_presence.map((presence: OrbitPresence) => (
-                <TableRow key={presence.uuid + presence.presence.student_id}>
-                  <TableCell>{presence.title}</TableCell>
-                  <TableCell>
-                    <span
-                      className={`font-medium uppercase ${
-                        colors[presence.presence.status.toUpperCase()]
-                      }`}
-                    >
-                      {presence.presence.status}
-                    </span>
-                  </TableCell>
-                  <TableCell>{presence.presence.notes}</TableCell>
+        {attendance.orbit_presence?.length ? (
+          <ScrollArea className="h-[450px] border rounded-sm">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Presensi</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Catatan</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {attendance.orbit_presence.map((presence: OrbitPresence) => (
+                  <TableRow key={presence.uuid + presence.presence.student_id}>
+                    <TableCell>{presence.title}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`font-medium uppercase ${
+                          colors[presence.presence.status.toUpperCase()]
+                        }`}
+                      >
+                        {presence.presence.status}
+                      </span>
+                    </TableCell>
+                    <TableCell>{presence.presence.notes}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            <ScrollBar orientation="vertical" />
+          </ScrollArea>
         ) : (
-          <div>belum ada presensi</div>
+          <div className="p-5 text-center">belum ada presensi</div>
         )}
       </SheetContent>
     </Sheet>
