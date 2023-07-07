@@ -22,6 +22,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { memo, useEffect, useMemo, useState } from "react";
+import SheetDetailAttendance from "./sheet-detail-attendance";
 
 interface TableAttendancesProps {
   modulUuid: string;
@@ -46,8 +47,9 @@ export default function TableAttendances({ modulUuid }: TableAttendancesProps) {
       {
         header: "Nama",
         accessorKey: "fullname",
-        cell: (cell) =>
-          `${cell.row.original.nipd} - ${cell.row.original.fullname}`,
+        cell: (cell) => (
+          <SheetDetailAttendance attendance={cell.row.original} />
+        ),
       },
       ...orbitPresence.map((presence, i) => ({
         header: () => i + 1,

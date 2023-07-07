@@ -91,10 +91,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       <form onSubmit={onSubmit}>
         <input type="hidden" name="csrfToken" defaultValue={csrfToken} />
         <div className="grid gap-2">
-          <div className="grid gap-3">
-            <Label className="sr-only" htmlFor="email">
-              Email
-            </Label>
+          <div className="mb-5 grid space-y-5">
             <Input
               id="email"
               placeholder="NIY atau Email"
