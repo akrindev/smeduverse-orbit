@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { isUser } from "@/lib/auth-role";
+import { Badge } from "@/components/ui/badge";
 
 export default function ModulCard({
   modul,
@@ -21,23 +21,28 @@ export default function ModulCard({
   className?: string;
   isUser?: boolean;
 }) {
+  console.log(modul);
   return (
     <Link
       href={isUser ? `/modul/${modul.uuid}` : `/rekap/presensi/${modul.uuid}`}
-      className={cn(
-        "hover:shadow-xl hover:scale-95 duration-300 space-y-1 col-span-6 md:col-span-3",
-        className
-      )}
+      className="space-y-1 col-span-6 md:col-span-3"
     >
-      <Card>
+      <Card
+        className={cn("hover:shadow-xl hover:scale-95 duration-300", className)}
+      >
         <CardHeader>
-          <CardTitle>{modul.rombel.nama}</CardTitle>
+          <CardTitle>
+            {modul.rombel.nama} | {modul.semester?.name}
+          </CardTitle>
           <CardDescription className="text-xs">
-            {modul.mapel.nama}
+            {modul.teacher.fullname}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm">{modul.teacher.fullname}</p>
+          <p className="text-sm space-x-3">
+            <Badge>{modul.mapel.kode}</Badge>
+            <span>{modul.mapel.nama}</span>
+          </p>
         </CardContent>
       </Card>
     </Link>

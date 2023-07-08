@@ -1,7 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -16,27 +15,34 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { toast } from "@/components/ui/use-toast";
 import { usePresence } from "@/store/usePresence";
 import { Presence } from "@/types/presence";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+
+const colors = {
+  H: "bg-green-500",
+  S: "bg-yellow-500",
+  I: "bg-blue-500",
+  A: "bg-red-500",
+  B: "bg-red-500",
+};
 
 export default function TableListPresensi({
   modulUuid,
 }: {
   modulUuid: string;
 }) {
-  const [presences, fetchPresences] = usePresence((state) => [
-    state.presences,
-    state.fetchPresences,
-  ]);
+  const [presences, fetchPresences] = usePresence<
+    [Presence[], (modulUuid: string) => void]
+  >((state) => [state.presences, state.fetchPresences]);
 
   const router = useRouter();
 
   useEffect(() => {
     fetchPresences(modulUuid);
   }, [modulUuid]);
+  console.log(presences);
 
   const handleViewPresence = (presence: Presence) => {
     router.push(`/modul/${modulUuid}/presensi/${presence.uuid}`);
@@ -62,19 +68,40 @@ export default function TableListPresensi({
                 className="cursor-pointer"
               >
                 <TableCell>{presences.length - i}</TableCell>
-                <TableCell className="text-left max-w-[130px] truncate">
+                <TableCell className="p-2 text-left max-w-[130px] truncate">
                   <TooltipText text={presence.title} />
                 </TableCell>
-                <TableCell className="text-left max-w-lg truncate">
-                  <TooltipText text={presence.description} />
+                <TableCell className="p-2 text-left max-w-[420px] truncate">
+                  {presence.description}
                 </TableCell>
-                <TableCell className="text-left">
-                  {new Date(presence.created_at).toLocaleDateString("id-ID", {
-                    weekday: "long",
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
+                <TableCell className="p-2 text-left">
+                  <div className="flex flex-wrap gap-1 text-left">
+                    {/* count_[a,i,s,b,a] */}
+                    {["h", "i", "s", "b", "a"].map(
+                      (status) =>
+                        presence[`count_${status}`] > 0 && (
+                          <Badge
+                            className={
+                              "text-white " +
+                              colors[status.slice(0, 5).toUpperCase()]
+                            }
+                            variant={"outline"}
+                            key={presence.uuid + status}
+                          >
+                            {status.toUpperCase()}:{" "}
+                            {presence[`count_${status}`]}
+                          </Badge>
+                        )
+                    )}
+                  </div>
+                  <div className="text-muted-foreground">
+                    {new Date(presence.created_at).toLocaleDateString("id-ID", {
+                      weekday: "long",
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </div>
                 </TableCell>
               </TableRow>
             ))

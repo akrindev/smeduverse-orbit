@@ -3,10 +3,9 @@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useModul } from "@/store/useModul";
 import { Modul } from "@/types/modul";
-import ModulCard from "../../components/ModulCard";
+import ModulCard from "../../components/modul-card";
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { isUser } from "@/lib/auth-role";
 
 export default function ModulList({ owned }: { owned?: boolean }) {
   const [moduls, fetchOwned, refetch] = useModul((state) => [
