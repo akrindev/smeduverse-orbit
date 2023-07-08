@@ -33,6 +33,7 @@ export default function SelectRombel({ onSelected }) {
         <SelectGroup>
           <SelectLabel>Pilih Rombel</SelectLabel>
           <ScrollArea className="h-72">
+            <SelectItem value={""}>Semua Rombel</SelectItem>
             {rombels &&
               rombels.map((rombel: Rombel) => (
                 <SelectItem key={rombel.id} value={rombel.id}>

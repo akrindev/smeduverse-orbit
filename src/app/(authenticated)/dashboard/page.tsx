@@ -2,7 +2,6 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Metadata } from "next";
 import ModulList from "../modul/components/modul-list";
-import { hasRole, hasRoles } from "@/lib/auth-role";
 
 export const metadata: Metadata = {
   title: "Dashboard",

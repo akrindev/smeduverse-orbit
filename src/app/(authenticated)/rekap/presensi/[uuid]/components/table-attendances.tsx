@@ -16,12 +16,11 @@ import { useAttendance } from "@/store/useAttendance";
 import { Attendance, OrbitPresence } from "@/types/attendance";
 import {
   ColumnDef,
-  createColumnHelper,
   flexRender,
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { memo, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import SheetDetailAttendance from "./sheet-detail-attendance";
 
 interface TableAttendancesProps {

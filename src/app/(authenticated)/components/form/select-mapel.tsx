@@ -31,6 +31,7 @@ export default function SelectMapel({ onSelected }) {
         <SelectGroup>
           <SelectLabel>Pilih Mapel</SelectLabel>
           <ScrollArea className="h-72">
+            <SelectItem value={""}>Semua Mapel</SelectItem>
             {mapels &&
               mapels.map((mapel: Mapel) => (
                 <SelectItem key={mapel.id} value={mapel.id.toString()}>
