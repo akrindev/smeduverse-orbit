@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: "Halaman utama",
 };
 
-export async function analytics() {
+async function analytics() {
   const response = await api.get("/analytics");
   return response.data;
 }
