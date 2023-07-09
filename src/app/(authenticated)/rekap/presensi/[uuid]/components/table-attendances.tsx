@@ -116,7 +116,7 @@ export default function TableAttendances({ modulUuid }: TableAttendancesProps) {
         }
       })
       .catch((error) => {
-        console.log(error);
+        // console.log(error);
       });
   }, [modulUuid, getRecapAttendances, setData]);
 

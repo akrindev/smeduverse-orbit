@@ -14,6 +14,7 @@ import BaseLoading from "@/components/base-loading";
 export default function ModulList({ owned }: { owned?: boolean }) {
   const [query, setQuery] = useState<Query | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isWaka, setIsWaka] = useState(false);
 
   const [moduls, fetchOwned, refetch] = useModul<
     [
@@ -26,6 +27,18 @@ export default function ModulList({ owned }: { owned?: boolean }) {
   const { data: session } = useSession({
     required: true,
   });
+
+  useEffect(() => {
+    if (session) {
+      const roles = session.user?.roles?.map((role) => role.name);
+
+      // console.log(roles);
+
+      if (roles?.includes("waka kurikulum")) {
+        setIsWaka(true);
+      }
+    }
+  }, [session]);
 
   useEffect(() => {
     setLoading(true);
@@ -73,6 +86,7 @@ export default function ModulList({ owned }: { owned?: boolean }) {
                   modul={modul}
                   className="cursor-pointer"
                   isUser={isOwned(modul)}
+                  isWakaKurikulum={isWaka}
                 />
               ))
             ) : (

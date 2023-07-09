@@ -42,7 +42,6 @@ export default function TableListPresensi({
   useEffect(() => {
     fetchPresences(modulUuid);
   }, [modulUuid]);
-  console.log(presences);
 
   const handleViewPresence = (presence: Presence) => {
     router.push(`/modul/${modulUuid}/presensi/${presence.uuid}`);

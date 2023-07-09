@@ -10,6 +10,7 @@ import { IconLink } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TablePresences from "./components/table-presence";
+import { AxiosPromise, AxiosResponse } from "axios";
 
 interface RekapPageProps {
   params: {
@@ -19,13 +20,18 @@ interface RekapPageProps {
 
 export default function RekapPage({ params }: RekapPageProps) {
   const [modul, fetchModul] = useModul<
-    [modul: Modul | null, fetchByUuid: (uuid: string) => void]
+    [
+      modul: Modul | null,
+      fetchByUuid: (uuid: string) => AxiosPromise<AxiosResponse>
+    ]
   >((state) => [state.modul, state.fetchByUuid]);
 
   const router = useRouter();
 
   useEffect(() => {
-    fetchModul(params.uuid);
+    fetchModul(params.uuid).catch((e) => {
+      router.push("/modul");
+    });
   }, [params.uuid]);
 
   return (

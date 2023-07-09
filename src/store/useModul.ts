@@ -20,8 +20,9 @@ type ModulState = {
   setModul: (modul: any) => void;
   refetch: (query?: Query | null | undefined) => Promise<void>;
   fetchOwned: (teacher_id: string | null | undefined) => Promise<void>;
-  fetchByUuid: (uuid: string | null | undefined) => Promise<void>;
+  fetchByUuid: (uuid: string | null | undefined) => AxiosPromise<AxiosResponse>;
   store: (body: any) => AxiosPromise<AxiosResponse>;
+  destroy: (uuid: string | null | undefined) => AxiosPromise<AxiosResponse>;
 };
 
 export const useModul = create<ModulState>((set, get) => ({
@@ -53,12 +54,32 @@ export const useModul = create<ModulState>((set, get) => ({
     set({ moduls });
   },
   fetchByUuid: async (uuid) => {
-    const response = await api.get<Modul>(`/modul/show/${uuid}`);
+    const response = await api.get(`/modul/show/${uuid}`);
     const modul = response.data;
+
     set({ modul });
+
+    return response;
   },
   store: async (body) => {
     const response = await api.post("/modul/store", body);
+
+    // if error
+    if (response.data.error) {
+      toast({
+        title: "Error",
+        description: response.data.message,
+        variant: "destructive",
+      });
+    }
+
+    // call refetch
+    await get().refetch();
+
+    return response;
+  },
+  destroy: async (uuid) => {
+    const response = await api.delete(`/modul/destroy/${uuid}`);
 
     // if error
     if (response.data.error) {
