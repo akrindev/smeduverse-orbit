@@ -3,6 +3,7 @@
 import { Separator } from "@/components/ui/separator";
 import { useModul } from "@/store/useModul";
 import { Modul } from "@/types/modul";
+import { AxiosPromise, AxiosResponse } from "axios";
 import { useEffect } from "react";
 
 interface InformationProps {
@@ -13,7 +14,7 @@ interface InformationProps {
 
 export default function PreseniPage({ params }: InformationProps) {
   const [modul, fetchByUuid] = useModul<
-    [Modul | null, (uuid: string) => Promise<void>]
+    [Modul | null, (uuid: string) => AxiosPromise<AxiosResponse>]
   >((state) => [state.modul, state.fetchByUuid]);
 
   useEffect(() => {
