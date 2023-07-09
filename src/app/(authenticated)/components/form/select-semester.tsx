@@ -10,12 +10,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useMapel } from "@/store/useMapel";
-import { Mapel } from "@/types/modul";
+import { useSemester } from "@/store/useSemester";
 import { useEffect } from "react";
 
-export default function SelectMapel({ onSelected }) {
-  const [mapels, refetch] = useMapel((state) => [state.mapels, state.refetch]);
+export default function SelectSemester({ onSelected }) {
+  const [semesters, refetch] = useSemester((state) => [
+    state.semesters,
+    state.refetch,
+  ]);
 
   useEffect(() => {
     refetch();
@@ -24,17 +26,17 @@ export default function SelectMapel({ onSelected }) {
   return (
     <Select onValueChange={(value: string) => onSelected(value)}>
       <SelectTrigger className="w-full">
-        <SelectValue placeholder="Pilih Mapel" />
+        <SelectValue placeholder="Pilih Semester" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          <SelectLabel>Pilih Mapel</SelectLabel>
+          <SelectLabel>Pilih Semester</SelectLabel>
           <ScrollArea className="h-72">
-            <SelectItem value={""}>Semua Mapel</SelectItem>
-            {mapels &&
-              mapels.map((mapel: Mapel) => (
-                <SelectItem key={mapel.id} value={mapel.id.toString()}>
-                  {mapel.kode} - {mapel.nama}
+            <SelectItem value={""}>Semua Semester</SelectItem>
+            {semesters &&
+              semesters.map((semester) => (
+                <SelectItem key={semester.name} value={semester.id.toString()}>
+                  {semester.name}
                 </SelectItem>
               ))}
             <ScrollBar />

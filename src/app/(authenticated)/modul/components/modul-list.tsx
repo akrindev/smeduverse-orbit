@@ -10,6 +10,7 @@ import SelectTeacher from "../../components/form/select-teacher";
 import SelectRombel from "../../components/form/select-rombel";
 import SelectMapel from "../../components/form/select-mapel";
 import BaseLoading from "@/components/base-loading";
+import SelectSemester from "../../components/form/select-semester";
 
 export default function ModulList({ owned }: { owned?: boolean }) {
   const [query, setQuery] = useState<Query | null>(null);
@@ -71,6 +72,9 @@ export default function ModulList({ owned }: { owned?: boolean }) {
           />
           <SelectMapel
             onSelected={(mapel_id) => setQuery({ ...query, mapel_id })}
+          />
+          <SelectSemester
+            onSelected={(semester_id) => setQuery({ ...query, semester_id })}
           />
         </div>
       )}
