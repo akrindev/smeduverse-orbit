@@ -6,11 +6,7 @@ export default function RekapPage() {
           <div className="mt-5 space-y-1">rekap</div>
         </div>
 
-        <div>
-          - rekap presensi permodul <br />
-          - rekap presensi per siswa <br />
-          ditampilkan dalam bentuk tabel
-        </div>
+        <div>pilih modul untuk melihat rekap</div>
       </div>
     </div>
   );

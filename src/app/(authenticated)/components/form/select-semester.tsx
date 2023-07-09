@@ -32,7 +32,7 @@ export default function SelectSemester({ onSelected }) {
         <SelectGroup>
           <SelectLabel>Pilih Semester</SelectLabel>
           <ScrollArea className="h-72">
-            <SelectItem value={""}>Semua Semester</SelectItem>
+            {/* <SelectItem value={""}>Semua Semester</SelectItem> */}
             {semesters &&
               semesters.map((semester) => (
                 <SelectItem key={semester.name} value={semester.id.toString()}>
