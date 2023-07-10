@@ -47,7 +47,7 @@
     "filepond": "^4.30.4",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.241.0",
-    "next": "13.4.8",
+    "next": "13.4.9",
     "next-auth": "^4.22.1",
     "next-themes": "^0.2.1",
     "postcss": "^8.4.24",
