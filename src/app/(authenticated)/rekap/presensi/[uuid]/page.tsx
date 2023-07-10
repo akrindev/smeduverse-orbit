@@ -3,13 +3,19 @@
 import { Separator } from "@/components/ui/separator";
 import { useModul } from "@/store/useModul";
 import { Modul } from "@/types/modul";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import TableAttendances from "./components/table-attendances";
 import { Button } from "@/components/ui/button";
 import { IconLink } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TablePresences from "./components/table-presence";
+import { AxiosPromise, AxiosResponse } from "axios";
+import { isUser } from "@/lib/auth-role";
+import { useSession } from "next-auth/react";
+import BaseLoading from "@/components/base-loading";
+import { api } from "@/lib/api";
+import { Loader } from "lucide-react";
 
 interface RekapPageProps {
   params: {
@@ -18,15 +24,51 @@ interface RekapPageProps {
 }
 
 export default function RekapPage({ params }: RekapPageProps) {
+  const [loading, setLoading] = useState(false);
   const [modul, fetchModul] = useModul<
-    [modul: Modul | null, fetchByUuid: (uuid: string) => void]
+    [
+      modul: Modul | null,
+      fetchByUuid: (uuid: string) => AxiosPromise<AxiosResponse>
+    ]
   >((state) => [state.modul, state.fetchByUuid]);
 
   const router = useRouter();
 
+  const { data: session } = useSession({
+    required: true,
+  });
+
   useEffect(() => {
-    fetchModul(params.uuid);
+    fetchModul(params.uuid).catch((e) => {
+      router.push("/modul");
+    });
   }, [params.uuid]);
+
+  if (!session) {
+    return <BaseLoading />;
+  }
+
+  // handle cetak
+  const handleExport = async () => {
+    setLoading(true);
+    // download data using axios api
+    const response = await api
+      .get(`/modul/presence/recap/export/${params.uuid}`, {
+        responseType: "blob",
+      })
+      .then((response) => {
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute(
+          "download",
+          `rekap presensi ${modul?.mapel.kode}-${modul?.rombel.nama}.xlsx`
+        );
+        document.body.appendChild(link);
+        link.click();
+      })
+      .finally(() => setLoading(false));
+  };
 
   return (
     <div className="h-full flex flex-col space-y-5">
@@ -42,14 +84,18 @@ export default function RekapPage({ params }: RekapPageProps) {
             </p>
           </div>
           <div className="flex gap-3">
-            <Button variant="outline">Cetak</Button>
-            <Button
-              variant="default"
-              onClick={() => router.push(`/modul/${params.uuid}`)}
-            >
-              Lihat
-              <IconLink className="w-4 h-4 ml-1" />
+            <Button variant="outline" onClick={handleExport} disabled={loading}>
+              {loading ? <Loader className="w-5 h-5" /> : <>Unduh</>}
             </Button>
+            {isUser(session, modul?.teacher_id!) && (
+              <Button
+                variant="default"
+                onClick={() => router.push(`/modul/${params.uuid}`)}
+              >
+                Lihat
+                <IconLink className="w-4 h-4 ml-1" />
+              </Button>
+            )}
           </div>
         </div>
         <Separator className="my-4" />

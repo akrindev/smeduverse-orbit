@@ -1,5 +1,6 @@
 import { toast } from "@/components/ui/use-toast";
 import Axios, { AxiosError, AxiosInstance } from "axios";
+import { notFound, redirect } from "next/navigation";
 
 const api: AxiosInstance = Axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,

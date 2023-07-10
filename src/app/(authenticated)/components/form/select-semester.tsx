@@ -10,13 +10,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useRombel } from "@/store/useRombel";
-import { Rombel } from "@/types/modul";
+import { useSemester } from "@/store/useSemester";
 import { useEffect } from "react";
 
-export default function SelectRombel({ onSelected }) {
-  const [rombels, refetch] = useRombel((state) => [
-    state.rombels,
+export default function SelectSemester({ onSelected }) {
+  const [semesters, refetch] = useSemester((state) => [
+    state.semesters,
     state.refetch,
   ]);
 
@@ -25,19 +24,19 @@ export default function SelectRombel({ onSelected }) {
   }, []);
 
   return (
-    <Select onValueChange={onSelected}>
+    <Select onValueChange={(value: string) => onSelected(value)}>
       <SelectTrigger className="w-full">
-        <SelectValue placeholder="Pilih Rombel" />
+        <SelectValue placeholder="Pilih Semester" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          <SelectLabel>Pilih Rombel</SelectLabel>
+          <SelectLabel>Pilih Semester</SelectLabel>
           <ScrollArea className="h-72">
-            <SelectItem value={""}>Semua Rombel</SelectItem>
-            {rombels &&
-              rombels.map((rombel: Rombel) => (
-                <SelectItem key={rombel.id} value={rombel.id}>
-                  {rombel.nama}
+            {/* <SelectItem value={""}>Semua Semester</SelectItem> */}
+            {semesters &&
+              semesters.map((semester) => (
+                <SelectItem key={semester.name} value={semester.id.toString()}>
+                  {semester.name}
                 </SelectItem>
               ))}
             <ScrollBar />

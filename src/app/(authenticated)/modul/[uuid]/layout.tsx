@@ -3,8 +3,16 @@ import { api } from "@/lib/api";
 import { notFound } from "next/navigation";
 import { SidebarNav } from "./components/sidebar-nax";
 
-export async function getModulInfo(uuid: string) {
-  const response = await api.get(`/modul/show/${uuid}`);
+import { AxiosResponse } from "axios";
+
+export async function getModulInfo(uuid: string): Promise<AxiosResponse<any>> {
+  const response = await api.get(`/modul/show/${uuid}`).catch((e) => {
+    // if not found
+    if (e.response.status === 404) {
+      notFound();
+    }
+    return e.response;
+  });
 
   return response;
 }
@@ -18,11 +26,7 @@ export default async function Layout({
     uuid: string;
   };
 }) {
-  const { data: modul, status } = await getModulInfo(params.uuid);
-
-  if (status === 404) {
-    notFound();
-  }
+  const { data: modul } = await getModulInfo(params.uuid);
 
   const sidebarNavItems = [
     {
@@ -40,23 +44,23 @@ export default async function Layout({
   ];
 
   return (
-    <div className="h-full flex flex-col space-y-5">
-      <div className="flex flex-col h-full">
-        <div className="mt-5 space-y-1">
-          <h2 className="text-2xl font-semibold tracking-tight">
+    <div className='h-full flex flex-col space-y-5'>
+      <div className='flex flex-col h-full'>
+        <div className='mt-5 space-y-1'>
+          <h2 className='text-2xl font-semibold tracking-tight'>
             {modul.mapel.nama}
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className='text-sm text-muted-foreground'>
             {/* list of all modul available */}
             {modul.teacher.fullname} - {modul.rombel.nama}
           </p>
         </div>
-        <Separator className="my-4" />
-        <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
-          <aside className="mx-4 lg:-mx-4 lg:w-1/6">
+        <Separator className='my-4' />
+        <div className='flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0'>
+          <aside className='mx-4 lg:-mx-4 lg:w-1/6'>
             <SidebarNav items={sidebarNavItems} />
           </aside>
-          <div className="flex-1">{children}</div>
+          <div className='flex-1'>{children}</div>
         </div>
       </div>
     </div>

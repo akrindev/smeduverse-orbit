@@ -48,7 +48,7 @@ export interface Teacher {
 }
 
 export interface Semester {
-  id: number;
+  id: string | number;
   name: string;
   is_active: boolean | number;
   date_start?: null;

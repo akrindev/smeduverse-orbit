@@ -2,35 +2,22 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Metadata } from "next";
 import ModulList from "../modul/components/modul-list";
-import { hasRole, hasRoles } from "@/lib/auth-role";
+import { api } from "@/lib/api";
 
 export const metadata: Metadata = {
   title: "Dashboard",
   description: "Halaman utama",
 };
 
+async function analytics() {
+  const response = await api.get("/analytics");
+  return response.data;
+}
+
 export default async function Page() {
-  const analitycs: Array<{
-    name: string;
-    value: number;
-  }> = [
-    {
-      name: "Mata Pelajaran",
-      value: 721,
-    },
-    {
-      name: "Modul",
-      value: 52,
-    },
-    {
-      name: "Materi",
-      value: 4573,
-    },
-    {
-      name: "Presensi",
-      value: 2234,
-    },
-  ];
+  const analitycs = await analytics();
+
+  console.log(analitycs);
 
   return (
     <div className="h-full flex flex-col space-y-5">

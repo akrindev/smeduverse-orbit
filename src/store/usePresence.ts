@@ -79,7 +79,7 @@ export const usePresence = create<PresenceState>((set, get) => ({
       throw new Error("Presence uuid not found");
     }
 
-    console.log("aa", attendance);
+    // console.log("aa", attendance);
 
     const data = {
       ...attendance,
