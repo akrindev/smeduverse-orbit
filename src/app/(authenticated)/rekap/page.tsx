@@ -86,7 +86,7 @@ export default function RekapPage() {
           <BaseLoading />
         ) : (
           <div className='rounded-md border'>
-            {data ? (
+            {data?.data && data.data.length > 0 ? (
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -141,10 +141,15 @@ export default function RekapPage() {
                             </TableCell>
                             <TableCell className='max-w-[150px] truncate'>
                               <Link href={`/modul/${item.modul?.uuid}`}>
-                                <div>
-                                  <span>{item.title}</span>
-                                  {/* icon external link */}
-                                  <IconExternalLink className='inline-block w-3 h-3 ml-2 text-blue-700' />
+                                <div className='flex flex-col'>
+                                  <span className='text-gray-400 dark:text-gray-600'>
+                                    {item.modul?.mapel?.nama || ""}
+                                  </span>
+                                  <div>
+                                    <span>{item.title}</span>
+                                    {/* icon external link */}
+                                    <IconExternalLink className='inline-block w-3 h-3 ml-2 text-blue-700' />
+                                  </div>
                                 </div>
                               </Link>
                             </TableCell>
@@ -153,7 +158,7 @@ export default function RekapPage() {
                                 <Calendar className='w-4 h-4 text-gray-400' />
                                 <span>
                                   {format(
-                                    new Date(attendance.presence?.created_at!),
+                                    new Date(item.created_at),
                                     "E, dd LLL y",
                                     {
                                       locale: id,

@@ -71,44 +71,43 @@ export default function RekapPage({ params }: RekapPageProps) {
   };
 
   return (
-    <div className="h-full flex flex-col space-y-5">
-      <div className="flex flex-col h-full">
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          <div className="mt-5 space-y-1">
-            <h2 className="text-2xl font-semibold tracking-tight">
+    <div className='h-full flex flex-col space-y-5'>
+      <div className='flex flex-col h-full'>
+        <div className='flex flex-col md:flex-row justify-between'>
+          <div className='mt-5 space-y-1'>
+            <h2 className='text-2xl font-semibold tracking-tight'>
               Rekap Presensi
             </h2>
-            <p className="text-sm text-muted-foreground">
-              Rekap presensi pada modul {modul?.mapel.nama} -{" "}
+            <p className='text-sm text-muted-foreground'>
+              Rekap presensi pada modul {modul?.mapel.nama} <br />
               {modul?.rombel.nama} - {modul?.teacher.fullname}
             </p>
           </div>
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={handleExport} disabled={loading}>
-              {loading ? <Loader className="w-5 h-5" /> : <>Unduh</>}
+          <div className='mt-5 md:mt-0 flex gap-3'>
+            <Button variant='outline' onClick={handleExport} disabled={loading}>
+              {loading ? <Loader className='w-5 h-5' /> : <>Unduh</>}
             </Button>
             {isUser(session, modul?.teacher_id!) && (
               <Button
-                variant="default"
-                onClick={() => router.push(`/modul/${params.uuid}`)}
-              >
+                variant='default'
+                onClick={() => router.push(`/modul/${params.uuid}`)}>
                 Lihat
-                <IconLink className="w-4 h-4 ml-1" />
+                <IconLink className='w-4 h-4 ml-1' />
               </Button>
             )}
           </div>
         </div>
-        <Separator className="my-4" />
+        <Separator className='my-4' />
         {/* table */}
-        <Tabs defaultValue="rekap">
-          <TabsList className="max-w-md grid grid-cols-2">
-            <TabsTrigger value="rekap">Kehadiran</TabsTrigger>
-            <TabsTrigger value="presensi">Presensi</TabsTrigger>
+        <Tabs defaultValue='rekap'>
+          <TabsList className='max-w-md grid grid-cols-2'>
+            <TabsTrigger value='rekap'>Kehadiran</TabsTrigger>
+            <TabsTrigger value='presensi'>Presensi</TabsTrigger>
           </TabsList>
-          <TabsContent value="rekap">
+          <TabsContent value='rekap'>
             <TableAttendances modulUuid={params.uuid} />
           </TabsContent>
-          <TabsContent value="presensi">
+          <TabsContent value='presensi'>
             <TablePresences modulUuid={params.uuid} />
           </TabsContent>
         </Tabs>

@@ -61,9 +61,9 @@ export default function ModulList({ owned }: { owned?: boolean }) {
   };
 
   return (
-    <div className="relative">
+    <div className='relative'>
       {!owned && (
-        <div className="flex gap-3 my-3">
+        <div className='flex flex-col md:flex-row gap-3 my-3'>
           <SelectTeacher
             onSelected={(teacher_id) => setQuery({ ...query, teacher_id })}
           />
@@ -82,25 +82,25 @@ export default function ModulList({ owned }: { owned?: boolean }) {
         {loading ? (
           <BaseLoading />
         ) : (
-          <div className="py-5 grid grid-cols-12 gap-5">
+          <div className='py-5 grid grid-cols-12 gap-5'>
             {moduls && moduls.length > 0 ? (
               moduls.map((modul: Modul) => (
                 <ModulCard
                   key={modul.uuid}
                   modul={modul}
-                  className="cursor-pointer"
+                  className='cursor-pointer'
                   isUser={isOwned(modul)}
                   isWakaKurikulum={isWaka}
                 />
               ))
             ) : (
-              <div className="col-span-full py-20 text-center">
+              <div className='col-span-full py-20 text-center'>
                 Tidak ada modul untuk ditampilkan
               </div>
             )}
           </div>
         )}
-        <ScrollBar orientation="horizontal" />
+        <ScrollBar orientation='horizontal' />
       </ScrollArea>
     </div>
   );

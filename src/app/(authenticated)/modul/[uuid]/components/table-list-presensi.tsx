@@ -47,14 +47,14 @@ export default function TableListPresensi({
     router.push(`/modul/${modulUuid}/presensi/${presence.uuid}`);
   };
   return (
-    <div className="border rounded-md">
+    <div className='border rounded-md'>
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="text-left w-10">No</TableHead>
-            <TableHead className="text-left">Judul</TableHead>
-            <TableHead className="text-left">Deskripsi</TableHead>
-            <TableHead className="text-left">Tanggal</TableHead>
+            <TableHead className='text-left w-10'>No</TableHead>
+            <TableHead className='text-left'>Judul</TableHead>
+            <TableHead className='text-left'>Deskripsi</TableHead>
+            <TableHead className='text-left'>Tanggal</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -64,17 +64,16 @@ export default function TableListPresensi({
               <TableRow
                 key={presence.uuid}
                 onClick={() => handleViewPresence(presence)}
-                className="cursor-pointer"
-              >
+                className='cursor-pointer'>
                 <TableCell>{presences.length - i}</TableCell>
-                <TableCell className="p-2 text-left max-w-[130px] truncate">
+                <TableCell className='p-2 text-left max-w-[130px] whitespace-pre-line truncate'>
                   <TooltipText text={presence.title} />
                 </TableCell>
-                <TableCell className="p-2 text-left max-w-[420px] truncate">
+                <TableCell className='p-2 text-left max-w-[420px] whitespace-pre-line truncate'>
                   {presence.description}
                 </TableCell>
-                <TableCell className="p-2 text-left">
-                  <div className="flex flex-wrap gap-1 text-left">
+                <TableCell className='p-2 text-left'>
+                  <div className='flex flex-wrap gap-1 text-left'>
                     {/* count_[a,i,s,b,a] */}
                     {["h", "i", "s", "b", "a"].map(
                       (status) =>
@@ -85,15 +84,14 @@ export default function TableListPresensi({
                               colors[status.slice(0, 5).toUpperCase()]
                             }
                             variant={"outline"}
-                            key={presence.uuid + status}
-                          >
+                            key={presence.uuid + status}>
                             {status.toUpperCase()}:{" "}
                             {presence[`count_${status}`]}
                           </Badge>
                         )
                     )}
                   </div>
-                  <div className="text-muted-foreground">
+                  <div className='text-muted-foreground'>
                     {new Date(presence.created_at).toLocaleDateString("id-ID", {
                       weekday: "long",
                       day: "numeric",
@@ -108,7 +106,7 @@ export default function TableListPresensi({
             <TableRow>
               <TableCell colSpan={3}>
                 {/* desciption that the data is empty */}
-                <div className="flex flex-col items-center justify-center space-y-2">
+                <div className='flex flex-col items-center justify-center space-y-2'>
                   <p>Belum ada data presensi untuk ditampilkan</p>
                 </div>
               </TableCell>
