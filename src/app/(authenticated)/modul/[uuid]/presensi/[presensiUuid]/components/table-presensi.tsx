@@ -44,7 +44,7 @@ export default function TablePresensi({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="hidden md:flex"></TableHead>
+          <TableHead className='hidden md:flex'></TableHead>
           <TableHead>Nama</TableHead>
           <TableHead>Status</TableHead>
           <TableHead>Note</TableHead>
@@ -53,20 +53,23 @@ export default function TablePresensi({
       <TableBody>
         {attendances!.map((attendance: Attendance, i) => (
           <TableRow key={attendance.student_id + generateRandomString(15)}>
-            <TableCell className="p-2 w-[40px] hidden md:flex items-center justify-center">
+            <TableCell className='p-2 w-[40px] hidden md:flex items-center justify-center'>
               {i + 1}
             </TableCell>
-            <TableCell className="p-2 truncate max-w-[500px] font-medium">
-              <span className="font-normal">{attendance.nipd}</span> -{" "}
+            <TableCell className='p-2 truncate max-w-[500px] font-normal md:font-medium'>
+              <span className='font-normal text-gray-300 dark:text-gray-700'>
+                {attendance.nipd}
+              </span>{" "}
+              <br />
               {attendance.fullname}
             </TableCell>
-            <TableCell className="p-2">
+            <TableCell className='p-2'>
               <StatusAction
                 attendance={attendance}
                 key={attendance.student_id + generateRandomString(15)}
               />
             </TableCell>
-            <TableCell className="p-2">
+            <TableCell className='p-2'>
               <NoteAction
                 attendance={attendance}
                 key={attendance.student_id + generateRandomString(15)}
@@ -109,21 +112,21 @@ function StatusAction({ attendance }: { attendance: Attendance }) {
   }
 
   return (
-    <div className="relative w-max">
+    <div className='relative w-max'>
       <Select value={status} onValueChange={handleChange} disabled={loading}>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Status Kehadiran" />
+        <SelectTrigger className='w-[150px]'>
+          <SelectValue placeholder='Status Kehadiran' />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="h">Hadir</SelectItem>
-          <SelectItem value="i">Izin</SelectItem>
-          <SelectItem value="s">Sakit</SelectItem>
-          <SelectItem value="a">Alpa</SelectItem>
-          <SelectItem value="b">Bolos</SelectItem>
+          <SelectItem value='h'>Hadir</SelectItem>
+          <SelectItem value='i'>Izin</SelectItem>
+          <SelectItem value='s'>Sakit</SelectItem>
+          <SelectItem value='a'>Alpa</SelectItem>
+          <SelectItem value='b'>Bolos</SelectItem>
         </SelectContent>
       </Select>
 
-      <ChevronDown className="absolute right-3 top-3 h-4 w-4 opacity-50" />
+      <ChevronDown className='absolute right-3 top-3 h-4 w-4 opacity-50' />
     </div>
   );
 }
@@ -186,8 +189,9 @@ function NoteAction({ attendance }: { attendance: Attendance }) {
       ref={inputRef}
       value={notes || ""}
       onChange={(e: BaseSyntheticEvent) => setNotes(e.target.value)}
-      placeholder="Catatan Kehadiran"
+      placeholder='Catatan Kehadiran'
       disabled={loading}
+      className='min-w-[150px]'
     />
   );
 }
