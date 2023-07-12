@@ -22,7 +22,7 @@ export function DatePickerWithRange({
   onSelect: (date: DateRange | undefined) => void;
 }) {
   const [date, setDate] = useState<DateRange | undefined>({
-    from: subDays(new Date(), 7),
+    from: subDays(new Date(), 6),
     to: new Date(),
   });
 
@@ -63,6 +63,7 @@ export function DatePickerWithRange({
             defaultMonth={date?.from}
             selected={date}
             onSelect={setDate}
+            max={6}
             disabled={(date) =>
               date > new Date() || date < new Date("2022-01-01")
             }

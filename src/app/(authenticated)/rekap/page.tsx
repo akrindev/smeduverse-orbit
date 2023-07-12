@@ -86,7 +86,7 @@ export default function RekapPage() {
           <BaseLoading />
         ) : (
           <div className='rounded-md border'>
-            {data ? (
+            {data?.data && data.data.length > 0 ? (
               <Table>
                 <TableHeader>
                   <TableRow>
