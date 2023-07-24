@@ -45,7 +45,7 @@ export const useAttendance = create<AttendanceState>((set, get) => ({
     const formattedFrom = format(from as Date, "yyyy-MM-dd");
     const formattedTo = to ? format(to as Date, "yyyy-MM-dd") : "";
 
-    console.log(formattedFrom, formattedTo, to);
+    // console.log(formattedFrom, formattedTo, to);
 
     const response = await api.post(`/modul/presence/recap/date-range`, {
       from: formattedFrom,
