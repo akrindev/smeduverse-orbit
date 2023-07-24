@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import SelectAttendanceStatus from "./components/select-attendance-status";
 import { DatePickerWithRange } from "./components/date-picker";
 import { useAttendance } from "@/store/useAttendance";
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { FormEvent, Fragment, useCallback, useEffect, useState } from "react";
 import { DateRange } from "react-day-picker";
 import subDays from "date-fns/subDays";
 import {
@@ -35,11 +35,7 @@ type TabsValue = "kehadiran" | "jurnal";
 
 const TABS_VALUE: TabsValue[] = ["kehadiran", "jurnal"];
 
-export default function RekapPage({
-  searchParams,
-}: {
-  searchParams?: { tab: TabsValue | string | undefined };
-}) {
+export default function RekapPage() {
   // active tabs state
   const [activeTab, setActiveTab] = useState<TabsValue>("kehadiran");
   const [status, setStatus] = useState("no");
@@ -64,25 +60,9 @@ export default function RekapPage({
       .finally(() => setIsLoading(false));
   }, [status, date]);
 
-  const handleTabChange = useCallback(
-    (tab: TabsValue) => {
-      setActiveTab(TABS_VALUE.includes(tab) ? tab : "kehadiran");
-    },
-    [setActiveTab]
-  );
-
-  // useEffect for tabs
-  useEffect(() => {
-    const { tab } = searchParams ?? {};
-
-    if (tab) {
-      handleTabChange(tab as TabsValue);
-    }
-  }, [searchParams, setActiveTab, activeTab]);
-
   return (
     <div className='h-full flex flex-col space-y-5'>
-      <Tabs defaultValue={activeTab} value={activeTab}>
+      <Tabs defaultValue={activeTab}>
         <TabsList>
           <TabsTrigger value='kehadiran'>Kehadiran</TabsTrigger>
           <TabsTrigger value='jurnal'>Jurnal Kelas</TabsTrigger>
