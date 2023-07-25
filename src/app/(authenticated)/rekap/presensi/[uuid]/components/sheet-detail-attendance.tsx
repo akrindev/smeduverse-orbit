@@ -28,31 +28,31 @@ export default function SheetDetailAttendance({
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost">
+        <Button variant='ghost'>
           {attendance.nipd} - {attendance.fullname}
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-screen md:w-1/2">
-        <ScrollArea className="w-full h-full">
-          <div className="my-5">
-            <div className="flex flex-col space-y-5">
+      <SheetContent className='w-screen md:max-w-2xl'>
+        <ScrollArea className='w-full h-full'>
+          <div className='my-5'>
+            <div className='flex flex-col space-y-5'>
               {/* name */}
               <div>
-                <div className="text-sm font-medium text-gray-500">Nama</div>
-                <div className="text-lg font-semibold">
+                <div className='text-sm font-medium text-gray-500'>Nama</div>
+                <div className='text-lg font-semibold'>
                   {attendance.fullname}
                 </div>
               </div>
               {/* nipd */}
               <div>
-                <div className="text-sm font-medium text-gray-500">NIS</div>
-                <div className="text-lg font-semibold">{attendance.nipd}</div>
+                <div className='text-sm font-medium text-gray-500'>NIS</div>
+                <div className='text-lg font-semibold'>{attendance.nipd}</div>
               </div>
               <div>
-                <div className="text-sm font-medium text-gray-500">
+                <div className='text-sm font-medium text-gray-500'>
                   KEHADIRAN
                 </div>
-                <div className="text-lg font-semibold space-x-2">
+                <div className='text-lg font-semibold space-x-2'>
                   {Object.entries(attendance.status_count!).map(
                     ([key, value]) => (
                       <Badge variant={"outline"} key={key}>
@@ -67,7 +67,7 @@ export default function SheetDetailAttendance({
           </div>
 
           {attendance.orbit_presence?.length ? (
-            <ScrollArea className="h-[450px] border rounded-sm">
+            <ScrollArea className='h-[450px] border rounded-sm'>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -79,15 +79,13 @@ export default function SheetDetailAttendance({
                 <TableBody>
                   {attendance.orbit_presence.map((presence: OrbitPresence) => (
                     <TableRow
-                      key={presence.uuid + presence.presence.student_id}
-                    >
+                      key={presence.uuid + presence.presence.student_id}>
                       <TableCell>{presence.title}</TableCell>
                       <TableCell>
                         <span
                           className={`font-medium uppercase ${
                             colors[presence.presence.status.toUpperCase()]
-                          }`}
-                        >
+                          }`}>
                           {presence.presence.status}
                         </span>
                       </TableCell>
@@ -96,12 +94,12 @@ export default function SheetDetailAttendance({
                   ))}
                 </TableBody>
               </Table>
-              <ScrollBar orientation="vertical" />
+              <ScrollBar orientation='vertical' />
             </ScrollArea>
           ) : (
-            <div className="p-5 text-center">belum ada presensi</div>
+            <div className='p-5 text-center'>belum ada presensi</div>
           )}
-          <ScrollBar orientation="vertical" />
+          <ScrollBar orientation='vertical' />
         </ScrollArea>
       </SheetContent>
     </Sheet>

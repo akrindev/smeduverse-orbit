@@ -4,6 +4,9 @@ import { Metadata } from "next";
 import ModulList from "../modul/components/modul-list";
 import { api } from "@/lib/api";
 
+// revalidate every 5 seconds
+export const revalidate = 5;
+
 export const metadata: Metadata = {
   title: "Dashboard",
   description: "Halaman utama",
