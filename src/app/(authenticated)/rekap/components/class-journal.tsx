@@ -27,7 +27,7 @@ export default function ClassJournal() {
 
   const getJournal = usePresence((state) => state.getJournalKelas);
 
-  const journals = usePresence((state) => state.presences);
+  const journals = usePresence((state) => state.journals);
 
   useEffect(() => {
     if (!classJournal) return;
