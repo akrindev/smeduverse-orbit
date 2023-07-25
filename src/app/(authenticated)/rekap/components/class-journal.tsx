@@ -35,8 +35,6 @@ export default function ClassJournal() {
   const journals = usePresence((state) => state.journals);
 
   useEffect(() => {
-    if (!classJournal) return;
-
     // set loading
     setIsloading(true);
 
