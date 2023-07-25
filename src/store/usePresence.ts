@@ -19,6 +19,7 @@ type JournalProps = {
 type PresenceState = {
   presences: Presence[] | Array<any>;
   presence: Presence | any;
+  journals: Presence[] | Array<any>;
   fetchPresences: (modulUuid: string) => Promise<void>;
   showPresence: (presenceUuid: string) => AxiosPromise<AxiosResponse>;
   createPresence: (data: Data) => AxiosPromise<AxiosResponse>;
@@ -138,7 +139,7 @@ export const usePresence = create<PresenceState>((set, get) => ({
       })
       .then((res) => res.data);
 
-    set({ presences: response.data });
+    set({ journals: response.data });
 
     return response;
   },
