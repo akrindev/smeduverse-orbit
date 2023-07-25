@@ -4,11 +4,16 @@ import { api } from "@/lib/api";
 import { Presence } from "@/types/presence";
 import { AxiosPromise, AxiosResponse } from "axios";
 import { Attendance } from "@/types/attendance";
-import { notFound } from "next/navigation";
-import { useRouter } from "next/router";
+import format from "date-fns/format";
 
 type Data = Pick<Presence, "orbit_modul_uuid" | "title" | "description"> & {
   presence_uuid?: string;
+};
+
+type JournalProps = {
+  rombel_id: string;
+  from: Date;
+  to?: Date;
 };
 
 type PresenceState = {
@@ -33,11 +38,13 @@ type PresenceState = {
     attendance: Attendance;
     notes: string | null;
   }) => AxiosPromise<AxiosResponse<{ message: string; in_notes: string }>>;
+  getJournalKelas: (data: JournalProps) => AxiosPromise<Presence[]>;
 };
 
 export const usePresence = create<PresenceState>((set, get) => ({
   presences: [],
   presence: {},
+  journals: [],
   fetchPresences: async (modulUuid) => {
     const response = await api.get(`/modul/presence/${modulUuid}`);
     set({ presences: response.data });
@@ -110,6 +117,28 @@ export const usePresence = create<PresenceState>((set, get) => ({
       `/modul/presence/patch-attendance/${presenceUuid}/notes`,
       data
     );
+
+    return response;
+  },
+  // get journal kelas
+  getJournalKelas: async (data) => {
+    // parse the data
+    const { from, to, rombel_id } = data;
+    // from to must be in string format YYYY-MM-DD / 2023-08-22
+    const formattedFrom = format(from as Date, "yyyy-MM-dd");
+    const formattedTo = to ? format(to as Date, "yyyy-MM-dd") : "";
+
+    // console.log(formattedFrom, formattedTo, to);
+
+    const response = await api
+      .post(`/modul/presence/recap/journal`, {
+        from: formattedFrom,
+        to: formattedTo,
+        rombel_id,
+      })
+      .then((res) => res.data);
+
+    set({ presences: response.data });
 
     return response;
   },

@@ -10,8 +10,37 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useEffect, useState } from "react";
+import { usePresence } from "@/store/usePresence";
+import { DateRange } from "react-day-picker";
+import subDays from "date-fns/subDays";
+import { DatePickerWithRange } from "./date-picker";
+import { Presence } from "@/types/presence";
+import { format } from "date-fns";
 
 export default function ClassJournal() {
+  const [classJournal, setClassJournal] = useState("");
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: subDays(new Date(), 1),
+    to: new Date(),
+  });
+
+  const getJournal = usePresence((state) => state.getJournalKelas);
+
+  const journals = usePresence((state) => state.presences);
+
+  useEffect(() => {
+    if (!classJournal) return;
+
+    getJournal({
+      rombel_id: classJournal,
+      from: date?.from ? date.from : new Date(),
+      to: date?.to,
+    });
+  }, [classJournal, date]);
+
+  console.log(journals);
+
   return (
     <div className='flex flex-col h-full'>
       <div className='flex flex-col md:flex-row justify-between'>
@@ -27,7 +56,13 @@ export default function ClassJournal() {
       <Separator className='my-5' />
       <div className='mb-5 grid grid-cols-12 gap-5'>
         <div className='col-span-12 md:col-span-3'>
-          <SelectRombel onSelected={(e) => console.log(e)} />
+          <div className='font-medium mb-3'>Pilih Rombel</div>
+          <SelectRombel onSelected={(e) => setClassJournal(e)} />
+        </div>
+
+        <div className='col-span-12 md:col-span-3'>
+          <div className='font-medium mb-3'>Jarak Tanggal</div>
+          <DatePickerWithRange onSelect={setDate} />
         </div>
       </div>
 
@@ -40,18 +75,28 @@ export default function ClassJournal() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow>
-            <TableCell>
-              <div className='flex flex-col'>
-                <div className='font-medium'>PAI</div>
-                <span className='text-muted-foreground'>
-                  Alim Assidiq, S.Pd
-                </span>
-              </div>
-            </TableCell>
-            <TableCell>Perkenalan Pertama</TableCell>
-            <TableCell>Pengenalan siswa</TableCell>
-          </TableRow>
+          {journals.map((journal) => (
+            <TableRow key={journal.uuid}>
+              <TableCell>
+                <div className='flex flex-col'>
+                  <div className='font-medium'>{journal.modul.mapel.nama}</div>
+                  <span className='text-muted-foreground'>
+                    {journal.modul.teacher.fullname}
+                  </span>
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className='flex flex-col'>
+                  <div className='font-medium'>{journal.title}</div>
+                  <span className='text-muted-foreground'>
+                    {/* date */}
+                    {format(new Date(journal.created_at), "dd MMM yyyy")}
+                  </span>
+                </div>
+              </TableCell>
+              <TableCell>{journal.description}</TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
     </div>
