@@ -28,7 +28,7 @@ export default function Information({
 }: {
   title: string;
   description: string;
-  date: string;
+  date: Date | string | number;
   modulUuid: string;
   presenceUuid?: string;
   presence?: Presence;
@@ -38,7 +38,7 @@ export default function Information({
   // handle data state
   const [data, setData] = useState<{
     title: string;
-    date: string;
+    date: Date | string | number;
     description: string;
     presenceUuid?: string;
   }>();
