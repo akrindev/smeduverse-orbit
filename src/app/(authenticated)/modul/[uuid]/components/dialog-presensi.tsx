@@ -1,5 +1,6 @@
 "use client";
 
+import { DatePicker } from "@/app/(authenticated)/components/date-picker";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,6 +18,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
 import { usePresence } from "@/store/usePresence";
 import { IconEditCircle, IconPlus, IconTrash } from "@tabler/icons-react";
+import { setDate } from "date-fns";
+import format from "date-fns/format";
 import { Loader } from "lucide-react";
 import { redirect, useRouter } from "next/navigation";
 import { Router } from "next/router";
@@ -30,12 +33,14 @@ export default function DialogPresensi({
   data?: {
     title: string;
     description: string;
+    date: string;
     presenceUuid?: string;
   };
 }) {
   const [open, setOpen] = useState<boolean>(false);
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
+  const [date, setDate] = useState<Date | string>(new Date());
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [uuid, setUuid] = useState<string>("");
   const [presenceUuid, setPresenceUuid] = useState<string>("");
@@ -59,6 +64,7 @@ export default function DialogPresensi({
     const body = {
       title: title,
       description: description,
+      date: format(date as Date, "yyyy-MM-dd"),
       orbit_modul_uuid: uuid,
       presence_uuid: presenceUuid,
     };
@@ -104,10 +110,12 @@ export default function DialogPresensi({
 
   useEffect(() => {
     setUuid(modulUuid);
+    // console.log(data);
 
     if (data) {
       setTitle(data.title);
       setDescription(data.description);
+      setDate(data.date);
       setPresenceUuid(data.presenceUuid || "");
     }
   }, [modulUuid, data]);
@@ -115,11 +123,11 @@ export default function DialogPresensi({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="flex items-center">
+        <Button className='flex items-center'>
           {data ? (
-            <IconEditCircle className="w-4 h-4 mr-2" />
+            <IconEditCircle className='w-4 h-4 mr-2' />
           ) : (
-            <IconPlus className="w-4 h-4 mr-2" />
+            <IconPlus className='w-4 h-4 mr-2' />
           )}
           {data ? "Edit" : "Buat"} Presensi
         </Button>
@@ -130,13 +138,13 @@ export default function DialogPresensi({
             <DialogTitle>{data ? "Edit" : "Buat"} Presensi</DialogTitle>
           </DialogHeader>
           <Separator />
-          <div className="grid grid-cols-12 gap-4 py-4">
-            <div className="col-span-12 gap-2">
-              <Label htmlFor="title">Judul Presensi</Label>
+          <div className='grid grid-cols-12 gap-4 py-4'>
+            <div className='col-span-12 gap-2'>
+              <Label htmlFor='title'>Judul Presensi</Label>
               <Input
-                id="title"
+                id='title'
                 onInput={(e) => setTitle(e.currentTarget.value)}
-                placeholder="Judul Presensi"
+                placeholder='Judul Presensi'
                 disabled={isLoading}
                 onKeyDown={(e: React.KeyboardEvent) => {
                   if (e.key === "Enter") handleSubmitPresensi(e);
@@ -146,21 +154,29 @@ export default function DialogPresensi({
                 required
               />
             </div>
-            <div className="col-span-12 gap-2">
-              <Label htmlFor="description">Deskripsi Presensi</Label>
+            <div className='col-span-12 gap-2'>
+              <Label htmlFor='description'>Deskripsi Presensi</Label>
               <Textarea
-                id="description"
+                id='description'
                 onInput={(e) => setDescription(e.currentTarget.value)}
-                placeholder="Deskripsi Presensi"
+                placeholder='Deskripsi Presensi'
                 disabled={isLoading}
                 value={description}
                 required
               />
             </div>
+            {/* date picker that indicate date of presence */}
+            <div className='col-span-12 gap-2 flex flex-col'>
+              <Label htmlFor='date'>Tanggal Presensi</Label>
+              <DatePicker
+                selectedDate={data?.date}
+                onSelect={(date) => setDate(date)}
+              />
+            </div>
           </div>
           <DialogFooter>
-            <Button disabled={isLoading} type="submit">
-              {isLoading && <Loader className="mr-2 h-4 w-4" />}
+            <Button disabled={isLoading} type='submit'>
+              {isLoading && <Loader className='mr-2 h-4 w-4' />}
               Save
             </Button>
             {/* add button delete */}
@@ -183,8 +199,8 @@ function DialogDeletePresensi({ onDestroy, isLoading }) {
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" className="flex gap-3">
-          <IconTrash className="w-4 h-4" />
+        <Button variant='ghost' className='flex gap-3'>
+          <IconTrash className='w-4 h-4' />
           <span>Hapus</span>
         </Button>
       </DialogTrigger>
@@ -192,8 +208,8 @@ function DialogDeletePresensi({ onDestroy, isLoading }) {
         <DialogHeader>
           <DialogTitle>Hapus Presensi</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
+        <div className='grid gap-4 py-4'>
+          <div className='grid gap-2'>
             <DialogDescription>
               Apakah kamu yakin ingin menghapus presensi ini?
             </DialogDescription>
@@ -201,11 +217,10 @@ function DialogDeletePresensi({ onDestroy, isLoading }) {
         </div>
         <DialogFooter>
           <Button
-            variant="destructive"
+            variant='destructive'
             onClick={onDestroy}
-            disabled={isLoading}
-          >
-            {isLoading && <Loader className="mr-2 h-4 w-4" />}
+            disabled={isLoading}>
+            {isLoading && <Loader className='mr-2 h-4 w-4' />}
             Hapus
           </Button>
           <Button variant={`ghost`} onClick={() => setDialogOpen(false)}>

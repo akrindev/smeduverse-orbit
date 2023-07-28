@@ -19,6 +19,7 @@ import { IconReload } from "@tabler/icons-react";
 export default function Information({
   title,
   description,
+  date,
   modulUuid,
   presenceUuid,
   presence,
@@ -27,6 +28,7 @@ export default function Information({
 }: {
   title: string;
   description: string;
+  date: string;
   modulUuid: string;
   presenceUuid?: string;
   presence?: Presence;
@@ -36,6 +38,7 @@ export default function Information({
   // handle data state
   const [data, setData] = useState<{
     title: string;
+    date: string;
     description: string;
     presenceUuid?: string;
   }>();
@@ -44,6 +47,7 @@ export default function Information({
     setData({
       title: title,
       description: description,
+      date: date,
       presenceUuid: presenceUuid,
     });
   }, [title, description, presenceUuid]);

@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/tooltip";
 import { usePresence } from "@/store/usePresence";
 import { Presence } from "@/types/presence";
+import format from "date-fns/format";
+import id from "date-fns/locale/id";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -92,11 +94,9 @@ export default function TableListPresensi({
                     )}
                   </div>
                   <div className='text-muted-foreground'>
-                    {new Date(presence.created_at).toLocaleDateString("id-ID", {
-                      weekday: "long",
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
+                    {/* format day name, PPP */}
+                    {format(new Date(presence.date), "EEEE, PPP", {
+                      locale: id,
                     })}
                   </div>
                 </TableCell>

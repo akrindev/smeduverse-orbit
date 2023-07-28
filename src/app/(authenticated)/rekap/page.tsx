@@ -174,7 +174,7 @@ export default function RekapPage() {
                                     <Calendar className='w-4 h-4 text-gray-400' />
                                     <span>
                                       {format(
-                                        new Date(item.created_at),
+                                        new Date(item.date),
                                         "E, dd LLL y",
                                         {
                                           locale: id,

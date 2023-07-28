@@ -15,6 +15,7 @@ export interface Presence {
   orbit_modul_uuid: string;
   title: string;
   description: string;
+  date: Date | string | number;
   created_at: string;
   updated_at: string;
   deleted_at?: string | null;

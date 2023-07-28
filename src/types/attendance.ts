@@ -5,6 +5,7 @@ export interface IAttendance {
   orbit_modul_uuid: string;
   title: string;
   description: string;
+  date: Date | string | number;
   created_at: string;
   updated_at: string;
   attendances: Attendance[];
