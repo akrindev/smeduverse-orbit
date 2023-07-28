@@ -33,14 +33,14 @@ export default function DialogPresensi({
   data?: {
     title: string;
     description: string;
-    date: string;
+    date: Date | string | number;
     presenceUuid?: string;
   };
 }) {
   const [open, setOpen] = useState<boolean>(false);
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [date, setDate] = useState<Date | string>(new Date());
+  const [date, setDate] = useState<Date | string | number>(new Date());
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [uuid, setUuid] = useState<string>("");
   const [presenceUuid, setPresenceUuid] = useState<string>("");

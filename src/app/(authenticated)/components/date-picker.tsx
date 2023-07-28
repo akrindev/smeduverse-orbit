@@ -19,7 +19,7 @@ export function DatePicker({
   selectedDate,
 }: {
   className?: string;
-  selectedDate?: Date | string;
+  selectedDate?: Date | string | number;
   onSelect: (date: Date) => void;
 }) {
   const [date, setDate] = React.useState<Date>(new Date());
