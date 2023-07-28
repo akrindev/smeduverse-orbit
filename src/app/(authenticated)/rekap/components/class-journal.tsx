@@ -20,6 +20,7 @@ import id from "date-fns/locale/id";
 import { is } from "date-fns/locale";
 import BaseLoading from "@/components/base-loading";
 import TableJournal from "./table-journal";
+import { Presence } from "@/types/presence";
 
 export default function ClassJournal() {
   const [classJournal, setClassJournal] = useState("");
@@ -32,7 +33,7 @@ export default function ClassJournal() {
 
   const getJournal = usePresence((state) => state.getJournalKelas);
 
-  const journals = usePresence((state) => state.journals);
+  const journals = usePresence<Presence[]>((state) => state.journals);
 
   useEffect(() => {
     // set loading

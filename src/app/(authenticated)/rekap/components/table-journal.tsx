@@ -10,6 +10,7 @@ import format from "date-fns/format";
 import id from "date-fns/locale/id";
 
 export default function TableJournal({ journals }) {
+  console.log(journals);
   return journals.length > 0 ? (
     <Table>
       <TableHeader>
@@ -35,13 +36,20 @@ export default function TableJournal({ journals }) {
                 <div className='font-medium'>{journal.title}</div>
                 <span className='text-muted-foreground'>
                   {/* date */}
-                  {format(new Date(journal.created_at), "dd MMMM yyyy", {
+                  {format(new Date(journal.date), "dd MMMM yyyy", {
                     locale: id,
                   })}
                 </span>
               </div>
             </TableCell>
-            <TableCell>{journal.description}</TableCell>
+            <TableCell>
+              <div className='flex flex-col'>
+                <div className='text-muted-foreground'>
+                  {journal.modul.rombel?.nama}
+                </div>
+                <span>{journal.description}</span>
+              </div>
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
