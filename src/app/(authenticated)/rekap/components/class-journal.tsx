@@ -5,7 +5,7 @@ import SelectRombel from "../../components/form/select-rombel";
 import { useEffect, useState } from "react";
 import { usePresence } from "@/store/usePresence";
 import { DateRange } from "react-day-picker";
-import { subDays } from "date-fns/subDays";
+import { subDays } from "date-fns";
 import { DatePickerWithRange } from "./date-picker";
 import BaseLoading from "@/components/base-loading";
 import TableJournal from "./table-journal";
