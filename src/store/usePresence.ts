@@ -4,7 +4,7 @@ import { api } from "@/lib/api";
 import { Presence } from "@/types/presence";
 import { AxiosPromise, AxiosResponse } from "axios";
 import { Attendance } from "@/types/attendance";
-import format from "date-fns/format";
+import { format } from "date-fns/format";
 
 type Data = Pick<Presence, "orbit_modul_uuid" | "title" | "description"> & {
   presence_uuid?: string;

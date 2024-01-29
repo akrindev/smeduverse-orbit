@@ -4,9 +4,8 @@ import { Separator } from "@/components/ui/separator";
 import SelectAttendanceStatus from "./components/select-attendance-status";
 import { DatePickerWithRange } from "./components/date-picker";
 import { useAttendance } from "@/store/useAttendance";
-import { FormEvent, Fragment, useCallback, useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { DateRange } from "react-day-picker";
-import subDays from "date-fns/subDays";
 import {
   Table,
   TableBody,
@@ -21,9 +20,9 @@ import {
   IAttendance,
 } from "@/types/attendance";
 import { nanoid } from "nanoid";
-import { format, set } from "date-fns";
+import { format, subDays } from "date-fns";
 import { cn } from "@/lib/utils";
-import id from "date-fns/locale/id";
+import { id } from "date-fns/locale/id";
 import BaseLoading from "@/components/base-loading";
 import Link from "next/link";
 import { IconExternalLink } from "@tabler/icons-react";

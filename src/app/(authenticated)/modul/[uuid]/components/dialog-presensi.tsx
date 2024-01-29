@@ -19,7 +19,7 @@ import { toast } from "@/components/ui/use-toast";
 import { usePresence } from "@/store/usePresence";
 import { IconEditCircle, IconPlus, IconTrash } from "@tabler/icons-react";
 import { setDate } from "date-fns";
-import format from "date-fns/format";
+import { format } from "date-fns/format";
 import { Loader } from "lucide-react";
 import { redirect, useRouter } from "next/navigation";
 import { Router } from "next/router";
@@ -109,16 +109,19 @@ export default function DialogPresensi({
   };
 
   useEffect(() => {
-    setUuid(modulUuid);
-    // console.log(data);
+    if (modulUuid) {
+      setUuid(modulUuid);
+    }
 
     if (data) {
+      // console.log(data);
+
       setTitle(data.title);
       setDescription(data.description);
       setDate(data.date);
       setPresenceUuid(data.presenceUuid || "");
     }
-  }, [modulUuid, data]);
+  }, []);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -168,10 +171,7 @@ export default function DialogPresensi({
             {/* date picker that indicate date of presence */}
             <div className='col-span-12 gap-2 flex flex-col'>
               <Label htmlFor='date'>Tanggal Presensi</Label>
-              <DatePicker
-                selectedDate={data?.date}
-                onSelect={(date) => setDate(date)}
-              />
+              <DatePicker selectedDate={data?.date} onSelect={setDate} />
             </div>
           </div>
           <DialogFooter>

@@ -8,8 +8,8 @@ import {
 } from "@/components/ui/table";
 import { usePresence } from "@/store/usePresence";
 import { Presence } from "@/types/presence";
-import format from "date-fns/format";
-import id from "date-fns/locale/id";
+import { format } from "date-fns/format";
+import { id } from "date-fns/locale/id";
 import { useEffect } from "react";
 
 export default function TablePresences({ modulUuid }: { modulUuid: string }) {
