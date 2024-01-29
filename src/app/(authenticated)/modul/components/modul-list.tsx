@@ -95,7 +95,8 @@ export default function ModulList({ owned }: { owned?: boolean }) {
               ))
             ) : (
               <div className='col-span-full py-20 text-center'>
-                Tidak ada modul untuk ditampilkan
+                Tidak ada modul yang tersedia pada semester ini. Silahkan buat
+                modul baru untuk semester ini.
               </div>
             )}
           </div>

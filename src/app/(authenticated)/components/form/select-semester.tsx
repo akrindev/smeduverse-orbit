@@ -25,13 +25,13 @@ export default function SelectSemester({ onSelected }) {
 
   return (
     <Select onValueChange={(value: string) => onSelected(value)}>
-      <SelectTrigger className="w-full">
-        <SelectValue placeholder="Pilih Semester" />
+      <SelectTrigger className='w-full'>
+        <SelectValue placeholder='Pilih Semester' />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          <SelectLabel>Pilih Semester</SelectLabel>
-          <ScrollArea className="h-72">
+          {/* <SelectLabel>Pilih Semester</SelectLabel> */}
+          <ScrollArea className='h-72'>
             {/* <SelectItem value={""}>Semua Semester</SelectItem> */}
             {semesters &&
               semesters.map((semester) => (
