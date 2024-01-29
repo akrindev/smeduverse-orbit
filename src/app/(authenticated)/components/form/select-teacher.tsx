@@ -25,15 +25,15 @@ export default function SelectTeacher({ onSelected }) {
   }, []);
 
   return (
-    <Select onValueChange={onSelected}>
-      <SelectTrigger className="w-full">
-        <SelectValue placeholder="Pilih Guru" />
+    <Select onValueChange={onSelected} defaultValue=''>
+      <SelectTrigger className='w-full'>
+        <SelectValue placeholder='Pilih Guru' />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
           <SelectLabel>Pilih Guru</SelectLabel>
-          <ScrollArea className="h-72">
-            <SelectItem value={""}>Semua Guru</SelectItem>
+          <ScrollArea className='h-72'>
+            {/* <SelectItem value={""}>Semua Guru</SelectItem> */}
             {teachers &&
               teachers.map((teacher: Teacher) => (
                 <SelectItem key={teacher.teacher_id} value={teacher.teacher_id}>

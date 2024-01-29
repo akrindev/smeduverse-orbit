@@ -1,21 +1,6 @@
 import { Separator } from "@/components/ui/separator";
-import { api } from "@/lib/api";
-import { notFound } from "next/navigation";
 import { SidebarNav } from "./components/sidebar-nax";
-
-import { AxiosResponse } from "axios";
-
-export async function getModulInfo(uuid: string): Promise<AxiosResponse<any>> {
-  const response = await api.get(`/modul/show/${uuid}`).catch((e) => {
-    // if not found
-    if (e.response.status === 404) {
-      notFound();
-    }
-    return e.response;
-  });
-
-  return response;
-}
+import { getModulInfo } from "@/lib/modul-info";
 
 export default async function Layout({
   children,

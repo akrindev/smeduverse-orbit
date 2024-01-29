@@ -25,15 +25,15 @@ export default function SelectRombel({ onSelected }) {
   }, []);
 
   return (
-    <Select onValueChange={onSelected}>
-      <SelectTrigger className="w-full">
-        <SelectValue placeholder="Pilih Rombel" />
+    <Select onValueChange={onSelected} defaultValue=''>
+      <SelectTrigger className='w-full'>
+        <SelectValue placeholder='Pilih Rombel' />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
           <SelectLabel>Pilih Rombel</SelectLabel>
-          <ScrollArea className="h-72">
-            <SelectItem value={""}>Semua Rombel</SelectItem>
+          <ScrollArea className='h-72'>
+            {/* <SelectItem value={""}>Semua Rombel</SelectItem> */}
             {rombels &&
               rombels.map((rombel: Rombel) => (
                 <SelectItem key={rombel.id} value={rombel.id}>
