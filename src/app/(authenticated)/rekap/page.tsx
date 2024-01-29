@@ -22,7 +22,7 @@ import {
 import { nanoid } from "nanoid";
 import { format, subDays } from "date-fns";
 import { cn } from "@/lib/utils";
-import { id } from "date-fns/locale/id";
+import { id } from "date-fns/locale";
 import BaseLoading from "@/components/base-loading";
 import Link from "next/link";
 import { IconExternalLink } from "@tabler/icons-react";

@@ -17,8 +17,8 @@ import {
 } from "@/components/ui/tooltip";
 import { usePresence } from "@/store/usePresence";
 import { Presence } from "@/types/presence";
-import { format } from "date-fns/format";
-import { id } from "date-fns/locale/id";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 

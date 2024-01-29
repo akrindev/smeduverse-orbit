@@ -18,11 +18,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
 import { usePresence } from "@/store/usePresence";
 import { IconEditCircle, IconPlus, IconTrash } from "@tabler/icons-react";
-import { setDate } from "date-fns";
-import { format } from "date-fns/format";
+import { format } from "date-fns";
 import { Loader } from "lucide-react";
-import { redirect, useRouter } from "next/navigation";
-import { Router } from "next/router";
+import { useRouter } from "next/navigation";
 import { FormEventHandler, useEffect, useState } from "react";
 
 export default function DialogPresensi({
