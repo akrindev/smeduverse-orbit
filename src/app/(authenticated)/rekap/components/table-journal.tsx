@@ -7,7 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format } from "date-fns";
-import { id } from "date-fns/locale/id";
+import { id } from "date-fns/locale";
 
 export default function TableJournal({ journals }) {
   return journals.length > 0 ? (

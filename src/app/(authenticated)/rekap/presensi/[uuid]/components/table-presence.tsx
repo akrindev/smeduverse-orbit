@@ -9,7 +9,7 @@ import {
 import { usePresence } from "@/store/usePresence";
 import { Presence } from "@/types/presence";
 import { format } from "date-fns";
-import { id } from "date-fns/locale/id";
+import { id } from "date-fns/locale";
 import { useEffect } from "react";
 
 export default function TablePresences({ modulUuid }: { modulUuid: string }) {
