@@ -24,7 +24,9 @@ export default function SelectSemester({ onSelected }) {
   }, []);
 
   return (
-    <Select onValueChange={(value: string) => onSelected(value)}>
+    <Select
+      onValueChange={(value: string) => onSelected(value)}
+      defaultValue=''>
       <SelectTrigger className='w-full'>
         <SelectValue placeholder='Pilih Semester' />
       </SelectTrigger>

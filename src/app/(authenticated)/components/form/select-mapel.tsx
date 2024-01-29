@@ -22,15 +22,17 @@ export default function SelectMapel({ onSelected }) {
   }, []);
 
   return (
-    <Select onValueChange={(value: string) => onSelected(value)}>
-      <SelectTrigger className="w-full">
-        <SelectValue placeholder="Pilih Mapel" />
+    <Select
+      onValueChange={(value: string) => onSelected(value)}
+      defaultValue=''>
+      <SelectTrigger className='w-full'>
+        <SelectValue placeholder='Pilih Mapel' />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
           <SelectLabel>Pilih Mapel</SelectLabel>
-          <ScrollArea className="h-72">
-            <SelectItem value={""}>Semua Mapel</SelectItem>
+          <ScrollArea className='h-72'>
+            {/* <SelectItem value={""}>Semua Mapel</SelectItem> */}
             {mapels &&
               mapels.map((mapel: Mapel) => (
                 <SelectItem key={mapel.id} value={mapel.id.toString()}>

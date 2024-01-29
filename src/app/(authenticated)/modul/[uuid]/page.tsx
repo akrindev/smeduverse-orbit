@@ -1,6 +1,6 @@
 import { Separator } from "@/components/ui/separator";
 import TableListPresensi from "./components/table-list-presensi";
-import { getModulInfo } from "./layout";
+import { getModulInfo } from "@/lib/modul-info";
 import DialogPresensi from "./components/dialog-presensi";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
