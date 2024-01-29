@@ -54,6 +54,7 @@ export const useModul = create<ModulState>((set, get) => ({
     set({ moduls });
   },
   fetchByUuid: async (uuid) => {
+    // empty modul
     const response = await api.get(`/modul/show/${uuid}`);
     const modul = response.data;
 

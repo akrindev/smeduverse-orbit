@@ -2,22 +2,11 @@
 
 import { Separator } from "@/components/ui/separator";
 import SelectRombel from "../../components/form/select-rombel";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useEffect, useState } from "react";
 import { usePresence } from "@/store/usePresence";
 import { DateRange } from "react-day-picker";
-import subDays from "date-fns/subDays";
+import { subDays } from "date-fns/subDays";
 import { DatePickerWithRange } from "./date-picker";
-import { format } from "date-fns";
-import id from "date-fns/locale/id";
-import { is } from "date-fns/locale";
 import BaseLoading from "@/components/base-loading";
 import TableJournal from "./table-journal";
 import { Presence } from "@/types/presence";

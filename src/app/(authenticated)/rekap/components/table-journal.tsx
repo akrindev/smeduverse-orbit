@@ -6,11 +6,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import format from "date-fns/format";
-import id from "date-fns/locale/id";
+import { format } from "date-fns/format";
+import { id } from "date-fns/locale/id";
 
 export default function TableJournal({ journals }) {
-  console.log(journals);
   return journals.length > 0 ? (
     <Table>
       <TableHeader>

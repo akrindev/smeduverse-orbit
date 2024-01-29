@@ -16,6 +16,7 @@ import { useSession } from "next-auth/react";
 import BaseLoading from "@/components/base-loading";
 import { api } from "@/lib/api";
 import { Loader } from "lucide-react";
+import Link from "next/link";
 
 interface RekapPageProps {
   params: {
@@ -87,14 +88,14 @@ export default function RekapPage({ params }: RekapPageProps) {
             <Button variant='outline' onClick={handleExport} disabled={loading}>
               {loading ? <Loader className='w-5 h-5' /> : <>Unduh</>}
             </Button>
-            {isUser(session, modul?.teacher_id!) && (
-              <Button
-                variant='default'
-                onClick={() => router.push(`/modul/${params.uuid}`)}>
-                Lihat
-                <IconLink className='w-4 h-4 ml-1' />
-              </Button>
-            )}
+            {/* {isUser(session, modul?.teacher_id!) && (
+              <Link href={`/modul/${params.uuid}`}>
+                <Button variant='default'>
+                  Lihat
+                  <IconLink className='w-4 h-4 ml-1' />
+                </Button>
+              </Link>
+            )} */}
           </div>
         </div>
         <Separator className='my-4' />
