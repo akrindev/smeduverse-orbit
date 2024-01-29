@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table";
 import { usePresence } from "@/store/usePresence";
 import { Presence } from "@/types/presence";
-import { format } from "date-fns/format";
+import { format } from "date-fns";
 import { id } from "date-fns/locale/id";
 import { useEffect } from "react";
 

@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { format } from "date-fns/format";
+import { format } from "date-fns";
 import { id } from "date-fns/locale/id";
 
 export default function TableJournal({ journals }) {
