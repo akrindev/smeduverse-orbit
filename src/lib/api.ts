@@ -1,6 +1,8 @@
 import { toast } from "@/components/ui/use-toast";
 import Axios, { AxiosError, AxiosInstance } from "axios";
+import { getSession } from "next-auth/react";
 import { notFound, redirect } from "next/navigation";
+import { Session } from "next-auth";
 
 const api: AxiosInstance = Axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -10,15 +12,18 @@ const api: AxiosInstance = Axios.create({
   },
 });
 
-// interceptors to use the token from next-auth.js
-// api.interceptors.request.use(async (config) => {
-//   const session = await getSession();
-//   if (session) {
-//     console.log(session);
-//     // config.headers.Authorization = `Bearer ${session.user}`;
-//   }
-//   return config;
-// });
+// Modify the interceptor to handle both client and server-side scenarios
+api.interceptors.request.use(async (config) => {
+  if (typeof window !== "undefined") {
+    // Client-side
+    const session = await getSession();
+    if (session?.user.access_token) {
+      config.headers.Authorization = `Bearer ${session.user.access_token}`;
+    }
+  }
+  // For server-side, the token should be passed manually when making API calls
+  return config;
+});
 
 // interceptors to handle response errors
 // when error is 401, redirect to login page

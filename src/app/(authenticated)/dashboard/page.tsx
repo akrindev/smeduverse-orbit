@@ -3,6 +3,9 @@ import { Separator } from "@/components/ui/separator";
 import { Metadata } from "next";
 import ModulList from "../modul/components/modul-list";
 import { api } from "@/lib/api";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { getToken } from "next-auth/jwt";
 
 // revalidate every 5 seconds
 export const revalidate = 5;
@@ -13,7 +16,18 @@ export const metadata: Metadata = {
 };
 
 async function analytics() {
-  const response = await api.get("/analytics");
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user.access_token) {
+    throw new Error("Unauthorized");
+  }
+
+  const response = await api.get("/analytics", {
+    headers: {
+      Authorization: `Bearer ${session.user.access_token}`,
+    },
+  });
+
   return response.data;
 }
 
@@ -23,31 +37,31 @@ export default async function Page() {
   // console.log(analitycs);
 
   return (
-    <div className='h-full flex flex-col space-y-5'>
+    <div className='flex flex-col space-y-5 h-full'>
       <div className='flex flex-col h-full'>
-        <div className='flex items-center justify-between'>
+        <div className='flex justify-between items-center'>
           <div className='space-y-1'>
-            <h2 className='text-2xl font-semibold tracking-tight'>Dashboard</h2>
-            <p className='text-sm text-muted-foreground'>
+            <h2 className='font-semibold text-2xl tracking-tight'>Dashboard</h2>
+            <p className='text-muted-foreground text-sm'>
               Selamat datang kembali
             </p>
           </div>
         </div>
 
-        <div className='mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+        <div className='gap-4 grid md:grid-cols-2 lg:grid-cols-4 mt-5'>
           {analitycs.map((item) => (
             <Card
               key={item.name}
               className='shadow-md hover:scale-105 duration-500 cursor-pointer'>
-              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                <CardTitle className='text-sm font-medium'>
+              <CardHeader className='flex flex-row justify-between items-center space-y-0 pb-2'>
+                <CardTitle className='font-medium text-sm'>
                   {item.name}
                 </CardTitle>
-                {/* <DollarSign className="h-4 w-4 text-muted-foreground" /> */}
+                {/* <DollarSign className="w-4 h-4 text-muted-foreground" /> */}
               </CardHeader>
               <CardContent>
-                <div className='text-2xl font-bold'>{item.value}</div>
-                {/* <p className="text-xs text-muted-foreground">
+                <div className='font-bold text-2xl'>{item.value}</div>
+                {/* <p className="text-muted-foreground text-xs">
                   jumlah keseluruhan mapel
                 </p> */}
               </CardContent>
@@ -56,9 +70,9 @@ export default async function Page() {
         </div>
 
         <div className='mt-5'>
-          <div className='mt-6 space-y-1'>
-            <h2 className='text-2xl font-semibold tracking-tight'>Modul</h2>
-            <p className='text-sm text-muted-foreground'>
+          <div className='space-y-1 mt-6'>
+            <h2 className='font-semibold text-2xl tracking-tight'>Modul</h2>
+            <p className='text-muted-foreground text-sm'>
               Modul yang kamu kelola
             </p>
           </div>

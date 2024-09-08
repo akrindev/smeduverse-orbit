@@ -49,9 +49,6 @@ export const authOptions: NextAuthOptions = {
 
         const { access_token } = await res.json();
 
-        // set access token to use in api
-        setAccessToken(access_token);
-
         const user = await fetch(
           new URL(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`),
           {
@@ -67,7 +64,10 @@ export const authOptions: NextAuthOptions = {
 
         // If no error and we have user data, return it
         if (res.ok && user) {
-          return user;
+          return {
+            ...user,
+            access_token,
+          };
         }
 
         // Return null if user data could not be retrieved
@@ -81,15 +81,15 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, account }) {
       if (user && account) {
         token.user = user;
-        token.accessToken = account.access_token;
+        token.access_token = account.access_token;
       }
       return token;
     },
 
     // Extending session object
     async session({ session, token, user }) {
-      // @ts-expect-error
       session.user = token.user;
+      session.access_token = token.access_token;
       return session;
     },
     async redirect({ url, baseUrl }) {
