@@ -63,7 +63,7 @@ export default function ModulList({ owned }: { owned?: boolean }) {
   return (
     <div className='relative'>
       {!owned && (
-        <div className='flex flex-col md:flex-row gap-3 my-3'>
+        <div className='flex md:flex-row flex-col gap-3 my-3'>
           <SelectTeacher
             onSelected={(teacher_id) => setQuery({ ...query, teacher_id })}
           />
@@ -82,7 +82,7 @@ export default function ModulList({ owned }: { owned?: boolean }) {
         {loading ? (
           <BaseLoading />
         ) : (
-          <div className='py-5 grid grid-cols-12 gap-5'>
+          <div className='gap-5 grid grid-cols-12 py-5'>
             {moduls && moduls.length > 0 ? (
               moduls.map((modul: Modul) => (
                 <ModulCard
@@ -90,7 +90,6 @@ export default function ModulList({ owned }: { owned?: boolean }) {
                   modul={modul}
                   className='cursor-pointer'
                   isUser={isOwned(modul)}
-                  isWakaKurikulum={isWaka}
                 />
               ))
             ) : (

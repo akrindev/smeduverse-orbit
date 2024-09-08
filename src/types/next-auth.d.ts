@@ -19,7 +19,9 @@ declare module "next-auth" {
         tempat_lahir: string;
         tanggal_lahir: string;
       };
-    };
+      access_token: string;
+    } & DefaultSession["user"];
+    access_token: string | null | undefined;
   }
 
   interface Role {
@@ -33,5 +35,11 @@ declare module "next-auth" {
       role_id: number;
       model_type: string;
     };
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    access_token?: string; // Add accessToken to JWT
   }
 }
