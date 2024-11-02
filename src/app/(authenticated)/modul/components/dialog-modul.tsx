@@ -24,7 +24,7 @@ export default function DialogModul() {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState({
     rombongan_belajar_id: null,
-    teacher_id: null,
+    // teacher_id: null,
     mapel_id: null,
   });
 
@@ -45,7 +45,7 @@ export default function DialogModul() {
       // reset selected
       setSelected({
         rombongan_belajar_id: null,
-        teacher_id: null,
+        // teacher_id: null,
         mapel_id: null,
       });
     }
@@ -56,8 +56,8 @@ export default function DialogModul() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="flex items-center">
-          <IconPlus className="w-5 h-5 mr-2" />
+        <Button className='flex items-center'>
+          <IconPlus className='mr-2 w-5 h-5' />
           Buat Modul Baru
         </Button>
       </DialogTrigger>
@@ -67,23 +67,23 @@ export default function DialogModul() {
         </DialogHeader>
 
         {/* form to use to create new modul */}
-        <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
-            <label htmlFor="name">Pilih Rombel</label>
+        <div className='gap-4 grid py-4'>
+          <div className='gap-2 grid'>
+            <label htmlFor='name'>Pilih Rombel</label>
             <SelectRombel
               onSelected={(e) =>
                 setSelected((s) => ({ ...s, rombongan_belajar_id: e }))
               }
             />
           </div>
-          <div className="grid gap-2">
-            <label htmlFor="name">Pilih Guru</label>
+          {/* <div className='gap-2 grid'>
+            <label htmlFor='name'>Pilih Guru</label>
             <SelectTeacher
               onSelected={(e) => setSelected((s) => ({ ...s, teacher_id: e }))}
             />
-          </div>
-          <div className="grid gap-2">
-            <label htmlFor="name">Pilih Mapel</label>
+          </div> */}
+          <div className='gap-2 grid'>
+            <label htmlFor='name'>Pilih Mapel</label>
             <SelectMapel
               onSelected={(e) => setSelected((s) => ({ ...s, mapel_id: e }))}
             />
@@ -92,7 +92,7 @@ export default function DialogModul() {
         {/* button submit */}
         <DialogFooter>
           <Button disabled={isLoading} onClick={handleSave}>
-            {isLoading && <Loader className="mr-2" size={16} />}
+            {isLoading && <Loader className='mr-2' size={16} />}
             Simpan
           </Button>
           <Button variant={`ghost`} onClick={() => setOpen(false)}>

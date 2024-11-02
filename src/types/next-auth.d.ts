@@ -1,4 +1,4 @@
-import NextAuth from "next-auth";
+import NextAuth, { DefaultSession } from "next-auth";
 
 declare module "next-auth" {
   /**
@@ -19,7 +19,8 @@ declare module "next-auth" {
         tempat_lahir: string;
         tanggal_lahir: string;
       };
-    };
+      access_token?: string; // Add the accessToken field here
+    } & DefaultSession["user"];
   }
 
   interface Role {
@@ -33,5 +34,11 @@ declare module "next-auth" {
       role_id: number;
       model_type: string;
     };
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    access_token?: string; // Add accessToken to JWT
   }
 }

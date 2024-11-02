@@ -1,6 +1,29 @@
 import { toast } from "@/components/ui/use-toast";
 import Axios, { AxiosError, AxiosInstance } from "axios";
-import { notFound, redirect } from "next/navigation";
+
+function getToken() {
+  return fetch("/api/client", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({}),
+    cache: "no-store",
+  })
+    .then(async (res) => {
+      // Check if the response body is empty
+      if (res.ok && res.headers.get("content-length") !== "0") {
+        return res.json();
+      } else {
+        throw new Error("No content or invalid JSON response");
+      }
+    })
+    .then(({ access_token }) => access_token)
+    .catch((error) => {
+      console.error("Failed to retrieve token:", error);
+      return null;
+    });
+}
 
 const api: AxiosInstance = Axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -11,14 +34,13 @@ const api: AxiosInstance = Axios.create({
 });
 
 // interceptors to use the token from next-auth.js
-// api.interceptors.request.use(async (config) => {
-//   const session = await getSession();
-//   if (session) {
-//     console.log(session);
-//     // config.headers.Authorization = `Bearer ${session.user}`;
-//   }
-//   return config;
-// });
+api.interceptors.request.use(async (config) => {
+  const token = await getToken();
+  if (token) {
+    config.headers["Authorization"] = `Bearer ${token}`;
+  }
+  return config;
+});
 
 // interceptors to handle response errors
 // when error is 401, redirect to login page
@@ -31,7 +53,9 @@ api.interceptors.response.use(
   ) => {
     // console.error(error.response);
     if (error && error.response?.status === 401) {
-      window.location.href = "/login";
+      if (typeof window !== "undefined") {
+        window.location.href = "/login";
+      }
     }
 
     if (error && error.response?.status === 422) {

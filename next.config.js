@@ -7,7 +7,26 @@ const nextConfig = {
     buildActivityPosition: "bottom-right",
   },
   images: {
-    domains: ["images.unsplash.com", "source.unsplash.com", "picsum.photos"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "source.unsplash.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "picsum.photos",
+        port: "",
+        pathname: "/**",
+      },
+    ],
   },
   // redirect / to login
   async redirects() {
