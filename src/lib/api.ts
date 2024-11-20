@@ -1,6 +1,6 @@
 import { toast } from "@/components/ui/use-toast";
 import Axios, { AxiosError, AxiosInstance } from "axios";
-import { getSession } from "next-auth/react";
+import { getSession, signOut } from "next-auth/react";
 import { notFound, redirect } from "next/navigation";
 import { Session } from "next-auth";
 
@@ -36,7 +36,13 @@ api.interceptors.response.use(
   ) => {
     // console.error(error.response);
     if (error && error.response?.status === 401) {
-      window.location.href = "/login";
+      // redirect("/login");
+      if (typeof window !== "undefined") {
+        window.location.href = "/login";
+
+      }
+      signOut({
+        callbackUrl: "/login",});
     }
 
     if (error && error.response?.status === 422) {

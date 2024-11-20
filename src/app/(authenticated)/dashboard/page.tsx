@@ -6,6 +6,7 @@ import { api } from "@/lib/api";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getToken } from "next-auth/jwt";
+import { LayoutSidebar } from "@/components/layout-sidebar";
 
 // revalidate every 5 seconds
 export const revalidate = 5;

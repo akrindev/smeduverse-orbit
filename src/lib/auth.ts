@@ -1,6 +1,6 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import type { NextAuthOptions } from "next-auth";
-import { setAccessToken } from "./api";
+// import { api, setAccessToken } from "./api";
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
@@ -31,19 +31,27 @@ export const authOptions: NextAuthOptions = {
         // e.g. return { id: 1, name: 'J Smith', email: 'jsmith@example.com' }
         // You can also use the `req` object to obtain additional parameters
         // (i.e., the request IP address)
+        
+        const { email, password } = credentials as {
+          email: string;
+          password: string;
+        };
+
         const res = await fetch(
           new URL(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`),
           {
             method: "POST",
-            body: JSON.stringify(credentials),
             headers: {
               "Content-Type": "application/json",
               Accept: "application/json",
             },
             cache: "no-store",
+            body: JSON.stringify({
+              email,
+              password,
+            }),
           }
-        ); //.then((res) => res.json());
-
+        )
         // Any error will do
         if (res.status !== 200) return null;
 
