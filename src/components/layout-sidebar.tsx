@@ -29,15 +29,13 @@ export function LayoutSidebar({ children }: { children: React.ReactNode }) {
           <Separator orientation='vertical' className='mr-2 h-4' />
           <Breadcrumb>
             <BreadcrumbList>
-              <BreadcrumbItem className='md:block hidden'>
-                <BreadcrumbLink href='#'>
-                  Building Your Application
-                </BreadcrumbLink>
+              <BreadcrumbItem className=''>
+                <BreadcrumbLink href='/'>Smeduverse Orbit</BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator className='md:block hidden' />
+              {/* <BreadcrumbSeparator className='md:block hidden' />
               <BreadcrumbItem>
                 <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-              </BreadcrumbItem>
+              </BreadcrumbItem> */}
             </BreadcrumbList>
           </Breadcrumb>
         </header>

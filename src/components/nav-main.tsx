@@ -21,6 +21,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { menuList } from "@/app/(authenticated)/components/menu-list";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 export function NavMain() {
   const pathname = usePathname();
@@ -59,10 +60,10 @@ export function NavMain() {
         {filteredMenu.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild isActive={isActive(item.path)}>
-              <a href={item.path}>
+              <Link href={item.path}>
                 <item.icon />
                 <span>{item.name}</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         ))}
