@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Metadata } from "next";
@@ -7,35 +9,49 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getToken } from "next-auth/jwt";
 import { LayoutSidebar } from "@/components/layout-sidebar";
+import { useEffect, useState } from "react";
+import { getSession } from "next-auth/react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // revalidate every 5 seconds
-export const revalidate = 5;
+// export const revalidate = 5;
 
-export const metadata: Metadata = {
-  title: "Dashboard",
-  description: "Halaman utama",
-};
+// export const metadata: Metadata = {
+//   title: "Dashboard",
+//   description: "Halaman utama",
+// };
 
-async function analytics() {
-  const session = await getServerSession(authOptions);
+export default function Page() {
+  const [analitycs, setAnalyticsData] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  if (!session || !session.user.access_token) {
-    throw new Error("Unauthorized");
-  }
+  useEffect(() => {
+    async function fetchAnalytics() {
+      const session = await getSession();
 
-  const response = await api.get("/analytics", {
-    headers: {
-      Authorization: `Bearer ${session.user.access_token}`,
-    },
-  });
+      if (!session || !session.user.access_token) {
+        throw new Error("Unauthorized");
+      }
 
-  return response.data;
-}
+      const response = await api.get("/analytics");
+      setAnalyticsData(response.data);
+      setIsLoading(false);
+    }
 
-export default async function Page() {
-  const analitycs = await analytics();
+    fetchAnalytics().catch(console.error);
+  }, []);
 
   // console.log(analitycs);
+
+  if (isLoading) {
+    return (
+      <div className='flex flex-col space-y-5 h-full'>
+        <Skeleton className='w-[250px] h-4' />
+        <Skeleton className='w-[350px] h-4' />
+        <Skeleton className='w-[350px] h-4' />
+      </div>
+    );
+  }
 
   return (
     <div className='flex flex-col space-y-5 h-full'>
