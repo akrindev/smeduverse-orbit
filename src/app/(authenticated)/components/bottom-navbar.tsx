@@ -11,6 +11,19 @@ import { usePathname, useRouter } from "next/navigation";
 import { menuList } from "./menu-list";
 import { useSession } from "next-auth/react";
 
+interface Role {
+  id: number;
+  name: string;
+  guard_name: string;
+  created_at: string;
+  updated_at: string;
+  pivot: {
+    model_id: string;
+    role_id: number;
+    model_type: string;
+  };
+}
+
 export function BottomNavbar({ className }: { className?: string }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -23,7 +36,7 @@ export function BottomNavbar({ className }: { className?: string }) {
 
   // change variant to default when the page is active
   // this will highlight the menu item
-  function isActive(path, bool = false) {
+  function isActive(path: string, bool = false) {
     const matched = pathname.startsWith(path);
 
     if (!bool) {
@@ -39,7 +52,7 @@ export function BottomNavbar({ className }: { className?: string }) {
     if (!item.roles) return true;
 
     return item.roles.some((role) =>
-      session.user?.roles?.map((r) => r.name).includes(role)
+      session.user?.roles?.map((r: Role) => r.name).includes(role)
     );
   });
 
@@ -51,7 +64,7 @@ export function BottomNavbar({ className }: { className?: string }) {
       )}
     >
       <Separator />
-      <div className="flex justify-around py-4 px-2 space-x-2">
+      <div className="flex justify-around space-x-2 px-2 py-4">
         {filteredMenu.map(
           (item) =>
             !item.separator && (
@@ -59,10 +72,10 @@ export function BottomNavbar({ className }: { className?: string }) {
                 key={item.name}
                 variant={isActive(item.path) as "default" | "ghost"}
                 size="sm"
-                className="w-full justify-center"
+                className="justify-center w-full"
                 onClick={() => router.push(item.path)}
               >
-                <item.icon className="mr-2 h-4 w-4" />
+                <item.icon className="mr-2 w-4 h-4" />
                 {isActive(item.path, true) && item.name}
               </Button>
             )
