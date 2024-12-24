@@ -1,6 +1,6 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import type { NextAuthOptions } from "next-auth";
-import { setAccessToken } from "./api";
+// import { api, setAccessToken } from "./api";
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
@@ -31,23 +31,31 @@ export const authOptions: NextAuthOptions = {
         // e.g. return { id: 1, name: 'J Smith', email: 'jsmith@example.com' }
         // You can also use the `req` object to obtain additional parameters
         // (i.e., the request IP address)
+
+        const { email, password } = credentials as {
+          email: string;
+          password: string;
+        };
+
         const res = await fetch(
           new URL(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`),
           {
             method: "POST",
-            body: JSON.stringify(credentials),
             headers: {
               "Content-Type": "application/json",
               Accept: "application/json",
             },
             cache: "no-store",
+            body: JSON.stringify({
+              email,
+              password,
+            }),
           }
-        ); //.then((res) => res.json());
-
+        );
         // Any error will do
         if (res.status !== 200) return null;
 
-        const { access_token } = await res.json();
+        const { access_token, expires_in } = await res.json();
 
         const user = await fetch(
           new URL(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`),
@@ -67,6 +75,7 @@ export const authOptions: NextAuthOptions = {
           return {
             ...user,
             access_token,
+            expires_in,
           };
         }
 
@@ -81,8 +90,31 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, account }) {
       if (user && account) {
         token.user = user;
-        token.access_token = account.access_token;
+        token.access_token = account.access_token as string;
       }
+
+      // if it expires in less than 30 seconds, refresh it
+      if (token.expires_in < 30) {
+        const res = await fetch(
+          new URL(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`),
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token.access_token}`,
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            cache: "no-store",
+          }
+        );
+
+        if (res.ok) {
+          const { access_token, expires_in } = await res.json();
+          token.access_token = access_token;
+          token.expires_in = expires_in;
+        }
+      }
+
       return token;
     },
 

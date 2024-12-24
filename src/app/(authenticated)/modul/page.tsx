@@ -1,13 +1,15 @@
+"use client";
+
 import { Separator } from "@/components/ui/separator";
 import { Metadata } from "next";
 import ModulList from "./components/modul-list";
 import DialogModul from "./components/dialog-modul";
 import { isWakaKurikulum } from "@/lib/auth-role";
 
-export const metadata: Metadata = {
-  title: "Modul",
-  description: "Daftar semua modul yang telah dibuat",
-};
+// export const metadata: Metadata = {
+//   title: "Modul",
+//   description: "Daftar semua modul yang telah dibuat",
+// };
 
 export default async function Page() {
   return (
