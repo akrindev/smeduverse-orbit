@@ -1,14 +1,16 @@
 import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import Link from "next/link";
+import { validateAuthSession } from "@/lib/auth-actions";
 
 export default async function Page() {
-  const session = await getServerSession(authOptions);
+  // Check authentication status
+  const { isAuthenticated } = await validateAuthSession();
 
-  if (session) {
+  // If authenticated, redirect to dashboard
+  if (isAuthenticated) {
     redirect("/dashboard");
   }
 
+  // If not authenticated, show login link
   return <Link href={`/login`}>Login</Link>;
 }

@@ -1,26 +1,30 @@
 "use client";
 
-import { SessionProvider } from "next-auth/react";
+import { ReactQueryProvider } from "@/components/react-query-provider";
 import { Router } from "next/router";
 import ProgressBar from "@badrap/bar-of-progress";
+import { AuthProvider } from "@/components/auth-provider";
 
-type Props = {
-  children?: React.ReactNode;
-};
-
+// Progress bar configuration for navigation
 const progress = new ProgressBar({
   size: 2,
-  color: "#34D399",
+  color: "#22c55e",
   className: "bar-of-progress",
-  delay: 200,
+  delay: 100,
 });
 
-Router.events.on("routeChangeStart", progress.start);
-Router.events.on("routeChangeComplete", progress.finish);
-Router.events.on("routeChangeError", progress.finish);
-Router.events.on("hashChangeStart", progress.start);
-Router.events.on("hashChangeComplete", progress.finish);
+// Initialize progress bar events
+if (typeof window !== "undefined") {
+  Router.events.on("routeChangeStart", progress.start);
+  Router.events.on("routeChangeComplete", progress.finish);
+  Router.events.on("routeChangeError", progress.finish);
+}
 
-export const NextAuthProvider = ({ children }: Props) => {
-  return <SessionProvider>{children}</SessionProvider>;
-};
+// Main providers component that wraps the application
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <ReactQueryProvider>
+      <AuthProvider>{children}</AuthProvider>
+    </ReactQueryProvider>
+  );
+}
