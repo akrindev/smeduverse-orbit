@@ -6,16 +6,61 @@ import { Modul } from "@/types/modul";
 import ModulCard from "../../components/modul-card";
 import { useEffect, useState } from "react";
 import { useAuth, User } from "@/store/useAuth";
-import SelectTeacher from "../../components/form/select-teacher";
-import SelectRombel from "../../components/form/select-rombel";
-import SelectMapel from "../../components/form/select-mapel";
 import BaseLoading from "@/components/base-loading";
-import SelectSemester from "../../components/form/select-semester";
+import { IconFilter, IconX } from "@tabler/icons-react";
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import SearchableTeacherSelect from "../../components/form/searchable-teacher-select";
+import SearchableRombelSelect from "../../components/form/searchable-rombel-select";
+import SearchableMapelSelect from "../../components/form/searchable-mapel-select";
+import SearchableSemesterSelect from "../../components/form/searchable-semester-select";
+
+// Define useMediaQuery hook here to fix import issue
+function useMediaQuery(query: string): boolean {
+  // Default to false during SSR
+  const [matches, setMatches] = useState(false);
+
+  useEffect(() => {
+    // Only run on client
+    if (typeof window !== "undefined") {
+      // Create the media query list
+      const media = window.matchMedia(query);
+
+      // Set the initial value
+      setMatches(media.matches);
+
+      // Define our event listener
+      const listener = () => {
+        setMatches(media.matches);
+      };
+
+      // Add the event listener
+      media.addEventListener("change", listener);
+
+      // Clean up
+      return () => {
+        media.removeEventListener("change", listener);
+      };
+    }
+    return undefined;
+  }, [query]);
+
+  return matches;
+}
 
 export default function ModulList({ owned }: { owned?: boolean }) {
   const [query, setQuery] = useState<Query | null>(null);
   const [loading, setLoading] = useState(false);
   const [isWaka, setIsWaka] = useState(false);
+  const [open, setOpen] = useState(false);
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const [moduls, fetchOwned, refetch] = useModul<
     [
@@ -58,22 +103,74 @@ export default function ModulList({ owned }: { owned?: boolean }) {
     return false;
   };
 
+  // Function to reset all filters
+  const resetFilters = () => {
+    setQuery(null);
+    setOpen(false);
+  };
+
   return (
     <div className="relative">
       {!owned && (
-        <div className="flex md:flex-row flex-col gap-3 my-3">
-          <SelectTeacher
-            onSelected={(teacher_id) => setQuery({ ...query, teacher_id })}
-          />
-          <SelectRombel
-            onSelected={(rombel_id) => setQuery({ ...query, rombel_id })}
-          />
-          <SelectMapel
-            onSelected={(mapel_id) => setQuery({ ...query, mapel_id })}
-          />
-          <SelectSemester
-            onSelected={(semester_id) => setQuery({ ...query, semester_id })}
-          />
+        <div className="flex justify-start my-3">
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetTrigger asChild>
+              <Button variant="default" className="flex items-center gap-2">
+                <IconFilter size={18} />
+                Filter
+              </Button>
+            </SheetTrigger>
+            <SheetContent
+              side={isDesktop ? "right" : "bottom"}
+              className="sm:max-w-md"
+            >
+              <SheetHeader>
+                <SheetTitle>Filter Modul</SheetTitle>
+              </SheetHeader>
+              <div className="flex flex-col gap-4 py-4">
+                <div className="space-y-1">
+                  <h4 className="font-medium text-sm">Guru</h4>
+                  <SearchableTeacherSelect
+                    onSelected={(teacher_id) =>
+                      setQuery({ ...query, teacher_id })
+                    }
+                  />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="font-medium text-sm">Rombel</h4>
+                  <SearchableRombelSelect
+                    onSelected={(rombel_id) =>
+                      setQuery({ ...query, rombel_id })
+                    }
+                  />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="font-medium text-sm">Mata Pelajaran</h4>
+                  <SearchableMapelSelect
+                    onSelected={(mapel_id) => setQuery({ ...query, mapel_id })}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="font-medium text-sm">Semester</h4>
+                  <SearchableSemesterSelect
+                    onSelected={(semester_id) =>
+                      setQuery({ ...query, semester_id })
+                    }
+                  />
+                </div>
+              </div>
+              <SheetFooter>
+                <Button
+                  variant="destructive"
+                  onClick={resetFilters}
+                  className="flex items-center gap-2"
+                >
+                  <IconX size={18} />
+                  Reset Filter
+                </Button>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
         </div>
       )}
       <ScrollArea>
