@@ -1,31 +1,22 @@
 "use server";
 
 import { api } from "./api";
-import { cookies } from "next/headers";
 import Axios from "axios";
 
 // Function to handle sign out with Laravel Sanctum
 export async function signOutAction() {
   try {
-    // Get existing cookies to pass to the API
-    const cookieStore = cookies();
-    const cookieHeader = cookieStore
-      .getAll()
-      .map((cookie) => `${cookie.name}=${cookie.value}`)
-      .join("; ");
-
-    // Call Laravel Sanctum logout endpoint to invalidate session
+    // Make a direct request to the logout endpoint with the stored token
+    // The token will be added by the interceptor in api.ts
     await Axios.post(
       `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,
       {},
       {
         headers: {
-          Cookie: cookieHeader,
           "Content-Type": "application/json",
           Accept: "application/json",
           "X-Requested-With": "XMLHttpRequest",
         },
-        withCredentials: true,
       }
     );
 
@@ -38,43 +29,17 @@ export async function signOutAction() {
 
 /**
  * Server action to validate authentication on the server side
- * This checks for a valid token in cookies and returns the authentication status
+ * Since we're using Zustand persist, we don't need to validate auth on the server
+ * Authentication state is managed entirely on the client
  */
 export async function validateAuthSession() {
   try {
-    // Get existing cookies to pass to the API
-    const cookieStore = cookies();
-    const cookieHeader = cookieStore
-      .getAll()
-      .map((cookie) => `${cookie.name}=${cookie.value}`)
-      .join("; ");
-
-    // Call a simple endpoint that only succeeds for authenticated users
-    // This would be a lightweight endpoint that doesn't return user data but just validates the token
-    const response = await Axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/user`, // Use user endpoint instead of auth/me
-      {
-        headers: {
-          Cookie: cookieHeader,
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-Requested-With": "XMLHttpRequest",
-        },
-        withCredentials: true,
-      }
-    );
-
-    // If request is successful, the session is valid
-    if (response.status === 200) {
-      return {
-        isAuthenticated: true,
-        user: response.data,
-      };
-    }
-
-    // This code should not be reached if response is successful
+    // With token-based auth via Zustand, we don't need to check cookies
+    // The client will manage auth state through the persisted store
+    // This function now just returns a default response
+    // All actual auth checks happen on the client side
     return {
-      isAuthenticated: false,
+      isAuthenticated: false, // Default to false, client will override with actual state
       user: null,
     };
   } catch (error) {

@@ -2,11 +2,17 @@ import { LayoutSidebar } from "@/components/layout-sidebar";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { validateAuthSession } from "@/lib/auth-actions";
+import { cache } from "react";
+
+// Cache the auth validation to prevent repeated API calls
+const getAuthSession = cache(async () => {
+  return await validateAuthSession();
+});
 
 // Server component that checks for authentication
 export default async function DashboardLayout({ children }) {
-  // Validate authentication session on the server
-  const { isAuthenticated, user } = await validateAuthSession();
+  // Validate authentication session on the server with caching
+  const { isAuthenticated, user } = await getAuthSession();
 
   // If not authenticated, redirect to login
   if (!isAuthenticated) {

@@ -1,7 +1,7 @@
 import { toast } from "@/components/ui/use-toast";
 import Axios, { AxiosError, AxiosInstance } from "axios";
 
-// Create API client with correct configuration for Sanctum
+// Create API client with token-based authentication configuration
 const api: AxiosInstance = Axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: {
@@ -9,8 +9,7 @@ const api: AxiosInstance = Axios.create({
     Accept: "application/json",
     "X-Requested-With": "XMLHttpRequest",
   },
-  // Always include credentials with every request
-  withCredentials: true,
+  // Remove withCredentials since we're using token-based auth
 });
 
 // Interceptor to add bearer token to requests if available

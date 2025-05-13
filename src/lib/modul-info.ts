@@ -2,8 +2,7 @@ import { api } from "./api";
 
 export const getModulInfo = async (uuid: string) => {
   try {
-    // Use axios api client which already has withCredentials set to true
-    // Sanctum will automatically include the session cookie
+    // Use axios api client which automatically adds the auth token header
     const response = await api.get(`/modul/show/${uuid}`);
     return response;
   } catch (error: any) {

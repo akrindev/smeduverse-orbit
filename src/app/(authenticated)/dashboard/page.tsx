@@ -5,13 +5,9 @@ import { Separator } from "@/components/ui/separator";
 import { Metadata } from "next";
 import ModulList from "../modul/components/modul-list";
 import { api } from "@/lib/api";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { getToken } from "next-auth/jwt";
-import { LayoutSidebar } from "@/components/layout-sidebar";
 import { useEffect, useState } from "react";
-import { getSession } from "next-auth/react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuthQuery } from "@/hooks/useAuthQuery";
 
 // revalidate every 5 seconds
 // export const revalidate = 5;
@@ -22,28 +18,44 @@ import { Skeleton } from "@/components/ui/skeleton";
 // };
 
 export default function Page() {
-  const [analitycs, setAnalyticsData] = useState<any[]>([]);
+  const {
+    requireAuth,
+    isAuthenticated,
+    isLoading: authLoading,
+    user,
+  } = useAuthQuery();
+  const [analyticsData, setAnalyticsData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  // Ensure user is authenticated by using existing user data
   useEffect(() => {
-    async function fetchAnalytics() {
-      const session = await getSession();
-
-      if (!session || !session.user.access_token) {
-        throw new Error("Unauthorized");
-      }
-
-      const response = await api.get("/analytics");
-      setAnalyticsData(response.data);
-      setIsLoading(false);
-    }
-
-    fetchAnalytics().catch(console.error);
+    // This will use cached user data if available instead of triggering API calls
+    requireAuth();
   }, []);
 
-  // console.log(analitycs);
+  // Only fetch analytics if authenticated and don't have data yet
+  useEffect(() => {
+    async function fetchAnalytics() {
+      if (!isAuthenticated || !user) return;
 
-  if (isLoading) {
+      try {
+        const response = await api.get("/analytics");
+        setAnalyticsData(response.data);
+      } catch (error) {
+        console.error("Error fetching analytics:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    if (isAuthenticated && isLoading) {
+      fetchAnalytics();
+    }
+  }, [isAuthenticated, user, isLoading]);
+
+  // console.log(analyticsData);
+
+  if (authLoading || isLoading) {
     return (
       <div className="flex flex-col space-y-5 h-full">
         <Skeleton className="w-[250px] h-4" />
@@ -66,25 +78,26 @@ export default function Page() {
         </div>
 
         <div className="gap-4 grid md:grid-cols-2 lg:grid-cols-4 mt-5">
-          {analitycs.map((item) => (
-            <Card
-              key={item.name}
-              className="shadow-md hover:scale-105 duration-500 cursor-pointer"
-            >
-              <CardHeader className="flex flex-row justify-between items-center space-y-0 pb-2">
-                <CardTitle className="font-medium text-sm">
-                  {item.name}
-                </CardTitle>
-                {/* <DollarSign className="w-4 h-4 text-muted-foreground" /> */}
-              </CardHeader>
-              <CardContent>
-                <div className="font-bold text-2xl">{item.value}</div>
-                {/* <p className="text-muted-foreground text-xs">
+          {analyticsData &&
+            analyticsData.map((item) => (
+              <Card
+                key={item.name}
+                className="shadow-md hover:scale-105 duration-500 cursor-pointer"
+              >
+                <CardHeader className="flex flex-row justify-between items-center space-y-0 pb-2">
+                  <CardTitle className="font-medium text-sm">
+                    {item.name}
+                  </CardTitle>
+                  {/* <DollarSign className="w-4 h-4 text-muted-foreground" /> */}
+                </CardHeader>
+                <CardContent>
+                  <div className="font-bold text-2xl">{item.value}</div>
+                  {/* <p className="text-muted-foreground text-xs">
                   jumlah keseluruhan mapel
                 </p> */}
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))}
         </div>
 
         <div className="mt-5">

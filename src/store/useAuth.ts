@@ -220,33 +220,21 @@ export const useAuth = create<AuthState>()(
       // Get current user data
       getCurrentUser: async () => {
         try {
-          set({ isLoading: true });
+          // Don't set loading to true, as we're not making an API call
+          // This will just return the persisted user data from the store
 
-          // Fetch current user data
-          const response = await api.get("/api/user");
-
-          if (response.status === 200) {
-            const userData = response.data;
-            set({
-              user: userData,
-              isAuthenticated: true,
-              isLoading: false,
-            });
-            return userData;
+          // If we have a valid user in the store, return it
+          if (get().user && get().isAuthenticated) {
+            return get().user;
           }
 
-          set({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-          });
+          // Otherwise, return null (user is not authenticated)
           return null;
         } catch (error) {
           console.error("Get current user error:", error);
           set({
             user: null,
             isAuthenticated: false,
-            isLoading: false,
           });
           return null;
         }

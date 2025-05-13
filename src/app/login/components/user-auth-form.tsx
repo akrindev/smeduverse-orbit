@@ -8,7 +8,7 @@ import { IconLoader } from "@tabler/icons-react";
 import { useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
-import { useAuthQuery } from "@/hooks/useAuthQuery";
+import { useAuth } from "@/store/useAuth";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -16,58 +16,63 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const passwordRef = useRef<HTMLInputElement>(null);
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const router = useRouter();
 
-  // Use our custom auth hook
-  const { loginMutation, isLoading, error } = useAuthQuery();
+  // Use the Zustand store directly instead of useAuthQuery
+  const { login, error, isLoading } = useAuth();
 
   // This function will be called when the form is submitted
   async function onSubmit(event: React.SyntheticEvent) {
     // Prevent the default form submit
     event.preventDefault();
 
+    // Prevent multiple submissions
+    if (isLoggingIn) return;
+
     // Clear any previous errors
     setFormError(null);
 
     try {
-      // Use the loginMutation instead of NextAuth signIn
-      loginMutation.mutate(
-        { email, password },
-        {
-          onSuccess: () => {
-            // Authentication successful
-            toast({
-              title: "Login Successful",
-              description: "Berhasil masuk",
-            });
+      setIsLoggingIn(true);
 
-            // Get the redirect URL from query parameters or default to dashboard
-            const from = searchParams.get("from") || "/dashboard";
-            router.push(from);
-          },
-          onError: (error: any) => {
-            console.error("Login error:", error);
+      // Use the login function from Zustand store directly
+      const result = await login(email, password);
 
-            // Show an error toast
-            toast({
-              title: "Login Failed",
-              description: "Email/NIY atau password salah",
-              variant: "destructive",
-            });
+      if (result.success) {
+        // Authentication successful
+        toast({
+          title: "Login Successful",
+          description: "Berhasil masuk",
+        });
 
-            // Reset the password field
-            setPassword("");
+        // Get the redirect URL from query parameters or default to dashboard
+        const from = searchParams.get("from") || "/dashboard";
 
-            // Autofocus the password field
-            passwordRef.current?.focus();
-          },
-        }
-      );
-    } catch (error) {
+        // Simple redirection approach
+        window.location.href = from;
+      } else {
+        // Handle login failure
+        setFormError(result.error || "Login failed");
+
+        // Show an error toast
+        toast({
+          title: "Login Failed",
+          description: "Email/NIY atau password salah",
+          variant: "destructive",
+        });
+
+        // Reset the password field
+        setPassword("");
+
+        // Autofocus the password field
+        passwordRef.current?.focus();
+      }
+    } catch (error: any) {
       console.error("Unexpected error during login:", error);
       setFormError("An unexpected error occurred. Please try again.");
 
@@ -76,11 +81,14 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         description: "Terjadi kesalahan. Silakan coba lagi.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoggingIn(false);
     }
   }
 
   // Display either the form error or the auth store error
   const displayError = formError || error;
+  const showLoading = isLoading || isLoggingIn;
 
   return (
     <div className={cn("grid gap-6", className)} {...props}>
@@ -102,7 +110,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               autoComplete="email"
               autoCorrect="off"
               onChange={(e) => setEmail(e.target.value)}
-              disabled={isLoading}
+              disabled={showLoading}
               value={email}
               required
             />
@@ -112,13 +120,15 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               placeholder="password"
               type="password"
               onChange={(e) => setPassword(e.target.value)}
-              disabled={isLoading}
+              disabled={showLoading}
               value={password}
               required
             />
           </div>
-          <Button type="submit" disabled={isLoading}>
-            {isLoading && <IconLoader className="mr-2 w-4 h-4 animate-spin" />}
+          <Button type="submit" disabled={showLoading}>
+            {showLoading && (
+              <IconLoader className="mr-2 w-4 h-4 animate-spin" />
+            )}
             Masuk
           </Button>
         </div>

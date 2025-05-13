@@ -1,23 +1,34 @@
-import { Metadata } from "next";
+"use client";
+
 import Image from "next/image";
 import OrbitImg from "public/orbit.png";
+import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useAuth } from "@/store/useAuth";
 
 import { UserAuthForm } from "./components/user-auth-form";
 
-export const metadata: Metadata = {
-  title: "Login Smeduverse Orbit",
-  description: "Login to your Smeduverse account",
-};
-
 export default function AuthenticationPage() {
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Redirect if user is already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      const from = searchParams.get("from") || "/dashboard";
+      window.location.href = from;
+    }
+  }, [isAuthenticated, searchParams]);
+
   return (
     <>
-      <div className="container relative h-screen flex-col items-center justify-center grid lg:px-0">
+      <div className="relative flex-col justify-center items-center grid lg:px-0 h-screen container">
         <div className="lg:p-8">
-          <div className="mx-auto flex w-full flex-col justify-center sm:w-[400px]">
-            <div className="mb-10 flex flex-col space-y-5 text-center">
+          <div className="flex flex-col justify-center mx-auto w-full sm:w-[400px]">
+            <div className="flex flex-col space-y-5 mb-10 text-center">
               {/* add smeduverse orbit logo */}
-              <div className="mx-auto flex items-center">
+              <div className="flex items-center mx-auto">
                 <Image
                   src={OrbitImg}
                   alt="Smeduverse Orbit Logo"
@@ -25,17 +36,17 @@ export default function AuthenticationPage() {
                   height={30}
                   className="mr-3"
                 />
-                <h1 className="text-2xl font-semibold tracking-tight">
+                <h1 className="font-semibold text-2xl tracking-tight">
                   Smeduverse Orbit
                 </h1>
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Sebelum melangkah lebih jauh, <br /> Identifikasi diri kamu dulu
                 yuk ✨
               </p>
             </div>
             <UserAuthForm />
-            <p className="mt-10 px-8 text-center text-sm text-muted-foreground">
+            <p className="mt-10 px-8 text-muted-foreground text-sm text-center">
               <strong>"Smeduverse Orbit"</strong> {" by"} <br /> SMK Diponegoro
               Karanganyar Kab. Pekalongan
             </p>

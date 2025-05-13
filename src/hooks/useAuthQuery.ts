@@ -29,35 +29,26 @@ export function useAuthQuery() {
     isAuthenticated,
     isLoading,
     error,
+    login: zustandLogin,
+    logout: zustandLogout,
   } = useAuth();
 
-  // Query for the current user
+  // Query for the current user - simplified to just use the persisted state
   const currentUserQuery = useQuery({
     queryKey: authQueryKeys.currentUser,
     queryFn: async (): Promise<User | null> => {
-      try {
-        // Instead of making a request to /auth/me, use the existing user from the Zustand store
-        if (isAuthenticated && user) {
-          return user;
-        }
-
-        // If no authenticated user in the store, return null
-        setUser(null);
-        setToken(null, null);
-        return null;
-      } catch (error) {
-        // Update the Zustand store on error
-        setUser(null);
-        setToken(null, null);
-        return null;
-      }
+      // Simply return the user from Zustand store
+      return user;
     },
-    // Don't automatically refetch on focus/reconnect to avoid
-    // unnecessary loading states during normal app usage
+    // Enable stale time to prevent frequent refetching
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+    // Don't automatically refetch on focus/reconnect
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-    // This will be useful for initializing auth state
     retry: false,
+    // The initial data is already in the Zustand store
+    initialData: user,
   });
 
   // Login mutation
@@ -69,75 +60,59 @@ export function useAuthQuery() {
       email: string;
       password: string;
     }) => {
-      setLoading(true);
-      setError(null);
-
-      // Login attempt
-      const response = await api.post("/auth/login", { email, password });
-
-      return response.data;
+      // Use the Zustand login function
+      const result = await zustandLogin(email, password);
+      if (!result.success) {
+        throw new Error(result.error || "Login failed");
+      }
+      return { user };
     },
-    onSuccess: async (data) => {
-      // Extract token and user data from the response
-      const { access_token, token_type, user } = data;
-
-      // Save token
-      setToken(access_token, token_type);
-
-      // Set user data
-      setUser(user);
-
+    onSuccess: () => {
       // Update React Query cache
       queryClient.setQueryData(authQueryKeys.currentUser, user);
     },
     onError: (error: any) => {
-      const errorMessage = error.response?.data?.message || "Login failed";
-      setError(errorMessage);
-      setToken(null, null);
-      setLoading(false);
-    },
-    onSettled: () => {
-      setLoading(false);
+      console.error("Login error:", error);
     },
   });
 
   // Logout mutation
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      setLoading(true);
-      return await api.post("/auth/logout");
+      // Use the Zustand logout function
+      await zustandLogout();
+      return true;
     },
     onSuccess: () => {
-      // Clear user data and token from store
-      setUser(null);
-      setToken(null, null);
-
       // Invalidate the current user query
       queryClient.invalidateQueries({ queryKey: authQueryKeys.currentUser });
-
       // Redirect to login page
       router.push("/login");
-    },
-    onError: (error) => {
-      console.error("Logout error:", error);
-      // Even on error, clear the user data and token for security
-      setUser(null);
-      setToken(null, null);
-    },
-    onSettled: () => {
-      setLoading(false);
     },
   });
 
   // Function to check if user is authenticated and redirect if not
   const requireAuth = (redirectTo: string = "/login") => {
+    // Check if we already have authenticated user data in the store
+    // If authenticated, return early without triggering any API calls
+    if (isAuthenticated && user) {
+      return {
+        isAuthenticated: true,
+        isLoading: false,
+        user,
+      };
+    }
+
     // If we're not loading and not authenticated, redirect
     if (!isLoading && !isAuthenticated) {
       const currentPath = window.location.pathname;
-      const redirectPath = `${redirectTo}?from=${encodeURIComponent(
-        currentPath
-      )}`;
-      router.push(redirectPath);
+      // Avoid redirecting to login if already on login page
+      if (currentPath !== "/login") {
+        const redirectPath = `${redirectTo}?from=${encodeURIComponent(
+          currentPath
+        )}`;
+        window.location.href = redirectPath; // Use direct browser navigation to avoid router state issues
+      }
     }
 
     return {
