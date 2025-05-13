@@ -21,19 +21,20 @@ export default function SelectSemester({ onSelected }) {
 
   useEffect(() => {
     refetch();
-  }, []);
+  }, [refetch]);
 
   return (
     <Select
       onValueChange={(value: string) => onSelected(value)}
-      defaultValue=''>
-      <SelectTrigger className='w-full'>
-        <SelectValue placeholder='Pilih Semester' />
+      defaultValue=""
+    >
+      <SelectTrigger className="w-full">
+        <SelectValue placeholder="Pilih Semester" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
           {/* <SelectLabel>Pilih Semester</SelectLabel> */}
-          <ScrollArea className='h-72'>
+          <ScrollArea className="h-72">
             {/* <SelectItem value={""}>Semua Semester</SelectItem> */}
             {semesters &&
               semesters.map((semester) => (

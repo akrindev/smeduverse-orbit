@@ -3,7 +3,7 @@
 import { ReactQueryProvider } from "@/components/react-query-provider";
 import ProgressBar from "@badrap/bar-of-progress";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { AuthProvider } from "@/components/auth-provider";
 
 // Progress bar configuration
@@ -14,8 +14,8 @@ const progress = new ProgressBar({
   delay: 100,
 });
 
-// Main providers component that wraps the application
-export function Providers({ children }: { children: React.ReactNode }) {
+// Component that uses searchParams
+function ProgressBarManager({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -25,9 +25,18 @@ export function Providers({ children }: { children: React.ReactNode }) {
     // The combination of pathname and search params changing means a navigation occurred
   }, [pathname, searchParams]);
 
+  return <>{children}</>;
+}
+
+// Main providers component that wraps the application
+export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ReactQueryProvider>
-      <AuthProvider>{children}</AuthProvider>
+      <AuthProvider>
+        <Suspense fallback={null}>
+          <ProgressBarManager>{children}</ProgressBarManager>
+        </Suspense>
+      </AuthProvider>
     </ReactQueryProvider>
   );
 }

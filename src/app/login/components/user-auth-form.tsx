@@ -6,14 +6,24 @@ import { Input } from "@/components/ui/input";
 import { IconLoader } from "@tabler/icons-react";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
 
-import { useRef, useState } from "react";
+import { useRef, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/store/useAuth";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
+// Main component that doesn't directly use searchParams
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
+  return (
+    <Suspense fallback={<div>Loading form...</div>}>
+      <UserAuthFormContent className={className} {...props} />
+    </Suspense>
+  );
+}
+
+// Inner component that uses searchParams
+function UserAuthFormContent({ className, ...props }: UserAuthFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [formError, setFormError] = useState<string | null>(null);

@@ -17,7 +17,7 @@ export default function MataPelajaranPage() {
     if (!isWakaKurikulum()) {
       redirect("/dashboard");
     }
-  }, []);
+  }, [isWakaKurikulum]);
 
   return (
     <div className="flex flex-col space-y-5 h-full">

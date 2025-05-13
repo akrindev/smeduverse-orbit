@@ -29,7 +29,7 @@ export default function SearchableSemesterSelect({
   useEffect(() => {
     setLoading(true);
     refetch().finally(() => setLoading(false));
-  }, []);
+  }, [refetch]);
 
   useEffect(() => {
     if (semesters) {

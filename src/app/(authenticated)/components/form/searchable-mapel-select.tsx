@@ -26,7 +26,7 @@ export default function SearchableMapelSelect({
   useEffect(() => {
     setLoading(true);
     refetch().finally(() => setLoading(false));
-  }, []);
+  }, [refetch]);
 
   useEffect(() => {
     if (mapels) {
