@@ -1,47 +1,81 @@
 // this file will handle auth role: authorization
 
-import { Session, getServerSession } from "next-auth";
-import { authOptions } from "./auth";
+import { useAuth } from "@/store/useAuth";
+import type { User } from "@/store/useAuth";
 
-const hasRole = async (role: string) => {
-  const session = await getServerSession(authOptions);
-  // if no session, return false
-  if (!session) return false;
+// Check if user has a specific role
+const hasRole = (user: User | null, role: string): boolean => {
+  // If no user, return false
+  if (!user) return false;
 
-  //   get all roles name and store as array
-  const roles = session.user.roles?.map((role) => role.name);
+  // Get all roles names and store as array
+  const roles = user.roles?.map((role) => role.name);
 
-  if (roles && roles.length === 0) return false;
+  if (!roles || roles.length === 0) return false;
 
-  return roles!.includes(role);
+  return roles.includes(role);
 };
 
-// check if user has some roles
-const hasRoles = async (roles: string | string[]) => {
-  if (typeof roles === "string") return hasRole(roles);
+// Check if user has some roles
+const hasRoles = (user: User | null, roles: string | string[]): boolean => {
+  if (typeof roles === "string") return hasRole(user, roles);
 
-  const session = await getServerSession(authOptions);
-  // if no session, return false
-  if (!session) return false;
+  // If no user, return false
+  if (!user) return false;
 
-  return session.user.roles!.some((role) => roles.includes(role.name));
+  return user.roles.some((role) =>
+    typeof roles === "string" ? role.name === roles : roles.includes(role.name)
+  );
 };
 
-// check session is the same user
-const isUser = (session: Session, userId: string) => {
-  // if no session, return false
-  if (!session) return false;
+// Check if user is the same user
+const isUser = (user: User | null, userId: string): boolean => {
+  // If no user, return false
+  if (!user) return false;
 
-  return session.user.id === userId;
+  return user.id === userId;
 };
 
-// is admin
-const isAdmin = async () => await hasRole("admin");
-// is guru
-const isGuru = async () => await hasRole("guru");
-const isTeacher = async () => await hasRole("guru");
-// is waka kurikulum
-const isWakaKurikulum = async () => await hasRole("waka kurikulum");
+// Client-side role checks
+const useRoleCheck = () => {
+  const { user } = useAuth();
+
+  return {
+    isAdmin: () => hasRole(user, "admin"),
+    isGuru: () => hasRole(user, "guru"),
+    isTeacher: () => hasRole(user, "guru"),
+    isWakaKurikulum: () => hasRole(user, "waka kurikulum"),
+    hasRole: (role: string) => hasRole(user, role),
+    hasRoles: (roles: string | string[]) => hasRoles(user, roles),
+    isUser: (userId: string) => isUser(user, userId),
+  };
+};
+
+// Server-side role checks (for use in Server Components)
+// These will require getting the user from cookies or other storage
+const isAdmin = async () => {
+  const { getCurrentUser } = useAuth.getState();
+  const user = await getCurrentUser();
+  return hasRole(user, "admin");
+};
+
+const isGuru = async () => {
+  const { getCurrentUser } = useAuth.getState();
+  const user = await getCurrentUser();
+  return hasRole(user, "guru");
+};
+
+const isTeacher = async () => {
+  const { getCurrentUser } = useAuth.getState();
+  const user = await getCurrentUser();
+  return hasRole(user, "guru");
+};
+
+const isWakaKurikulum = async () => {
+  const { getCurrentUser } = useAuth.getState();
+  const user = await getCurrentUser();
+  return hasRole(user, "waka kurikulum");
+};
 
 export {
   hasRole,
@@ -51,4 +85,5 @@ export {
   isTeacher,
   isWakaKurikulum,
   isUser,
+  useRoleCheck,
 };
