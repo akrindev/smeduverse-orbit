@@ -36,17 +36,12 @@ export function useAuthQuery() {
     queryKey: authQueryKeys.currentUser,
     queryFn: async (): Promise<User | null> => {
       try {
-        // Use the api client which will automatically include the token if available
-        const response = await api.get("/api/user");
-
-        if (response.status === 200) {
-          const userData = response.data;
-          // Update the Zustand store
-          setUser(userData);
-          return userData;
+        // Instead of making a request to /auth/me, use the existing user from the Zustand store
+        if (isAuthenticated && user) {
+          return user;
         }
 
-        // If we get here, there's no valid user
+        // If no authenticated user in the store, return null
         setUser(null);
         setToken(null, null);
         return null;

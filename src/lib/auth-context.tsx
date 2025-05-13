@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { api, refreshCsrfToken } from "./api";
+import { api } from "./api";
 
 // Define user and role types
 export interface Teacher {
@@ -63,8 +63,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const checkAuth = async () => {
       try {
         setIsLoading(true);
-        // Fetch the current user from the API
-        const response = await api.get("/auth/me", { withCredentials: true });
+        // Fetch the current user from the API using the /api/user endpoint
+        const response = await api.get("/api/user", { withCredentials: true });
 
         if (response.status === 200) {
           setUser(response.data);
@@ -87,10 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setIsLoading(true);
 
-      // First, refresh CSRF token
-      await refreshCsrfToken();
-
-      // Attempt to log in
+      // Attempt to log in without refreshing CSRF token
       const response = await api.post(
         "/auth/login",
         {
@@ -102,7 +99,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // If login successful, fetch user data
       if (response.status === 200) {
-        const userResponse = await api.get("/auth/me", {
+        const userResponse = await api.get("/api/user", {
           withCredentials: true,
         });
         setUser(userResponse.data);
@@ -141,11 +138,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const refreshUser = async () => {
     try {
       setIsLoading(true);
-      const response = await api.get("/auth/me", { withCredentials: true });
+      const response = await api.get("/api/user", { withCredentials: true });
       if (response.status === 200) {
         setUser(response.data);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("User refresh error:", error);
       // If refresh fails due to auth issues, clear user
       if (error.response?.status === 401) {

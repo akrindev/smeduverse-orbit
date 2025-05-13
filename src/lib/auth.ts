@@ -60,7 +60,7 @@ export const authOptions: NextAuthOptions = {
 
           // Now fetch user info with the established session
           const userRes = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/auth/me`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/user`,
             {
               method: "GET",
               headers: {

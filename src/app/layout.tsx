@@ -46,6 +46,7 @@ export default function RootLayout({
           "min-h-screen bg-background font-sans antialiased",
           inter.className
         )}
+        suppressHydrationWarning
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Providers>{children}</Providers>

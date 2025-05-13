@@ -38,7 +38,7 @@ export async function signOutAction() {
 
 /**
  * Server action to validate authentication on the server side
- * This makes a request to the API to verify if the current session is valid
+ * This checks for a valid token in cookies and returns the authentication status
  */
 export async function validateAuthSession() {
   try {
@@ -49,9 +49,10 @@ export async function validateAuthSession() {
       .map((cookie) => `${cookie.name}=${cookie.value}`)
       .join("; ");
 
-    // Call the API to validate session using axios
+    // Call a simple endpoint that only succeeds for authenticated users
+    // This would be a lightweight endpoint that doesn't return user data but just validates the token
     const response = await Axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/me`, // Use the same endpoint as client-side
+      `${process.env.NEXT_PUBLIC_API_URL}/api/user`, // Use user endpoint instead of auth/me
       {
         headers: {
           Cookie: cookieHeader,
@@ -91,7 +92,7 @@ export async function validateAuthSession() {
  * @param roles - Single role or array of roles to check
  * @param userData - User data with roles information
  */
-export function hasRoles(roles: string | string[], userData: any) {
+export async function hasRoles(roles: string | string[], userData: any) {
   if (!userData || !userData.roles) return false;
 
   const userRoles = userData.roles.map((role) => role.name);
