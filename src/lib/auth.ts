@@ -4,9 +4,10 @@ import type { NextAuthOptions } from "next-auth";
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
-  // enabe JWT
+  // Using cookies instead of JWT
   session: {
-    strategy: "jwt",
+    strategy: "jwt", // Still using JWT for NextAuth, but with cookie authentication from Sanctum
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   providers: [
     CredentialsProvider({
@@ -25,103 +26,93 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials, req) {
-        // You need to provide your own logic here that takes the credentials
-        // submitted and returns either a object representing a user or value
-        // that is false/null if the credentials are invalid.
-        // e.g. return { id: 1, name: 'J Smith', email: 'jsmith@example.com' }
-        // You can also use the `req` object to obtain additional parameters
-        // (i.e., the request IP address)
-
         const { email, password } = credentials as {
           email: string;
           password: string;
         };
 
-        const res = await fetch(
-          new URL(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`),
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-            },
-            cache: "no-store",
-            body: JSON.stringify({
-              email,
-              password,
-            }),
+        try {
+          // First try to log in with Laravel Sanctum
+          const loginRes = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+              },
+              credentials: "include",
+              body: JSON.stringify({
+                email,
+                password,
+              }),
+            }
+          );
+
+          // If login failed
+          if (!loginRes.ok) {
+            console.error("Login failed:", await loginRes.text());
+            return null;
           }
-        );
-        // Any error will do
-        if (res.status !== 200) return null;
 
-        const { access_token, expires_in } = await res.json();
+          // Parse login response
+          const loginData = await loginRes.json();
 
-        const user = await fetch(
-          new URL(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`),
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${access_token}`,
-              "Content-Type": "application/json",
-              Accept: "application/json",
-            },
-            cache: "no-store",
+          // Now fetch user info with the established session
+          const userRes = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/auth/me`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+              },
+              credentials: "include",
+            }
+          );
+
+          // If user fetch failed
+          if (!userRes.ok) {
+            console.error("User fetch failed:", await userRes.text());
+            return null;
           }
-        ).then((res) => res.json());
 
-        // If no error and we have user data, return it
-        if (res.ok && user) {
+          // Parse user data
+          const userData = await userRes.json();
+
+          // Return user data for NextAuth session
           return {
-            ...user,
-            access_token,
-            expires_in,
+            id: userData.id,
+            name: userData.name,
+            email: userData.email,
+            roles: userData.roles,
+            teacher: userData.teacher,
+            // Store access token temporarily if needed until we fully migrate
+            // This will be removed once migration is complete
+            access_token: loginData.access_token,
           };
+        } catch (error) {
+          console.error("Auth error:", error);
+          return null;
         }
-
-        // Return null if user data could not be retrieved
-        return null;
       },
     }),
   ],
 
   callbacks: {
-    // Assigning encoded token from API to token created in the session
-    async jwt({ token, user, account }) {
-      if (user && account) {
+    // Assign token data from API to NextAuth JWT
+    async jwt({ token, user }) {
+      // Update the token with user data when signing in
+      if (user) {
         token.user = user;
-        token.access_token = account.access_token as string;
       }
-
-      // if it expires in less than 30 seconds, refresh it
-      if (token.expires_in < 30) {
-        const res = await fetch(
-          new URL(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`),
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token.access_token}`,
-              "Content-Type": "application/json",
-              Accept: "application/json",
-            },
-            cache: "no-store",
-          }
-        );
-
-        if (res.ok) {
-          const { access_token, expires_in } = await res.json();
-          token.access_token = access_token;
-          token.expires_in = expires_in;
-        }
-      }
-
       return token;
     },
 
-    // Extending session object
-    async session({ session, token, user }) {
-      session.user = token.user;
-      session.access_token = token.access_token;
+    // Extend session object with user data
+    async session({ session, token }) {
+      // Add user data to session
+      session.user = token.user as any;
       return session;
     },
     async redirect({ url, baseUrl }) {
@@ -129,6 +120,7 @@ export const authOptions: NextAuthOptions = {
       return url;
     },
   },
+  debug: process.env.NODE_ENV === "development",
   pages: {
     signIn: "/login",
   },

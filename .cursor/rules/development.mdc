@@ -1,0 +1,58 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Development Workflow
+
+## Local Development
+- Use Bun for package management and running the development server
+- Run the development server with `bun run dev`
+- Available scripts defined in [package.json](mdc:package.json):
+  ```
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  }
+  ```
+
+## Development Guidelines
+
+### State Management
+- Use Zustand for global state management
+- Create new stores in [src/store/](mdc:src/store) directory
+- Follow existing patterns for state persistence when needed
+
+### Component Development
+- Use Shadcn UI components from [src/components/ui/](mdc:src/components/ui)
+- Use Tailwind CSS for styling
+- Follow the existing project structure for new components
+
+### API Integration
+- Use the configured [api client](mdc:src/lib/api.ts) for backend communication
+- Handle API errors properly using the interceptors
+- Consider using TanStack Query for data fetching and caching
+
+## Production Deployment
+
+### Build Process
+1. Run `bun run build` to create a production build
+2. Run `bun run start` to start the production server
+3. Or deploy to your preferred hosting platform
+
+### Environment Variables
+- Configure environment variables for production:
+  - `NEXT_PUBLIC_API_URL` - Backend API URL
+  - Other environment-specific variables as needed
+
+### Performance Considerations
+- Next.js includes built-in optimizations
+- Images should use the Next.js Image component
+- Use proper caching strategies for API requests
+
+### Security Notes
+- Ensure proper CSRF protection is enabled
+- All API requests must include credentials for cookie-based auth
+- Protect authenticated routes appropriately

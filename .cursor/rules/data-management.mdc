@@ -1,0 +1,49 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Data Management
+
+## Zustand State Stores
+The application uses Zustand for state management with these main stores:
+
+- [useAuth.ts](mdc:src/store/useAuth.ts) - Authentication state
+- [useUser.ts](mdc:src/store/useUser.ts) - User information
+- [useAttendance.ts](mdc:src/store/useAttendance.ts) - Attendance tracking
+- [useMapel.ts](mdc:src/store/useMapel.ts) - Subjects management
+- [useModul.ts](mdc:src/store/useModul.ts) - Learning modules
+- [usePresence.ts](mdc:src/store/usePresence.ts) - Presence records
+- [useSemester.ts](mdc:src/store/useSemester.ts) - Semester data
+- [useRombel.ts](mdc:src/store/useRombel.ts) - Class groups
+- [useSelectedDate.ts](mdc:src/store/useSelectedDate.ts) - Date selection
+
+## Data Flow Pattern
+
+1. **API Requests**: Use the [api](mdc:src/lib/api.ts) client for backend communication
+2. **State Updates**: Update Zustand stores with API response data
+3. **Component Consumption**: Components subscribe to relevant state
+4. **Persistence**: Some stores use localStorage for state persistence
+
+## Form Handling
+
+- Use [React Hook Form](mdc:https:/react-hook-form.com) for form management
+- Validate with [Zod](mdc:https:/zod.dev) for type-safe validation
+- Follow patterns in existing forms like [user-auth-form.tsx](mdc:src/app/login/components/user-auth-form.tsx)
+
+## Best Practices
+
+### State Organization
+- Keep related state in appropriate stores
+- Use selectors to access only needed data from stores
+- Minimize state duplication across stores
+
+### Data Fetching
+- Consider TanStack Query for complex data fetching needs
+- Handle loading and error states appropriately
+- Implement proper cache invalidation where needed
+
+### Type Safety
+- Define proper TypeScript types for all data structures
+- Use Zod for runtime validation of external data
+- Maintain consistent typing across the application

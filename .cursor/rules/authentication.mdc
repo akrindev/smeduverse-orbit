@@ -1,0 +1,30 @@
+---
+description: authentication
+globs: 
+alwaysApply: false
+---
+# Authentication System
+
+## Overview
+This project uses a custom authentication system with Laravel Sanctum, not NextAuth (as per requirements).
+
+## Authentication Flow
+1. User submits credentials via the [login form](mdc:src/app/login/components/user-auth-form.tsx)
+2. API request is sent to the backend Laravel application
+3. Authentication state is managed through [useAuth](mdc:src/store/useAuth.ts) Zustand store
+4. Authenticated routes are protected in the [(authenticated)](mdc:src/app/(authenticated)/) directory
+
+## API Client Configuration
+- [api.ts](mdc:src/lib/api.ts) - Configures Axios with proper CSRF token handling
+  - Sets up withCredentials for cookie-based authentication
+  - Includes interceptors for error handling
+  - Provides refreshCsrfToken function for token refresh
+
+## State Management
+- Authentication state is persisted in localStorage
+- User information is stored in the Zustand store
+- Session validation is handled through API calls
+
+## Development Notes
+- When working with authenticated routes, ensure proper error handling
+- For API calls requiring authentication, use the configured [api](mdc:src/lib/api.ts) instance

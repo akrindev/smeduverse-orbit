@@ -19,10 +19,7 @@ declare module "next-auth" {
         tempat_lahir: string;
         tanggal_lahir: string;
       };
-      access_token: string;
     } & DefaultSession["user"];
-    access_token: string | null | undefined;
-    expires_in: number | null | undefined;
   }
 
   interface Role {
@@ -41,7 +38,6 @@ declare module "next-auth" {
 
 declare module "next-auth/jwt" {
   interface JWT {
-    access_token: string;
-    expires_in: number;
+    user: any;
   }
 }

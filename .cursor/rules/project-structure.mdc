@@ -1,0 +1,42 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Project Structure
+
+## App Router Structure
+- [src/app/](mdc:src/app) - Main application code using Next.js App Router
+  - [(authenticated)/](mdc:src/app/(authenticated)/) - Routes requiring authentication
+    - [dashboard/](mdc:src/app/(authenticated)/dashboard/) - Dashboard pages
+    - [mata-pelajaran/](mdc:src/app/(authenticated)/mata-pelajaran/) - Subject management 
+    - [modul/](mdc:src/app/(authenticated)/modul/) - Learning modules
+    - [presensi/](mdc:src/app/(authenticated)/presensi/) - Attendance system
+    - [rekap/](mdc:src/app/(authenticated)/rekap/) - Reports and summaries
+    - [semester/](mdc:src/app/(authenticated)/semester/) - Semester management
+  - [api/](mdc:src/app/api) - API routes
+  - [login/](mdc:src/app/login) - Authentication pages
+
+## Components and Libraries
+- [src/components/](mdc:src/components) - Reusable UI components
+  - [ui/](mdc:src/components/ui) - Shadcn UI components
+  - [hooks/](mdc:src/components/hooks) - Component-related hooks
+  - [lib/](mdc:src/components/lib) - Component utilities
+
+## State Management
+- [src/store/](mdc:src/store) - Zustand stores for global state
+  - [useAuth.ts](mdc:src/store/useAuth.ts) - Authentication state
+  - [useUser.ts](mdc:src/store/useUser.ts) - User state
+  - [useAttendance.ts](mdc:src/store/useAttendance.ts) - Attendance management
+  - [useModul.ts](mdc:src/store/useModul.ts) - Module state
+  - [usePresence.ts](mdc:src/store/usePresence.ts) - Presence tracking
+
+## Utilities and Helpers
+- [src/lib/](mdc:src/lib) - Utility functions and API clients
+  - [api.ts](mdc:src/lib/api.ts) - API client configuration with Axios
+
+## Configuration Files
+- [next.config.js](mdc:next.config.js) - Next.js configuration
+- [tailwind.config.js](mdc:tailwind.config.js) - Tailwind CSS configuration
+- [components.json](mdc:components.json) - Shadcn UI configuration
+- [package.json](mdc:package.json) - Project dependencies
