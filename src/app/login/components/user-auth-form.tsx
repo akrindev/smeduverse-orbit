@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { IconLoader } from "@tabler/icons-react";
+import { IconEye, IconEyeOff } from "@tabler/icons-react";
 
 import { useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -17,6 +18,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [password, setPassword] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const passwordRef = useRef<HTMLInputElement>(null);
   const searchParams = useSearchParams();
@@ -114,16 +116,30 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               value={email}
               required
             />
-            <Input
-              ref={passwordRef}
-              id="password"
-              placeholder="password"
-              type="password"
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={showLoading}
-              value={password}
-              required
-            />
+            <div className="relative">
+              <Input
+                ref={passwordRef}
+                id="password"
+                placeholder="password"
+                type={showPassword ? "text" : "password"}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={showLoading}
+                value={password}
+                required
+                autoComplete="current-password"
+              />
+              <button
+                type="button"
+                className="top-1/2 right-3 absolute text-gray-500 hover:text-gray-700 -translate-y-1/2 transform"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <IconEyeOff className="w-5 h-5" />
+                ) : (
+                  <IconEye className="w-5 h-5" />
+                )}
+              </button>
+            </div>
           </div>
           <Button type="submit" disabled={showLoading}>
             {showLoading && (
