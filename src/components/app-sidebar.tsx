@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { usePathname } from "next/navigation";
 
 import { NavMain } from "@/components/nav-main";
 // import { NavProjects } from "@/components/nav-projects";
@@ -12,12 +13,23 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const pathname = usePathname();
+  const { setOpenMobile, isMobile } = useSidebar();
+
+  // Close sidebar when route changes (only on mobile)
+  React.useEffect(() => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  }, [pathname, setOpenMobile, isMobile]);
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
