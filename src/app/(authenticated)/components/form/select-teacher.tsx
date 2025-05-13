@@ -10,19 +10,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useUser } from "@/store/useUser";
+import { useUserQuery } from "@/store/useUser";
 import { Teacher } from "@/types/modul";
-import { useEffect } from "react";
 
 export default function SelectTeacher({ onSelected }) {
-  const [teachers, refetch] = useUser((state) => [
-    state.teachers,
-    state.refetch,
-  ]);
+  const { teachers, isLoading } = useUserQuery();
 
-  useEffect(() => {
-    refetch();
-  }, []);
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <Select onValueChange={onSelected} defaultValue=''>

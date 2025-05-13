@@ -1,29 +1,8 @@
 import { toast } from "@/components/ui/use-toast";
 import Axios, { AxiosError, AxiosInstance } from "axios";
-
-function getToken() {
-  return fetch("/api/client", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({}),
-    cache: "no-store",
-  })
-    .then(async (res) => {
-      // Check if the response body is empty
-      if (res.ok && res.headers.get("content-length") !== "0") {
-        return res.json();
-      } else {
-        throw new Error("No content or invalid JSON response");
-      }
-    })
-    .then(({ access_token }) => access_token)
-    .catch((error) => {
-      console.error("Failed to retrieve token:", error);
-      return null;
-    });
-}
+import { getSession, signOut } from "next-auth/react";
+import { notFound, redirect } from "next/navigation";
+import { Session } from "next-auth";
 
 const api: AxiosInstance = Axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -33,12 +12,16 @@ const api: AxiosInstance = Axios.create({
   },
 });
 
-// interceptors to use the token from next-auth.js
+// Modify the interceptor to handle both client and server-side scenarios
 api.interceptors.request.use(async (config) => {
-  const token = await getToken();
-  if (token) {
-    config.headers["Authorization"] = `Bearer ${token}`;
+  if (typeof window !== "undefined") {
+    // Client-side
+    const session = await getSession();
+    if (session?.user.access_token) {
+      config.headers.Authorization = `Bearer ${session.user.access_token}`;
+    }
   }
+  // For server-side, the token should be passed manually when making API calls
   return config;
 });
 
@@ -53,9 +36,13 @@ api.interceptors.response.use(
   ) => {
     // console.error(error.response);
     if (error && error.response?.status === 401) {
+      // redirect("/login");
       if (typeof window !== "undefined") {
         window.location.href = "/login";
+
       }
+      signOut({
+        callbackUrl: "/login",});
     }
 
     if (error && error.response?.status === 422) {

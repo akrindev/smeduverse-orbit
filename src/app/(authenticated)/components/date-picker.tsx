@@ -44,16 +44,17 @@ export function DatePicker({
           className={cn(
             "w-[280px] justify-start text-left font-normal",
             !date && "text-muted-foreground"
-          )}>
-          <CalendarIcon className='mr-2 h-4 w-4' />
+          )}
+        >
+          <CalendarIcon className="mr-2 w-4 h-4" />
           {date ? format(date, "PPP") : <span>Pick a date</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className='w-auto p-0'>
+      <PopoverContent className="p-0 w-auto">
         <Calendar
-          mode='single'
+          mode="single"
           selected={date}
-          onSelect={(day: Date) => setDate(day)}
+          onSelect={(day: Date | undefined) => day && setDate(day)}
           initialFocus
           disabled={(date) => date > new Date()}
         />

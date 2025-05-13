@@ -3,7 +3,6 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { IconLoader } from "@tabler/icons-react";
 import { SignInResponse, getCsrfToken, signIn } from "next-auth/react";
 
@@ -51,9 +50,9 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       password,
       redirect: false,
     })
-      .then((res: SignInResponse) => {
+      .then((res: SignInResponse | undefined) => {
         // if there was an error
-        if (res.error) {
+        if (res!.error) {
           // show an error toast
           toast({
             title: "Error",
@@ -69,7 +68,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         }
 
         // if there was no error
-        if (!res.error) {
+        if (!res!.error) {
           // show a success toast
           toast({
             title: "Success",
@@ -90,8 +89,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     <div className={cn("grid gap-6", className)} {...props}>
       <form onSubmit={onSubmit}>
         <input type="hidden" name="csrfToken" defaultValue={csrfToken} />
-        <div className="grid gap-2">
-          <div className="mb-5 grid space-y-5">
+        <div className="gap-2 grid">
+          <div className="space-y-5 grid mb-5">
             <Input
               id="email"
               placeholder="NIY atau Email"
@@ -117,7 +116,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             />
           </div>
           <Button type="submit" disabled={isLoading}>
-            {isLoading && <IconLoader className="mr-2 h-4 w-4 animate-spin" />}
+            {isLoading && <IconLoader className="mr-2 w-4 h-4 animate-spin" />}
             Masuk
           </Button>
         </div>
