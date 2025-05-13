@@ -6,7 +6,7 @@ import { Modul } from "@/types/modul";
 import { useEffect, useState } from "react";
 import TableAttendances from "./components/table-attendances";
 import { Button } from "@/components/ui/button";
-import { IconLink } from "@tabler/icons-react";
+import { IconDownload, IconLink } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TablePresences from "./components/table-presence";
@@ -15,7 +15,7 @@ import { isUser } from "@/lib/auth-role";
 import { useAuth } from "@/store/useAuth";
 import BaseLoading from "@/components/base-loading";
 import { api } from "@/lib/api";
-import { Loader } from "lucide-react";
+import { ArrowLeft, Loader } from "lucide-react";
 import Link from "next/link";
 
 interface RekapPageProps {
@@ -85,8 +85,26 @@ export default function RekapPage({ params }: RekapPageProps) {
           </div>
           <div className="flex gap-3 mt-5 md:mt-0">
             <Button variant="outline" onClick={handleExport} disabled={loading}>
-              {loading ? <Loader className="w-5 h-5" /> : <>Unduh</>}
+              {loading ? (
+                <Loader className="w-5 h-5" />
+              ) : (
+                <div className="flex items-center gap-2">
+                  Unduh
+                  <IconDownload className="w-4 h-4" />
+                </div>
+              )}
             </Button>
+            <div className="flex mb-2">
+              <Link href={`/modul/${params.uuid}`}>
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-2 w-fit"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Kembali
+                </Button>
+              </Link>
+            </div>
             {/* {isUser(user, modul?.teacher_id!) && (
               <Link href={`/modul/${params.uuid}`}>
                 <Button variant='default'>

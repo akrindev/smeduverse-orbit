@@ -5,11 +5,12 @@ import TableListPresensi from "./table-list-presensi";
 import DialogPresensi from "./dialog-presensi";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { FileText, Loader2 } from "lucide-react";
+import { FileText, Loader2, Info, ArrowLeft } from "lucide-react";
 import { notFound, useRouter } from "next/navigation";
 import { useModulQuery } from "@/queries/useModulQuery";
 import { useAuth } from "@/store/useAuth";
 import { useEffect } from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function ModulClient({ modulUuid }: { modulUuid: string }) {
   const router = useRouter();
@@ -47,6 +48,14 @@ export default function ModulClient({ modulUuid }: { modulUuid: string }) {
 
   return (
     <div className="space-y-6">
+      {/* <div className="flex flex-col gap-4 mb-6">
+        <Link href="/modul">
+          <Button variant="outline" className="flex items-center gap-2 w-fit">
+            <ArrowLeft className="w-4 h-4" />
+            Kembali ke Daftar Modul
+          </Button>
+        </Link>
+      </div> */}
       <div className="gap-3 grid grid-cols-12">
         <div className="col-span-12 md:col-span-6">
           <h3 className="font-medium text-lg">Presensi</h3>
@@ -59,11 +68,19 @@ export default function ModulClient({ modulUuid }: { modulUuid: string }) {
           <Link href={`/rekap/presensi/${modulUuid}`}>
             <Button variant={`outline`}>
               <FileText className="w-4 h-4" />
+              Rekap Presensi
             </Button>
           </Link>
         </div>
       </div>
       <Separator />
+      <Alert>
+        <Info className="w-4 h-4" />
+        <AlertTitle>Info</AlertTitle>
+        <AlertDescription>
+          Pilih presensi untuk mengelola status presensi siswa
+        </AlertDescription>
+      </Alert>
       <TableListPresensi modulUuid={modulUuid} />
     </div>
   );
