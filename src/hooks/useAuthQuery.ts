@@ -107,11 +107,9 @@ export function useAuthQuery() {
     if (!isLoading && !isAuthenticated) {
       const currentPath = window.location.pathname;
       // Avoid redirecting to login if already on login page
-      if (currentPath !== "/login") {
-        const redirectPath = `${redirectTo}?from=${encodeURIComponent(
-          currentPath
-        )}`;
-        window.location.href = redirectPath; // Use direct browser navigation to avoid router state issues
+      if (currentPath !== "/login" && currentPath !== redirectTo) {
+        // Use Next.js router instead of direct browser navigation
+        router.push(`${redirectTo}?from=${encodeURIComponent(currentPath)}`);
       }
     }
 

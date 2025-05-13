@@ -9,17 +9,21 @@ import { useAuth } from "@/store/useAuth";
 import { UserAuthForm } from "./components/user-auth-form";
 
 export default function AuthenticationPage() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
 
   // Redirect if user is already authenticated
   useEffect(() => {
-    if (isAuthenticated) {
+    // Only redirect if authentication state is fully determined (not loading)
+    // and user is authenticated
+    if (!isLoading && isAuthenticated) {
       const from = searchParams.get("from") || "/dashboard";
-      window.location.href = from;
+
+      // Use Next.js router instead of window.location to prevent refresh and potential loops
+      router.push(from);
     }
-  }, [isAuthenticated, searchParams]);
+  }, [isAuthenticated, searchParams, router, isLoading]);
 
   return (
     <>

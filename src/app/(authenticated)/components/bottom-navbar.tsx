@@ -9,18 +9,16 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { usePathname, useRouter } from "next/navigation";
 import { menuList } from "./menu-list";
-import { useSession } from "next-auth/react";
+import { useAuth, User } from "@/store/useAuth";
 
+// We can use the role interface from the User type in useAuth
 interface Role {
   id: number;
   name: string;
-  guard_name: string;
-  created_at: string;
-  updated_at: string;
   pivot: {
+    model_type: string;
     model_id: string;
     role_id: number;
-    model_type: string;
   };
 }
 
@@ -28,11 +26,10 @@ export function BottomNavbar({ className }: { className?: string }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const { data: session } = useSession({
-    required: true,
-  });
+  // Use the custom auth store instead of next-auth
+  const { user, isAuthenticated } = useAuth();
 
-  if (!session) return null;
+  if (!user) return null;
 
   // change variant to default when the page is active
   // this will highlight the menu item
@@ -48,11 +45,11 @@ export function BottomNavbar({ className }: { className?: string }) {
 
   // filtered menu based on user roles
   const filteredMenu = menuList.filter((item) => {
-    // check if item.roles has session user roles
+    // check if item.roles has user roles
     if (!item.roles) return true;
 
     return item.roles.some((role) =>
-      session.user?.roles?.map((r: Role) => r.name).includes(role)
+      user.roles?.map((r: Role) => r.name).includes(role)
     );
   });
 

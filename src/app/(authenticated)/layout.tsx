@@ -1,8 +1,7 @@
 import { LayoutSidebar } from "@/components/layout-sidebar";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
-import { validateAuthSession } from "@/lib/auth-actions";
 import { cache } from "react";
+import { validateAuthSession } from "@/lib/auth-actions";
 
 // Cache the auth validation to prevent repeated API calls
 const getAuthSession = cache(async () => {
@@ -12,14 +11,11 @@ const getAuthSession = cache(async () => {
 // Server component that checks for authentication
 export default async function DashboardLayout({ children }) {
   // Validate authentication session on the server with caching
-  const { isAuthenticated, user } = await getAuthSession();
+  // This is now mainly to prevent SSR errors - real auth checks happen client-side
+  await getAuthSession();
 
-  // If not authenticated, redirect to login
-  if (!isAuthenticated) {
-    // Get the current path to redirect back after login
-    const currentPath = "/dashboard"; // Default fallback
-    return redirect(`/login?from=${encodeURIComponent(currentPath)}`);
-  }
+  // We no longer redirect here to prevent infinite loops
+  // All authentication protection is handled by client components
 
   return (
     <LayoutSidebar>

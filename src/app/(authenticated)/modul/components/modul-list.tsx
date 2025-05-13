@@ -5,7 +5,7 @@ import { Query, useModul } from "@/store/useModul";
 import { Modul } from "@/types/modul";
 import ModulCard from "../../components/modul-card";
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { useAuth, User } from "@/store/useAuth";
 import SelectTeacher from "../../components/form/select-teacher";
 import SelectRombel from "../../components/form/select-rombel";
 import SelectMapel from "../../components/form/select-mapel";
@@ -25,13 +25,11 @@ export default function ModulList({ owned }: { owned?: boolean }) {
     ]
   >((state) => [state.moduls, state.fetchOwned, state.refetch]);
 
-  const { data: session } = useSession({
-    required: true,
-  });
+  const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    if (session) {
-      const roles = session.user?.roles?.map((role) => role.name);
+    if (user) {
+      const roles = user.roles?.map((role) => role.name);
 
       // console.log(roles);
 
@@ -39,31 +37,31 @@ export default function ModulList({ owned }: { owned?: boolean }) {
         setIsWaka(true);
       }
     }
-  }, [session]);
+  }, [user]);
 
   useEffect(() => {
     setLoading(true);
 
-    if (session) {
+    if (user) {
       if (owned) {
-        fetchOwned(session.user?.id).finally(() => setLoading(false));
+        fetchOwned(user.id).finally(() => setLoading(false));
       } else {
         refetch(query).finally(() => setLoading(false));
       }
     }
-  }, [query, session]);
+  }, [query, user]);
 
   const isOwned = (modul: Modul) => {
-    if (session) {
-      return modul.teacher.teacher_id === session?.user?.id;
+    if (user) {
+      return modul.teacher.teacher_id === user.id;
     }
     return false;
   };
 
   return (
-    <div className='relative'>
+    <div className="relative">
       {!owned && (
-        <div className='flex md:flex-row flex-col gap-3 my-3'>
+        <div className="flex md:flex-row flex-col gap-3 my-3">
           <SelectTeacher
             onSelected={(teacher_id) => setQuery({ ...query, teacher_id })}
           />
@@ -82,25 +80,25 @@ export default function ModulList({ owned }: { owned?: boolean }) {
         {loading ? (
           <BaseLoading />
         ) : (
-          <div className='gap-5 grid grid-cols-12 py-5'>
+          <div className="gap-2 grid grid-cols-12 py-5">
             {moduls && moduls.length > 0 ? (
               moduls.map((modul: Modul) => (
                 <ModulCard
                   key={modul.uuid}
                   modul={modul}
-                  className='cursor-pointer'
+                  className="cursor-pointer"
                   isUser={isOwned(modul)}
                 />
               ))
             ) : (
-              <div className='col-span-full py-20 text-center'>
+              <div className="col-span-full py-20 text-center">
                 Tidak ada modul yang tersedia pada semester ini. Silahkan buat
                 modul baru untuk semester ini.
               </div>
             )}
           </div>
         )}
-        <ScrollBar orientation='horizontal' />
+        <ScrollBar orientation="horizontal" />
       </ScrollArea>
     </div>
   );

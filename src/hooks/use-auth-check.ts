@@ -1,23 +1,23 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/store/useAuth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 // Hook for client-side authentication checks
 export function useAuthCheck(redirectTo: string = "/login") {
-  const { data: session, status } = useSession();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // If the session is loading, wait
-    if (status === "loading") {
+    // If the auth state is loading, wait
+    if (authLoading) {
       return;
     }
 
-    // If there's no session (not authenticated)
-    if (!session) {
+    // If there's no user (not authenticated)
+    if (!isAuthenticated || !user) {
       // Add the current path to redirect back after login
       const currentPath = window.location.pathname;
       router.push(`${redirectTo}?from=${encodeURIComponent(currentPath)}`);
@@ -26,11 +26,11 @@ export function useAuthCheck(redirectTo: string = "/login") {
 
     // User is authenticated
     setIsLoading(false);
-  }, [session, status, router, redirectTo]);
+  }, [user, isAuthenticated, authLoading, router, redirectTo]);
 
   return {
-    isAuthenticated: !!session,
-    isLoading: status === "loading" || isLoading,
-    session,
+    isAuthenticated,
+    isLoading: authLoading || isLoading,
+    user,
   };
 }

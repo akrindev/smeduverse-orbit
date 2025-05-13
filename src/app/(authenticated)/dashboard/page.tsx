@@ -8,6 +8,7 @@ import { api } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthQuery } from "@/hooks/useAuthQuery";
+import { useRouter } from "next/navigation";
 
 // revalidate every 5 seconds
 // export const revalidate = 5;
@@ -18,6 +19,7 @@ import { useAuthQuery } from "@/hooks/useAuthQuery";
 // };
 
 export default function Page() {
+  const router = useRouter();
   const {
     requireAuth,
     isAuthenticated,
@@ -27,11 +29,17 @@ export default function Page() {
   const [analyticsData, setAnalyticsData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Ensure user is authenticated by using existing user data
+  // Ensure user is authenticated
   useEffect(() => {
-    // This will use cached user data if available instead of triggering API calls
-    requireAuth();
-  }, []);
+    // If authentication is already determined and user is not authenticated, redirect to login
+    if (!authLoading && !isAuthenticated) {
+      router.push("/login");
+      return;
+    }
+
+    // No need to call requireAuth() here as it can cause redirect loops
+    // Just check the authenticated state from the store
+  }, [isAuthenticated, authLoading, router]);
 
   // Only fetch analytics if authenticated and don't have data yet
   useEffect(() => {
