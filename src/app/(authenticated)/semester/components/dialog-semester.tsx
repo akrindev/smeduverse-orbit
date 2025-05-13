@@ -87,8 +87,8 @@ export default function DialogSemester({ semester }: { semester?: Semester }) {
             {semester ? "Edit Semester" : "Buat Semester Baru"}
           </DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
+        <div className="gap-4 grid py-4">
+          <div className="gap-2 grid">
             <Label htmlFor="name">Judul Semester</Label>
             <Input
               id="name"
@@ -101,14 +101,14 @@ export default function DialogSemester({ semester }: { semester?: Semester }) {
               value={name}
               autoFocus
             />
-            <div className="text-sm text-gray-400">
+            <div className="text-gray-400 text-sm">
               Semester yang baru ditambahkan akan menjadi semester aktif
             </div>
           </div>
         </div>
         <DialogFooter>
           <Button disabled={isLoading} onClick={handleSemester}>
-            {isLoading && <Loader className="mr-2 h-4 w-4" />}
+            {isLoading && <Loader className="mr-2 w-4 h-4" />}
             Save
           </Button>
           {/* add button delete */}
@@ -154,8 +154,8 @@ export function DialogDeleteSemester({ semester }: { semester: Semester }) {
         <DialogHeader>
           <DialogTitle>Hapus Semester</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
+        <div className="gap-4 grid py-4">
+          <div className="gap-2 grid">
             <DialogDescription>
               Apakah kamu yakin ingin menghapus semester ini?
             </DialogDescription>
@@ -167,7 +167,7 @@ export function DialogDeleteSemester({ semester }: { semester: Semester }) {
             onClick={handleDeleteSemester}
             disabled={isLoading}
           >
-            {isLoading && <Loader className="mr-2 h-4 w-4" />}
+            {isLoading && <Loader className="mr-2 w-4 h-4" />}
             Hapus
           </Button>
           <Button variant={`ghost`} onClick={() => setDialogOpen(false)}>
