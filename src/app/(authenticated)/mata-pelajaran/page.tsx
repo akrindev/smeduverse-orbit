@@ -1,26 +1,33 @@
+"use client";
+
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { IconInfoCircle } from "@tabler/icons-react";
 import DialogMataPelajaran from "./components/dialog-mata-pelajaran";
 import TableMataPelajaran from "./components/table-mata-pelajaran";
-import { isWakaKurikulum } from "@/lib/auth-role";
+import { useRoleCheck } from "@/lib/auth-role";
 import { redirect } from "next/navigation";
+import { useEffect } from "react";
 
-export default async function MataPelajaranPage() {
-  // only waka kurikulum can access this page
-  if (!(await isWakaKurikulum())) {
-    redirect("/dashboard");
-  }
+export default function MataPelajaranPage() {
+  const { isWakaKurikulum } = useRoleCheck();
+
+  // Check if user is waka kurikulum, if not redirect to dashboard
+  useEffect(() => {
+    if (!isWakaKurikulum()) {
+      redirect("/dashboard");
+    }
+  }, [isWakaKurikulum]);
 
   return (
-    <div className="h-full flex flex-col space-y-5">
+    <div className="flex flex-col space-y-5 h-full">
       <div className="flex flex-col h-full">
-        <div className="flex flex-col md:flex-row justify-between">
-          <div className="mt-5 space-y-1">
-            <h2 className="text-2xl font-semibold tracking-tight">
+        <div className="flex md:flex-row flex-col justify-between">
+          <div className="space-y-1 mt-5">
+            <h2 className="font-semibold text-2xl tracking-tight">
               Mata Pelajaran
             </h2>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Kelola data Mata Pelajaran
             </p>
           </div>
@@ -29,7 +36,7 @@ export default async function MataPelajaranPage() {
         </div>
         <Separator className="my-4" />
         <Alert>
-          <IconInfoCircle className="w-5 h-5 mr-2" />
+          <IconInfoCircle className="mr-2 w-5 h-5" />
           <AlertTitle>Info</AlertTitle>
           <AlertDescription>Kelola data mata pelajaran.</AlertDescription>
         </Alert>

@@ -18,7 +18,7 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { usePathname, useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/store/useAuth";
 import { menuList } from "@/app/(authenticated)/components/menu-list";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -27,9 +27,8 @@ export function NavMain() {
   const pathname = usePathname();
   const router = useRouter();
 
-  const { data: session } = useSession({
-    required: true,
-  });
+  // Use the custom auth store instead of next-auth
+  const { user, isAuthenticated } = useAuth();
 
   // change variant to default when the page is active
   // this will highlight the menu item
@@ -39,17 +38,14 @@ export function NavMain() {
 
   // filtered menu based on user roles
   const filteredMenu = menuList.filter((item) => {
-    // check if item.roles has session user roles
-
+    // check if item.roles has user roles
     if (!item.roles) return true;
 
     if (item.separator) return false;
 
     return (
       item.roles &&
-      item.roles.some((role) =>
-        session?.user?.roles?.map((r) => r.name).includes(role)
-      )
+      item.roles.some((role) => user?.roles?.map((r) => r.name).includes(role))
     );
   });
 

@@ -20,20 +20,20 @@ export default function TableMataPelajaran() {
 
   useEffect(() => {
     refetch();
-  }, []);
+  }, [refetch]);
 
   return (
     <div className="border rounded-md">
       {/* show skeleton when semester is loading */}
       {mapels.length === 0 ? (
-        <div className="animate-pulse p-5">
+        <div className="p-5 animate-pulse">
           <div className="space-y-1">
-            <div className="h-4 bg-gray-300 rounded w-1/2"></div>
-            <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+            <div className="bg-gray-300 rounded w-1/2 h-4"></div>
+            <div className="bg-gray-300 rounded w-1/4 h-4"></div>
           </div>
-          <div className="mt-5 space-y-1">
-            <div className="h-4 bg-gray-300 rounded w-1/2"></div>
-            <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+          <div className="space-y-1 mt-5">
+            <div className="bg-gray-300 rounded w-1/2 h-4"></div>
+            <div className="bg-gray-300 rounded w-1/4 h-4"></div>
           </div>
         </div>
       ) : (

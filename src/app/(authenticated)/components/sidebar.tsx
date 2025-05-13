@@ -5,15 +5,14 @@ import { Button } from "@/components/ui/button";
 import { usePathname, useRouter } from "next/navigation";
 import { menuList } from "./menu-list";
 import { Separator } from "@/components/ui/separator";
-import { useSession } from "next-auth/react";
+import { useAuth, User } from "@/store/useAuth";
 
 export function Sidebar({ className }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const { data: session } = useSession({
-    required: true,
-  });
+  // Use the custom auth store instead of next-auth
+  const { user, isAuthenticated } = useAuth();
 
   // change variant to default when the page is active
   // this will highlight the menu item
@@ -23,15 +22,13 @@ export function Sidebar({ className }) {
 
   // filtered menu based on user roles
   const filteredMenu = menuList.filter((item) => {
-    // check if item.roles has session user roles
+    // check if item.roles has user roles
 
     if (!item.roles) return true;
 
     return (
       item.roles &&
-      item.roles.some((role) =>
-        session?.user?.roles?.map((r) => r.name).includes(role)
-      )
+      item.roles.some((role) => user?.roles?.map((r) => r.name).includes(role))
     );
   });
 
@@ -39,7 +36,7 @@ export function Sidebar({ className }) {
     <div className={cn("pb-12", className)}>
       <div className="space-y-4 py-4">
         <div className="px-4 py-2">
-          <h2 className="mb-2 px-2 text-lg font-semibold tracking-tight">
+          <h2 className="mb-2 px-2 font-semibold text-lg tracking-tight">
             Discover
           </h2>
           <div className="space-y-1">
@@ -53,10 +50,10 @@ export function Sidebar({ className }) {
                   key={item.name}
                   variant={isActive(item.path)}
                   size="sm"
-                  className="w-full justify-start"
+                  className="justify-start w-full"
                   onClick={() => router.push(item.path)}
                 >
-                  <item.icon className="mr-2 h-4 w-4" />
+                  <item.icon className="mr-2 w-4 h-4" />
                   {item.name}
                 </Button>
               )

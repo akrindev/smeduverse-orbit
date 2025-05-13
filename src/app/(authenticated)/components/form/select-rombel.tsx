@@ -22,17 +22,17 @@ export default function SelectRombel({ onSelected }) {
 
   useEffect(() => {
     refetch();
-  }, []);
+  }, [refetch]);
 
   return (
-    <Select onValueChange={onSelected} defaultValue=''>
-      <SelectTrigger className='w-full'>
-        <SelectValue placeholder='Pilih Rombel' />
+    <Select onValueChange={onSelected} defaultValue="">
+      <SelectTrigger className="w-full">
+        <SelectValue placeholder="Pilih Rombel" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
           <SelectLabel>Pilih Rombel</SelectLabel>
-          <ScrollArea className='h-72'>
+          <ScrollArea className="h-72">
             {/* <SelectItem value={""}>Semua Rombel</SelectItem> */}
             {rombels &&
               rombels.map((rombel: Rombel) => (

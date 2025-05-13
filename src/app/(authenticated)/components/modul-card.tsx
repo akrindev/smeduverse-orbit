@@ -26,15 +26,16 @@ export default function ModulCard({
 }) {
   const theCard = (
     <Card
-      className={cn("hover:shadow-xl hover:scale-95 duration-300", className)}>
+      className={cn("hover:shadow-xl hover:scale-95 duration-300", className)}
+    >
       <CardHeader>
         <CardTitle>{modul.rombel.nama}</CardTitle>
-        <CardDescription className='text-xs'>
+        <CardDescription className="text-xs">
           {modul.semester?.name} | {modul.teacher.fullname}
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className='space-x-3 text-sm'>
+        <div className="space-x-3 text-sm">
           <Badge>{modul.mapel.kode}</Badge>
           <span>{modul.mapel.nama}</span>
         </div>
@@ -45,7 +46,8 @@ export default function ModulCard({
   return (
     <Link
       href={isUser ? `/modul/${modul.uuid}` : `/rekap/presensi/${modul.uuid}`}
-      className='space-y-1 col-span-12 md:col-span-4'>
+      className="space-y-1 col-span-12 md:col-span-6 xl:col-span-4"
+    >
       {isUser ? (
         <ContextMenuModul modul={modul}>{theCard}</ContextMenuModul>
       ) : (

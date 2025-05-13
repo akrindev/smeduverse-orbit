@@ -1,0 +1,34 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Technology Stack
+
+## Core Technologies
+- [Next.js](mdc:https:/nextjs.org) - React framework with App Router structure
+- [TypeScript](mdc:https:/www.typescriptlang.org) - For type safety
+- [Bun](mdc:https:/bun.sh) - JavaScript runtime and package manager
+- [Tailwind CSS](mdc:tailwind.config.js) - For styling
+- [Shadcn UI](mdc:components.json) - Component library built on Radix UI
+
+## State Management
+- [Zustand](mdc:src/store/useAuth.ts) - Simple state management solution
+  - Various stores in [src/store/](mdc:src/store) directory
+  - Persistent storage with localStorage
+
+## APIs & Data Fetching
+- [Axios](mdc:src/lib/api.ts) - HTTP client for API requests
+- [TanStack Query](mdc:https:/tanstack.com/query/latest) - For data fetching and cache management
+
+## UI Components & Libraries
+- [Radix UI](mdc:https:/www.radix-ui.com) - Headless UI components
+- [Lucide React](mdc:https:/lucide.dev/guide/packages/lucide-react) - Icon library
+- [Tailwind Merge](mdc:https:/github.com/dcastil/tailwind-merge) - Merges Tailwind CSS classes
+- [Class Variance Authority](mdc:https:/cva.style/docs) - For component variants
+- [React Hook Form](mdc:https:/react-hook-form.com) - Form management
+- [Zod](mdc:https:/zod.dev) - Schema validation
+
+## Authentication
+- Custom authentication system with Laravel Sanctum
+- CSRF token management through [src/lib/api.ts](mdc:src/lib/api.ts)

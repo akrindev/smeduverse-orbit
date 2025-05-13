@@ -1,26 +1,42 @@
 "use client";
 
-import { SessionProvider } from "next-auth/react";
-import { Router } from "next/router";
+import { ReactQueryProvider } from "@/components/react-query-provider";
 import ProgressBar from "@badrap/bar-of-progress";
+import { usePathname, useSearchParams } from "next/navigation";
+import { Suspense, useEffect } from "react";
+import { AuthProvider } from "@/components/auth-provider";
 
-type Props = {
-  children?: React.ReactNode;
-};
-
+// Progress bar configuration
 const progress = new ProgressBar({
   size: 2,
-  color: "#34D399",
+  color: "#22c55e",
   className: "bar-of-progress",
-  delay: 200,
+  delay: 100,
 });
 
-Router.events.on("routeChangeStart", progress.start);
-Router.events.on("routeChangeComplete", progress.finish);
-Router.events.on("routeChangeError", progress.finish);
-Router.events.on("hashChangeStart", progress.start);
-Router.events.on("hashChangeComplete", progress.finish);
+// Component that uses searchParams
+function ProgressBarManager({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-export const NextAuthProvider = ({ children }: Props) => {
-  return <SessionProvider>{children}</SessionProvider>;
-};
+  // Handle route changes for progress bar
+  useEffect(() => {
+    progress.finish();
+    // The combination of pathname and search params changing means a navigation occurred
+  }, [pathname, searchParams]);
+
+  return <>{children}</>;
+}
+
+// Main providers component that wraps the application
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <ReactQueryProvider>
+      <AuthProvider>
+        <Suspense fallback={null}>
+          <ProgressBarManager>{children}</ProgressBarManager>
+        </Suspense>
+      </AuthProvider>
+    </ReactQueryProvider>
+  );
+}

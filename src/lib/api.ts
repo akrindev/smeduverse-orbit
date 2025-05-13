@@ -1,69 +1,68 @@
 import { toast } from "@/components/ui/use-toast";
 import Axios, { AxiosError, AxiosInstance } from "axios";
-import { getSession, signOut } from "next-auth/react";
-import { notFound, redirect } from "next/navigation";
-import { Session } from "next-auth";
 
+// Create API client with token-based authentication configuration
 const api: AxiosInstance = Axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
+    "X-Requested-With": "XMLHttpRequest",
   },
+  // Remove withCredentials since we're using token-based auth
 });
 
-// Modify the interceptor to handle both client and server-side scenarios
-api.interceptors.request.use(async (config) => {
-  if (typeof window !== "undefined") {
-    // Client-side
-    const session = await getSession();
-    if (session?.user.access_token) {
-      config.headers.Authorization = `Bearer ${session.user.access_token}`;
+// Interceptor to add bearer token to requests if available
+api.interceptors.request.use(
+  (config) => {
+    // Check for token in localStorage (for SPA authentication)
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
-  }
-  // For server-side, the token should be passed manually when making API calls
-  return config;
-});
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
-// interceptors to handle response errors
-// when error is 401, redirect to login page
+// Interceptor to handle response errors
 api.interceptors.response.use(
   (response) => response,
-  (
-    error: AxiosError<{
-      message: string;
-    }>
-  ) => {
-    // console.error(error.response);
-    if (error && error.response?.status === 401) {
-      // redirect("/login");
+  (error: AxiosError<{ message: string }>) => {
+    // Handle unauthorized errors (401)
+    if (error.response?.status === 401) {
+      // Clear authentication data
       if (typeof window !== "undefined") {
-        window.location.href = "/login";
-
+        localStorage.removeItem("auth_token");
       }
-      signOut({
-        callbackUrl: "/login",});
+
+      // Toast notification for auth failures
+      toast({
+        title: "Authentication Error",
+        description: "Your session has expired. Please log in again.",
+        variant: "destructive",
+      });
+
+      // Force redirect to login in client context
+      if (typeof window !== "undefined") {
+        window.location.pathname = "/login";
+      }
     }
 
-    if (error && error.response?.status === 422) {
+    // Handle validation errors (422 Unprocessable Entity)
+    else if (error.response?.status === 422) {
       toast({
-        title: "Error",
-        description: error.response?.data.message,
+        title: "Validation Error",
+        description: error.response?.data.message || "Please check your input",
         variant: "destructive",
       });
     }
+
+    // Let the error propagate to be handled by the components
     return Promise.reject(error);
   }
 );
 
-// set api access token
-const setAccessToken = (token: string) => {
-  api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-};
-
-// unset api access token
-const unsetAccessToken = () => {
-  delete api.defaults.headers.common["Authorization"];
-};
-
-export { api, setAccessToken, unsetAccessToken };
+export { api };

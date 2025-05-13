@@ -19,19 +19,20 @@ export default function SelectMapel({ onSelected }) {
 
   useEffect(() => {
     refetch();
-  }, []);
+  }, [refetch]);
 
   return (
     <Select
       onValueChange={(value: string) => onSelected(value)}
-      defaultValue=''>
-      <SelectTrigger className='w-full'>
-        <SelectValue placeholder='Pilih Mapel' />
+      defaultValue=""
+    >
+      <SelectTrigger className="w-full">
+        <SelectValue placeholder="Pilih Mapel" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
           <SelectLabel>Pilih Mapel</SelectLabel>
-          <ScrollArea className='h-72'>
+          <ScrollArea className="h-72">
             {/* <SelectItem value={""}>Semua Mapel</SelectItem> */}
             {mapels &&
               mapels.map((mapel: Mapel) => (
