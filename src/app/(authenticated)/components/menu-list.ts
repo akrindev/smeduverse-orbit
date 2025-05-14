@@ -1,9 +1,11 @@
 import {
   IconBooks,
+  IconCalendar,
   IconGridPattern,
   IconListDetails,
   IconPlayerPlay,
   IconReportAnalytics,
+  IconUserCheck,
 } from "@tabler/icons-react";
 
 // list of sidebar menu
@@ -51,6 +53,12 @@ export const menuList: MenuItem[] = [
     path: "/modul",
   },
   {
+    name: "Monitoring Presensi",
+    title: "Monitoring Presensi",
+    icon: IconUserCheck,
+    path: "/monitoring-presensi",
+  },
+  {
     name: "Rekap Laporan",
     title: "Rekap Laporan",
     icon: IconReportAnalytics,
@@ -69,6 +77,13 @@ export const menuList: MenuItem[] = [
     title: "Semester",
     icon: IconListDetails,
     path: "/semester",
+    roles: ["waka kurikulum"],
+  },
+  {
+    name: "Jadwal Jam Pelajaran",
+    title: "Jadwal Jam Pelajaran",
+    icon: IconCalendar,
+    path: "/jadwal-pelajaran",
     roles: ["waka kurikulum"],
   },
   {
