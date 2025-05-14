@@ -10,9 +10,10 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { IconCheck, IconChevronDown } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Item {
   value: string;
@@ -40,6 +41,7 @@ export default function SearchableSelect({
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(defaultValue);
   const [searchQuery, setSearchQuery] = useState("");
+  const { toast } = useToast();
 
   // For handling "All" option
   const allItemsOption = { value: "", label: "Semua" };
@@ -62,10 +64,21 @@ export default function SearchableSelect({
       if (currentValue !== value) {
         setValue(currentValue);
         onSelected(currentValue);
+
+        // Show toast notification when selection changes
+        const selectedItem = allItems.find(
+          (item) => item.value === currentValue
+        );
+        if (selectedItem) {
+          toast({
+            title: "Pilihan berhasil diubah",
+            description: `Pilihan berhasil diubah ke ${selectedItem.label}`,
+          });
+        }
       }
       setOpen(false);
     },
-    [value, onSelected]
+    [value, onSelected, allItems, toast]
   );
 
   useEffect(() => {
@@ -89,6 +102,7 @@ export default function SearchableSelect({
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="gap-0 p-0 max-w-md">
+          <DialogTitle className="sr-only">{placeholder}</DialogTitle>
           <Command shouldFilter={false} className="shadow-md border rounded-lg">
             <CommandInput
               placeholder={`Cari ${placeholder.toLowerCase()}...`}
