@@ -132,7 +132,10 @@ export default function ModulList({ owned }: { owned?: boolean }) {
                   <h4 className="font-medium text-sm">Guru</h4>
                   <SearchableTeacherSelect
                     onSelected={(teacher_id) =>
-                      setQuery({ ...query, teacher_id })
+                      setQuery((prevQuery) => ({
+                        ...(prevQuery || {}),
+                        teacher_id,
+                      }))
                     }
                   />
                 </div>
@@ -140,21 +143,32 @@ export default function ModulList({ owned }: { owned?: boolean }) {
                   <h4 className="font-medium text-sm">Rombel</h4>
                   <SearchableRombelSelect
                     onSelected={(rombel_id) =>
-                      setQuery({ ...query, rombel_id })
+                      setQuery((prevQuery) => ({
+                        ...(prevQuery || {}),
+                        rombel_id,
+                      }))
                     }
                   />
                 </div>
                 <div className="space-y-1">
                   <h4 className="font-medium text-sm">Mata Pelajaran</h4>
                   <SearchableMapelSelect
-                    onSelected={(mapel_id) => setQuery({ ...query, mapel_id })}
+                    onSelected={(mapel_id) =>
+                      setQuery((prevQuery) => ({
+                        ...(prevQuery || {}),
+                        mapel_id,
+                      }))
+                    }
                   />
                 </div>
                 <div className="space-y-1">
                   <h4 className="font-medium text-sm">Semester</h4>
                   <SearchableSemesterSelect
                     onSelected={(semester_id) =>
-                      setQuery({ ...query, semester_id })
+                      setQuery((prevQuery) => ({
+                        ...(prevQuery || {}),
+                        semester_id,
+                      }))
                     }
                   />
                 </div>

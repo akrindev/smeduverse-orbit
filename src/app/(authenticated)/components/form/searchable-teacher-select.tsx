@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useUserQuery } from "@/store/useUser";
 import { Teacher } from "@/types/modul";
 import SearchableSelect from "./searchable-select";
@@ -18,19 +18,23 @@ export default function SearchableTeacherSelect({
   className,
 }: SearchableTeacherSelectProps) {
   const { teachers, isLoading } = useUserQuery();
-  const [teacherItems, setTeacherItems] = useState<
-    { value: string; label: string }[]
-  >([]);
 
-  useEffect(() => {
-    if (teachers) {
-      const items = teachers.map((teacher: Teacher) => ({
-        value: teacher.teacher_id,
-        label: `${teacher.fullname} (${teacher.niy})`,
-      }));
-      setTeacherItems(items);
-    }
+  // Convert teachers to format needed by SearchableSelect directly with useMemo
+  const teacherItems = useMemo(() => {
+    if (!teachers) return [];
+    return teachers.map((teacher: Teacher) => ({
+      value: teacher.teacher_id,
+      label: `${teacher.fullname} (${teacher.niy})`,
+    }));
   }, [teachers]);
+
+  // Create a properly memoized handler
+  const handleSelected = useCallback(
+    (value: string) => {
+      onSelected(value);
+    },
+    [onSelected]
+  );
 
   if (isLoading) {
     return <BaseLoading />;
@@ -40,7 +44,7 @@ export default function SearchableTeacherSelect({
     <SearchableSelect
       items={teacherItems}
       placeholder="Pilih Guru"
-      onSelected={onSelected}
+      onSelected={handleSelected}
       defaultValue={defaultValue}
       className={className}
       showAll={true}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -55,9 +55,24 @@ export default function SearchableSelect({
   // Get the selected item label for display
   const selectedItem = allItems.find((item) => item.value === value);
 
+  // Memoized handler to avoid recreating function on each render
+  const handleSelect = useCallback(
+    (currentValue: string) => {
+      // Only update if value actually changed
+      if (currentValue !== value) {
+        setValue(currentValue);
+        onSelected(currentValue);
+      }
+      setOpen(false);
+    },
+    [value, onSelected]
+  );
+
   useEffect(() => {
-    // Update the selected value when defaultValue changes
-    setValue(defaultValue);
+    // Only update internal state when defaultValue changes and differs from current value
+    if (defaultValue !== value) {
+      setValue(defaultValue);
+    }
   }, [defaultValue]);
 
   return (
@@ -88,11 +103,7 @@ export default function SearchableSelect({
                   <CommandItem
                     key={item.value}
                     value={item.value}
-                    onSelect={(currentValue) => {
-                      setValue(currentValue);
-                      onSelected(currentValue);
-                      setOpen(false);
-                    }}
+                    onSelect={handleSelect}
                     className="cursor-pointer"
                   >
                     {item.label}
