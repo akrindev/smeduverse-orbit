@@ -5,6 +5,7 @@ import {
   IconListDetails,
   IconPlayerPlay,
   IconReportAnalytics,
+  IconUserCheck,
 } from "@tabler/icons-react";
 
 // list of sidebar menu
@@ -50,6 +51,12 @@ export const menuList: MenuItem[] = [
     title: "Modul",
     icon: IconGridPattern,
     path: "/modul",
+  },
+  {
+    name: "Monitoring Presensi",
+    title: "Monitoring Presensi",
+    icon: IconUserCheck,
+    path: "/monitoring-presensi",
   },
   {
     name: "Rekap Laporan",
