@@ -29,6 +29,11 @@ export interface ActivePresence {
   subject_schedule_id: number;
   created_at: string;
   updated_at: string;
+  count_h: number;
+  count_s: number;
+  count_i: number;
+  count_a: number;
+  count_b: number;
   modul: {
     uuid: string;
     rombongan_belajar_id: string;

@@ -116,6 +116,60 @@ function RombelCard({ rombel }: { rombel: RombelWithPresence }) {
                 {rombel.presence?.description}
               </p>
             </div>
+
+            {/* Menampilkan statistik kehadiran */}
+            <div className="mt-3 pt-2 border-t">
+              <div className="mb-1 font-medium text-sm">
+                Statistik Kehadiran:
+              </div>
+              <div className="gap-1 grid grid-cols-5">
+                <Badge
+                  variant="outline"
+                  className="flex flex-col items-center p-1"
+                >
+                  <span className="font-bold text-green-600">
+                    {rombel.presence?.count_h || 0}
+                  </span>
+                  <span className="text-xs">Hadir</span>
+                </Badge>
+                <Badge
+                  variant="outline"
+                  className="flex flex-col items-center p-1"
+                >
+                  <span className="font-bold text-yellow-600">
+                    {rombel.presence?.count_s || 0}
+                  </span>
+                  <span className="text-xs">Sakit</span>
+                </Badge>
+                <Badge
+                  variant="outline"
+                  className="flex flex-col items-center p-1"
+                >
+                  <span className="font-bold text-blue-600">
+                    {rombel.presence?.count_i || 0}
+                  </span>
+                  <span className="text-xs">Izin</span>
+                </Badge>
+                <Badge
+                  variant="outline"
+                  className="flex flex-col items-center p-1"
+                >
+                  <span className="font-bold text-red-600">
+                    {rombel.presence?.count_a || 0}
+                  </span>
+                  <span className="text-xs">Alpha</span>
+                </Badge>
+                <Badge
+                  variant="outline"
+                  className="flex flex-col items-center p-1"
+                >
+                  <span className="font-bold text-purple-600">
+                    {rombel.presence?.count_b || 0}
+                  </span>
+                  <span className="text-xs">Bolos</span>
+                </Badge>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="py-2 text-muted-foreground text-sm">
