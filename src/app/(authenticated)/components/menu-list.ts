@@ -1,5 +1,6 @@
 import {
   IconBooks,
+  IconCalendar,
   IconGridPattern,
   IconListDetails,
   IconPlayerPlay,
@@ -69,6 +70,13 @@ export const menuList: MenuItem[] = [
     title: "Semester",
     icon: IconListDetails,
     path: "/semester",
+    roles: ["waka kurikulum"],
+  },
+  {
+    name: "Jadwal Jam Pelajaran",
+    title: "Jadwal Jam Pelajaran",
+    icon: IconCalendar,
+    path: "/jadwal-pelajaran",
     roles: ["waka kurikulum"],
   },
   {
