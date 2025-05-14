@@ -58,10 +58,13 @@ export default function PreseniPage({ params }: PresensiPageProps) {
         isLoading={loading}
       />
       {/* <Separator className="my-4" /> */}
-      <div className='relative w-full mt-5 rounded-md border'>
+      <div className="relative mt-5 border rounded-md w-full">
         <ScrollArea>
-          <TablePresensi attendances={presence?.attendances ?? []} />
-          <ScrollBar orientation='horizontal' />
+          <TablePresensi
+            attendances={presence?.attendances ?? []}
+            onUpdate={updatingPresence}
+          />
+          <ScrollBar orientation="horizontal" />
         </ScrollArea>
       </div>
     </div>
