@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/store/useAuth";
 import type { User } from "@/store/useAuth";
+import { api } from "@/lib/api";
 
 // Check if user has a specific role
 const hasRole = (user: User | null, role: string): boolean => {
@@ -40,41 +41,242 @@ const isUser = (user: User | null, userId: string): boolean => {
 const useRoleCheck = () => {
   const { user } = useAuth();
 
+  const verifyUserRole = async (role: string) => {
+    // If we have a user, check the role immediately
+    if (user) {
+      return hasRole(user, role);
+    }
+
+    // If no user in store, try to fetch from API
+    try {
+      const response = await api.post("/auth/me");
+      if (response.status === 200 && response.data) {
+        // Update the user in the store
+        useAuth.getState().setUser(response.data);
+        return hasRole(response.data, role);
+      }
+    } catch (error) {
+      // More detailed error logging
+      if (error instanceof Error) {
+        console.error(
+          `Error fetching user data: ${error.name} - ${error.message}`
+        );
+      } else {
+        console.error("Error fetching user data:", error);
+      }
+    }
+
+    return false;
+  };
+
   return {
-    isAdmin: () => hasRole(user, "admin"),
-    isGuru: () => hasRole(user, "guru"),
-    isTeacher: () => hasRole(user, "guru"),
-    isWakaKurikulum: () => hasRole(user, "waka kurikulum"),
-    hasRole: (role: string) => hasRole(user, role),
-    hasRoles: (roles: string | string[]) => hasRoles(user, roles),
-    isUser: (userId: string) => isUser(user, userId),
+    isAdmin: () => verifyUserRole("admin"),
+    isGuru: () => verifyUserRole("guru"),
+    isTeacher: () => verifyUserRole("guru"),
+    isWakaKurikulum: () => verifyUserRole("waka kurikulum"),
+    hasRole: (role: string) => verifyUserRole(role),
+    hasRoles: async (roles: string | string[]) => {
+      if (typeof roles === "string") return verifyUserRole(roles);
+
+      // For multiple roles, check if any match
+      if (user) {
+        return hasRoles(user, roles);
+      }
+
+      // Try to fetch user from API if not available
+      try {
+        const response = await api.post("/auth/me");
+        if (response.status === 200 && response.data) {
+          // Update the user in the store
+          useAuth.getState().setUser(response.data);
+          return hasRoles(response.data, roles);
+        }
+      } catch (error) {
+        // More detailed error logging
+        if (error instanceof Error) {
+          console.error(
+            `Error fetching user data: ${error.name} - ${error.message}`
+          );
+        } else {
+          console.error("Error fetching user data:", error);
+        }
+      }
+
+      return false;
+    },
+    isUser: async (userId: string) => {
+      if (user) {
+        return isUser(user, userId);
+      }
+
+      // Try to fetch user from API if not available
+      try {
+        const response = await api.post("/auth/me");
+        if (response.status === 200 && response.data) {
+          // Update the user in the store
+          useAuth.getState().setUser(response.data);
+          return isUser(response.data, userId);
+        }
+      } catch (error) {
+        // More detailed error logging
+        if (error instanceof Error) {
+          console.error(
+            `Error fetching user data: ${error.name} - ${error.message}`
+          );
+        } else {
+          console.error("Error fetching user data:", error);
+        }
+      }
+
+      return false;
+    },
   };
 };
 
 // Server-side role checks (for use in Server Components)
 // These will require getting the user from cookies or other storage
 const isAdmin = async () => {
-  const { getCurrentUser } = useAuth.getState();
-  const user = await getCurrentUser();
-  return hasRole(user, "admin");
+  try {
+    const { getCurrentUser } = useAuth.getState();
+    const user = await getCurrentUser();
+
+    // If user exists in store, check the role
+    if (user) {
+      return hasRole(user, "admin");
+    }
+
+    // If no user in store, try to fetch from API
+    try {
+      const response = await api.post("/auth/me");
+      if (response.status === 200 && response.data) {
+        // Update the user in the store
+        useAuth.getState().setUser(response.data);
+        return hasRole(response.data, "admin");
+      }
+    } catch (error) {
+      // More detailed error logging
+      if (error instanceof Error) {
+        console.error(
+          `Error fetching user data: ${error.name} - ${error.message}`
+        );
+      } else {
+        console.error("Error fetching user data:", error);
+      }
+    }
+
+    return false;
+  } catch (error) {
+    console.error("Error checking role:", error);
+    return false;
+  }
 };
 
 const isGuru = async () => {
-  const { getCurrentUser } = useAuth.getState();
-  const user = await getCurrentUser();
-  return hasRole(user, "guru");
+  try {
+    const { getCurrentUser } = useAuth.getState();
+    const user = await getCurrentUser();
+
+    // If user exists in store, check the role
+    if (user) {
+      return hasRole(user, "guru");
+    }
+
+    // If no user in store, try to fetch from API
+    try {
+      const response = await api.post("/auth/me");
+      if (response.status === 200 && response.data) {
+        // Update the user in the store
+        useAuth.getState().setUser(response.data);
+        return hasRole(response.data, "guru");
+      }
+    } catch (error) {
+      // More detailed error logging
+      if (error instanceof Error) {
+        console.error(
+          `Error fetching user data: ${error.name} - ${error.message}`
+        );
+      } else {
+        console.error("Error fetching user data:", error);
+      }
+    }
+
+    return false;
+  } catch (error) {
+    console.error("Error checking role:", error);
+    return false;
+  }
 };
 
 const isTeacher = async () => {
-  const { getCurrentUser } = useAuth.getState();
-  const user = await getCurrentUser();
-  return hasRole(user, "guru");
+  try {
+    const { getCurrentUser } = useAuth.getState();
+    const user = await getCurrentUser();
+
+    // If user exists in store, check the role
+    if (user) {
+      return hasRole(user, "guru");
+    }
+
+    // If no user in store, try to fetch from API
+    try {
+      const response = await api.post("/auth/me");
+      if (response.status === 200 && response.data) {
+        // Update the user in the store
+        useAuth.getState().setUser(response.data);
+        return hasRole(response.data, "guru");
+      }
+    } catch (error) {
+      // More detailed error logging
+      if (error instanceof Error) {
+        console.error(
+          `Error fetching user data: ${error.name} - ${error.message}`
+        );
+      } else {
+        console.error("Error fetching user data:", error);
+      }
+    }
+
+    return false;
+  } catch (error) {
+    console.error("Error checking role:", error);
+    return false;
+  }
 };
 
 const isWakaKurikulum = async () => {
-  const { getCurrentUser } = useAuth.getState();
-  const user = await getCurrentUser();
-  return hasRole(user, "waka kurikulum");
+  try {
+    const { getCurrentUser } = useAuth.getState();
+    const user = await getCurrentUser();
+
+    // If user exists in store, check the role
+    if (user) {
+      return hasRole(user, "waka kurikulum");
+    }
+
+    // If no user in store, try to fetch from API
+    try {
+      const response = await api.post("/auth/me");
+      if (response.status === 200 && response.data) {
+        // Update the user in the store
+        useAuth.getState().setUser(response.data);
+        return hasRole(response.data, "waka kurikulum");
+      }
+    } catch (error) {
+      // More detailed error logging
+      if (error instanceof Error) {
+        console.error(
+          `Error fetching user data: ${error.name} - ${error.message}`
+        );
+      } else {
+        console.error("Error fetching user data:", error);
+      }
+    }
+
+    return false;
+  } catch (error) {
+    console.error("Error checking role:", error);
+    return false;
+  }
 };
 
 export {
