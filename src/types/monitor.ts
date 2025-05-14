@@ -1,6 +1,3 @@
-import { Mapel, Rombel, Teacher } from "./modul";
-import { Presence } from "./presence";
-
 export interface ActivePresenceMonitor {
   current_time: string;
   debug: {
