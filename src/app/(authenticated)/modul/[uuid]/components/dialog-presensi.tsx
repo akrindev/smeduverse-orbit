@@ -19,7 +19,7 @@ import { toast } from "@/components/ui/use-toast";
 import { usePresence } from "@/store/usePresence";
 import { useSubjectSchedule } from "@/store/useSubjectSchedule";
 import { IconEditCircle, IconPlus, IconTrash } from "@tabler/icons-react";
-import { format } from "date-fns";
+import { format, parse, isBefore } from "date-fns";
 import { Loader, InfoIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { FormEventHandler, useEffect, useState } from "react";
@@ -31,6 +31,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+
+// Utility to convert "HH:mm" string into a Date
+const toDate = (t: string) => parse(t, "HH:mm", new Date());
 
 export default function DialogPresensi({
   modulUuid,
@@ -91,7 +94,10 @@ export default function DialogPresensi({
       if (
         startSchedule &&
         endSchedule &&
-        startSchedule.start_time > endSchedule.start_time
+        isBefore(
+          toDate(endSchedule.start_time),
+          toDate(startSchedule.start_time)
+        )
       ) {
         setSubjectScheduleEndId(null); // Reset end schedule if it's earlier than new start
       }
@@ -111,8 +117,13 @@ export default function DialogPresensi({
       const endSchedule = schedules.find((s) => s.id === subjectScheduleEndId);
 
       if (startSchedule && endSchedule) {
-        // Compare start times - we'll compare as strings since they should be in HH:MM format
-        if (startSchedule.start_time > endSchedule.start_time) {
+        // Compare start times using date-fns parsing for reliable comparison
+        if (
+          isBefore(
+            toDate(endSchedule.start_time),
+            toDate(startSchedule.start_time)
+          )
+        ) {
           setScheduleError(
             "Jadwal Selesai tidak boleh lebih awal dari Jadwal Mulai"
           );
@@ -313,7 +324,10 @@ export default function DialogPresensi({
                     if (
                       startSchedule &&
                       endSchedule &&
-                      startSchedule.start_time > endSchedule.start_time
+                      isBefore(
+                        toDate(endSchedule.start_time),
+                        toDate(startSchedule.start_time)
+                      )
                     ) {
                       setScheduleError(
                         "Jadwal Selesai tidak boleh lebih awal dari Jadwal Mulai"
@@ -340,7 +354,10 @@ export default function DialogPresensi({
                       );
                       return (
                         startSchedule &&
-                        schedule.start_time >= startSchedule.start_time
+                        !isBefore(
+                          toDate(schedule.start_time),
+                          toDate(startSchedule.start_time)
+                        )
                       );
                     })
                     .map((schedule) => (
