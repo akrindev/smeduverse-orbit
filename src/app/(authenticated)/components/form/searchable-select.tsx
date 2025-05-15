@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -10,9 +10,10 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { IconCheck, IconChevronDown } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Item {
   value: string;
@@ -40,6 +41,7 @@ export default function SearchableSelect({
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(defaultValue);
   const [searchQuery, setSearchQuery] = useState("");
+  const { toast } = useToast();
 
   // For handling "All" option
   const allItemsOption = { value: "", label: "Semua" };
@@ -55,9 +57,35 @@ export default function SearchableSelect({
   // Get the selected item label for display
   const selectedItem = allItems.find((item) => item.value === value);
 
+  // Memoized handler to avoid recreating function on each render
+  const handleSelect = useCallback(
+    (currentValue: string) => {
+      // Only update if value actually changed
+      if (currentValue !== value) {
+        setValue(currentValue);
+        onSelected(currentValue);
+
+        // Show toast notification when selection changes
+        const selectedItem = allItems.find(
+          (item) => item.value === currentValue
+        );
+        if (selectedItem) {
+          toast({
+            title: "Pilihan berhasil diubah",
+            description: `Pilihan berhasil diubah ke ${selectedItem.label}`,
+          });
+        }
+      }
+      setOpen(false);
+    },
+    [value, onSelected, allItems, toast]
+  );
+
   useEffect(() => {
-    // Update the selected value when defaultValue changes
-    setValue(defaultValue);
+    // Only update internal state when defaultValue changes and differs from current value
+    if (defaultValue !== value) {
+      setValue(defaultValue);
+    }
   }, [defaultValue]);
 
   return (
@@ -74,6 +102,7 @@ export default function SearchableSelect({
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="gap-0 p-0 max-w-md">
+          <DialogTitle className="sr-only">{placeholder}</DialogTitle>
           <Command shouldFilter={false} className="shadow-md border rounded-lg">
             <CommandInput
               placeholder={`Cari ${placeholder.toLowerCase()}...`}
@@ -88,11 +117,7 @@ export default function SearchableSelect({
                   <CommandItem
                     key={item.value}
                     value={item.value}
-                    onSelect={(currentValue) => {
-                      setValue(currentValue);
-                      onSelected(currentValue);
-                      setOpen(false);
-                    }}
+                    onSelect={handleSelect}
                     className="cursor-pointer"
                   >
                     {item.label}

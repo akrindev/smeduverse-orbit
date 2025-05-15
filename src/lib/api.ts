@@ -31,33 +31,41 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError<{ message: string }>) => {
-    // Handle unauthorized errors (401)
-    if (error.response?.status === 401) {
-      // Clear authentication data
-      if (typeof window !== "undefined") {
+    // Only execute client-side code in browser environment
+    if (typeof window !== "undefined") {
+      // Handle unauthorized errors (401)
+      if (error.response?.status === 401) {
+        // Clear authentication data
         localStorage.removeItem("auth_token");
-      }
 
-      // Toast notification for auth failures
-      toast({
-        title: "Authentication Error",
-        description: "Your session has expired. Please log in again.",
-        variant: "destructive",
-      });
+        // Toast notification for auth failures
+        try {
+          toast({
+            title: "Authentication Error",
+            description: "Your session has expired. Please log in again.",
+            variant: "destructive",
+          });
+        } catch (e) {
+          console.error("Failed to show toast notification:", e);
+        }
 
-      // Force redirect to login in client context
-      if (typeof window !== "undefined") {
+        // Force redirect to login
         window.location.pathname = "/login";
       }
-    }
 
-    // Handle validation errors (422 Unprocessable Entity)
-    else if (error.response?.status === 422) {
-      toast({
-        title: "Validation Error",
-        description: error.response?.data.message || "Please check your input",
-        variant: "destructive",
-      });
+      // Handle validation errors (422 Unprocessable Entity)
+      else if (error.response?.status === 422) {
+        try {
+          toast({
+            title: "Validation Error",
+            description:
+              error.response?.data.message || "Please check your input",
+            variant: "destructive",
+          });
+        } catch (e) {
+          console.error("Failed to show toast notification:", e);
+        }
+      }
     }
 
     // Let the error propagate to be handled by the components

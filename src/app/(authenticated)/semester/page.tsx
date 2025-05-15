@@ -1,24 +1,31 @@
+"use client";
+
 import { Separator } from "@/components/ui/separator";
 import TableSemester from "./components/table-semester";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { IconInfoCircle } from "@tabler/icons-react";
 import DialogCreateSemester from "./components/dialog-semester";
-import { isWakaKurikulum } from "@/lib/auth-role";
+import { useRoleCheck } from "@/lib/auth-role";
 import { redirect } from "next/navigation";
+import { useEffect } from "react";
 
-export default async function SemesterPage() {
-  // only waka kurikulum can access this page
-  if (!(await isWakaKurikulum())) {
-    redirect("/dashboard");
-  }
+export default function SemesterPage() {
+  const { isWakaKurikulum } = useRoleCheck();
+
+  // Check if user is waka kurikulum, if not redirect to dashboard
+  useEffect(() => {
+    if (!isWakaKurikulum()) {
+      redirect("/dashboard");
+    }
+  }, [isWakaKurikulum]);
 
   return (
-    <div className="h-full flex flex-col space-y-5">
+    <div className="flex flex-col space-y-5 h-full">
       <div className="flex flex-col h-full">
-        <div className="flex flex-col md:flex-row justify-between">
-          <div className="mt-5 space-y-1">
-            <h2 className="text-2xl font-semibold tracking-tight">Semester</h2>
-            <p className="text-sm text-muted-foreground">
+        <div className="flex md:flex-row flex-col justify-between">
+          <div className="space-y-1 mt-5">
+            <h2 className="font-semibold text-2xl tracking-tight">Semester</h2>
+            <p className="text-muted-foreground text-sm">
               Kelola data semester
             </p>
           </div>
@@ -26,13 +33,13 @@ export default async function SemesterPage() {
         </div>
         <Separator className="my-4" />
         <Alert>
-          <IconInfoCircle className="w-5 h-5 mr-2" />
+          <IconInfoCircle className="mr-2 w-5 h-5" />
           <AlertTitle>Info</AlertTitle>
           <AlertDescription>
-            Jika kamu menambahkan semester baru, maka semester yang baru
+            Jika Anda menambahkan semester baru, maka semester yang baru
             ditambahkan akan menjadi semester aktif dan semester sebelumnya akan
-            menjadi tidak aktif. kamu dapat mengubah semester aktif jika
-            terdapat kesalahan saat prosesi input semester. Jika kamu menghapus
+            menjadi tidak aktif. Anda dapat mengubah semester aktif jika
+            terdapat kesalahan saat prosesi input semester. Jika Anda menghapus
             semester aktif, maka semester yang sebelumnya akan diganti menjadi
             semester aktif saat ini.
           </AlertDescription>

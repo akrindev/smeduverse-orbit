@@ -15,6 +15,8 @@ import {
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { IconReload } from "@tabler/icons-react";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 export default function Information({
   title,
@@ -53,60 +55,82 @@ export default function Information({
   }, [title, description, presenceUuid]);
 
   return (
-    <div className='grid grid-cols-12 gap-3'>
-      <div className='space-y-1 col-span-12 md:col-span-6'>
-        <div className='font-medium'>Judul</div>
-        <div className='text-sm text-muted-foreground'>{data?.title}</div>
+    <div className="gap-3 grid grid-cols-12">
+      <div className="space-y-1 col-span-12 md:col-span-6">
+        <div className="font-medium">Judul</div>
+        <div className="text-muted-foreground text-sm">{data?.title}</div>
       </div>
-      <div className='space-y-1 col-span-12 md:col-span-6'>
-        <div className='font-medium'>Deskripsi</div>
-        <div className='text-sm text-muted-foreground'>{data?.description}</div>
+      <div className="space-y-1 col-span-12 md:col-span-6">
+        <div className="font-medium">Deskripsi</div>
+        <div className="text-muted-foreground text-sm">{data?.description}</div>
       </div>
 
-      <div className='relative w-full mt-5 space-y-1 col-span-12'>
+      <div className="relative space-y-1 col-span-12 mt-5 w-full">
         <ScrollArea>
-          <div className='font-medium'>Rekap Kehadiran</div>
-          <div className='flex flex-wrap gap-3'>
+          <div className="font-medium">Rekap Kehadiran</div>
+          <div className="flex flex-wrap gap-3">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className='whitespace-nowrap'>Hadir</TableHead>
-                  <TableHead className='whitespace-nowrap'>Izin</TableHead>
-                  <TableHead className='whitespace-nowrap'>Sakit</TableHead>
-                  <TableHead className='whitespace-nowrap'>Alpa</TableHead>
-                  <TableHead className='whitespace-nowrap'>Bolos</TableHead>
+                  <TableHead className="whitespace-nowrap">Hadir</TableHead>
+                  <TableHead className="whitespace-nowrap">Izin</TableHead>
+                  <TableHead className="whitespace-nowrap">Sakit</TableHead>
+                  <TableHead className="whitespace-nowrap">Alpa</TableHead>
+                  <TableHead className="whitespace-nowrap">Bolos</TableHead>
+                  <TableHead className="whitespace-nowrap">Total</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 <TableRow>
                   <TableCell>
-                    <p className='text-muted-foreground'>{presence?.count_h}</p>
+                    <p className="font-medium text-green-600 dark:text-green-500">
+                      {presence?.count_h}
+                    </p>
                   </TableCell>
                   <TableCell>
-                    <p className='text-muted-foreground'>{presence?.count_i}</p>
+                    <p className="font-medium text-amber-600 dark:text-amber-500">
+                      {presence?.count_i}
+                    </p>
                   </TableCell>
                   <TableCell>
-                    <p className='text-muted-foreground'>{presence?.count_s}</p>
+                    <p className="font-medium text-blue-600 dark:text-blue-500">
+                      {presence?.count_s}
+                    </p>
                   </TableCell>
                   <TableCell>
-                    <p className='text-muted-foreground'>{presence?.count_a}</p>
+                    <p className="font-medium text-red-600 dark:text-red-500">
+                      {presence?.count_a}
+                    </p>
                   </TableCell>
                   <TableCell>
-                    <p className='text-muted-foreground'>{presence?.count_b}</p>
+                    <p className="font-medium text-rose-600 dark:text-rose-500">
+                      {presence?.count_b}
+                    </p>
+                  </TableCell>
+                  <TableCell>
+                    <p className="font-medium text-slate-600 dark:text-slate-400">
+                      {(presence?.count_h || 0) +
+                        (presence?.count_i || 0) +
+                        (presence?.count_s || 0) +
+                        (presence?.count_a || 0) +
+                        (presence?.count_b || 0)}
+                    </p>
                   </TableCell>
                 </TableRow>
               </TableBody>
             </Table>
           </div>
-          <ScrollBar orientation='horizontal' />
+          <ScrollBar orientation="horizontal" />
         </ScrollArea>
       </div>
-      <div className='mt-3 flex items-center justify-end col-span-12 gap-3'>
-        <DialogPresensi modulUuid={modulUuid} data={data!} />
-        <Button variant={"outline"} onClick={onRefresh} disabled={isLoading}>
-          <IconReload className='w-5 h-5' />
-          Refresh
-        </Button>
+      <div className="flex justify-between items-center gap-3 col-span-12 mt-3">
+        <div className="flex items-center gap-3">
+          <DialogPresensi modulUuid={modulUuid} data={data!} />
+          <Button variant={"outline"} onClick={onRefresh} disabled={isLoading}>
+            <IconReload className="w-5 h-5" />
+            Refresh
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -53,14 +53,6 @@ export default function ModulClient({ modulUuid }: { modulUuid: string }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 mb-6">
-        <Link href="/modul">
-          <Button variant="outline" className="flex items-center gap-2 w-fit">
-            <ArrowLeft className="w-4 h-4" />
-            Kembali ke Daftar Modul
-          </Button>
-        </Link>
-      </div>
       <div className="gap-3 grid grid-cols-12">
         <div className="col-span-12 md:col-span-6">
           <h3 className="font-medium text-lg">Presensi</h3>
