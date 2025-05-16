@@ -54,7 +54,6 @@ type AuthState = {
   ) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   getCurrentUser: () => Promise<User | null>;
-  handleAuthExpired: () => void;
 };
 
 // Persisted state type
@@ -150,28 +149,6 @@ export const useAuth = create<AuthState>()(
 
       // Set error message
       setError: (error) => set({ error }),
-
-      // Handle expired authentication
-      handleAuthExpired: () => {
-        // Clear token and user data
-        get().setToken(null, null);
-        set({
-          user: null,
-          isAuthenticated: false,
-          isLoading: false,
-        });
-
-        // Clear localStorage data
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("auth_token");
-          localStorage.removeItem("auth-storage");
-
-          // Navigate to login page without page reload
-          setTimeout(() => {
-            window.location.href = "/login";
-          }, 100);
-        }
-      },
 
       // Login function
       login: async (email, password) => {

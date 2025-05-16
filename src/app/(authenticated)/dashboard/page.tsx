@@ -2,14 +2,12 @@
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Metadata } from "next";
 import ModulList from "../modul/components/modul-list";
 import { api } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthQuery } from "@/hooks/useAuthQuery";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/store/useAuth";
 
 // revalidate every 5 seconds
 // export const revalidate = 5;
@@ -22,7 +20,6 @@ import { useAuth } from "@/store/useAuth";
 export default function Page() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading, user } = useAuthQuery();
-  const { handleAuthExpired } = useAuth();
   const [analyticsData, setAnalyticsData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -30,11 +27,13 @@ export default function Page() {
   useEffect(() => {
     // If authentication is already determined and user is not authenticated, redirect to login
     if (!authLoading && !isAuthenticated) {
-      // Use our new safe redirect method instead
-      handleAuthExpired();
+      router.push("/login");
       return;
     }
-  }, [isAuthenticated, authLoading, handleAuthExpired]);
+
+    // No need to call requireAuth() here as it can cause redirect loops
+    // Just check the authenticated state from the store
+  }, [isAuthenticated, authLoading, router]);
 
   // Only fetch analytics if authenticated and don't have data yet
   useEffect(() => {
@@ -54,7 +53,7 @@ export default function Page() {
     if (isAuthenticated && isLoading) {
       fetchAnalytics();
     }
-  }, [isAuthenticated, user, isLoading, handleAuthExpired]);
+  }, [isAuthenticated, user, isLoading]);
 
   // console.log(analyticsData);
 
