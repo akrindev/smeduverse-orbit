@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthQuery } from "@/hooks/useAuthQuery";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/store/useAuth";
 
 // revalidate every 5 seconds
 // export const revalidate = 5;
@@ -20,12 +21,8 @@ import { useRouter } from "next/navigation";
 
 export default function Page() {
   const router = useRouter();
-  const {
-    requireAuth,
-    isAuthenticated,
-    isLoading: authLoading,
-    user,
-  } = useAuthQuery();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuthQuery();
+  const { handleAuthExpired } = useAuth();
   const [analyticsData, setAnalyticsData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -33,13 +30,11 @@ export default function Page() {
   useEffect(() => {
     // If authentication is already determined and user is not authenticated, redirect to login
     if (!authLoading && !isAuthenticated) {
-      router.push("/login");
+      // Use our new safe redirect method instead
+      handleAuthExpired();
       return;
     }
-
-    // No need to call requireAuth() here as it can cause redirect loops
-    // Just check the authenticated state from the store
-  }, [isAuthenticated, authLoading, router]);
+  }, [isAuthenticated, authLoading, handleAuthExpired]);
 
   // Only fetch analytics if authenticated and don't have data yet
   useEffect(() => {
@@ -59,7 +54,7 @@ export default function Page() {
     if (isAuthenticated && isLoading) {
       fetchAnalytics();
     }
-  }, [isAuthenticated, user, isLoading]);
+  }, [isAuthenticated, user, isLoading, handleAuthExpired]);
 
   // console.log(analyticsData);
 
