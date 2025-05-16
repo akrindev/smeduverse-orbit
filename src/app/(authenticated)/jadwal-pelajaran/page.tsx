@@ -39,7 +39,7 @@ export default function JadwalPelajaranPage() {
   };
 
   return (
-    <div className="space-y-4 p-8 pt-6">
+    <div className="space-y-4 pt-5">
       <div className="flex justify-between items-center space-y-2">
         <h2 className="font-bold text-3xl tracking-tight">Jadwal Pelajaran</h2>
         <div className="flex items-center space-x-2">
