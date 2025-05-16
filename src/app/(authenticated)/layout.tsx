@@ -1,7 +1,7 @@
 import { LayoutSidebar } from "@/components/layout-sidebar";
-import { validateAuthSession } from "@/lib/auth-actions";
+import { redirect } from "next/navigation";
 import { cache } from "react";
-import AuthGuardClient from "./components/auth-guard-client";
+import { validateAuthSession } from "@/lib/auth-actions";
 
 // Cache the auth validation to prevent repeated API calls
 const getAuthSession = cache(async () => {
@@ -14,11 +14,12 @@ export default async function DashboardLayout({ children }) {
   // This is now mainly to prevent SSR errors - real auth checks happen client-side
   await getAuthSession();
 
+  // We no longer redirect here to prevent infinite loops
+  // All authentication protection is handled by client components
+
   return (
-    <AuthGuardClient>
-      <LayoutSidebar>
-        <main className="flex-1 p-5 overflow-y-auto">{children}</main>
-      </LayoutSidebar>
-    </AuthGuardClient>
+    <LayoutSidebar>
+      <main className="flex-1 p-5 overflow-y-auto">{children}</main>
+    </LayoutSidebar>
   );
 }

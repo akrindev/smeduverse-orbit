@@ -1,6 +1,5 @@
 import { toast } from "@/components/ui/use-toast";
 import Axios, { AxiosError, AxiosInstance } from "axios";
-import { useAuth } from "@/store/useAuth";
 
 // Create API client with token-based authentication configuration
 const api: AxiosInstance = Axios.create({
@@ -36,6 +35,10 @@ api.interceptors.response.use(
     if (typeof window !== "undefined") {
       // Handle unauthorized errors (401)
       if (error.response?.status === 401) {
+        // Clear authentication data
+        localStorage.removeItem("auth_token");
+        localStorage.removeItem("auth-storage");
+
         // Toast notification for auth failures
         try {
           toast({
@@ -47,16 +50,8 @@ api.interceptors.response.use(
           console.error("Failed to show toast notification:", e);
         }
 
-        // Use the handleAuthExpired function directly
-        // Note: We can't use the hook here since this isn't a React component
-        // So we need to clear localStorage manually
-        localStorage.removeItem("auth_token");
-        localStorage.removeItem("auth-storage");
-
-        // Redirect to login without causing an infinite reload
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 100);
+        // Force redirect to login
+        window.location.pathname = "/login";
       }
 
       // Handle validation errors (422 Unprocessable Entity)
