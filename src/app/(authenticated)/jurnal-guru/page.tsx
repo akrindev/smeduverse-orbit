@@ -85,6 +85,15 @@ export default function TeacherJournalPage() {
       {/* Table */}
       {isLoading ? (
         <BaseLoading />
+      ) : !selectedTeacher ? (
+        <div className="flex flex-col items-center bg-yellow-50 my-8 p-8 border rounded-md">
+          <h3 className="mb-2 font-semibold text-yellow-800 text-lg">
+            Pilih Guru Terlebih Dahulu
+          </h3>
+          <p className="text-yellow-700 text-center">
+            Silakan pilih guru untuk menampilkan jurnal guru.
+          </p>
+        </div>
       ) : (
         <>
           <TeacherJournalTable journals={journals?.data || []} />

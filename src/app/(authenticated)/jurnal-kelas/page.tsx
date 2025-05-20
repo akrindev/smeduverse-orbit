@@ -71,6 +71,15 @@ export default function JurnalKelasPage() {
 
       {loading ? (
         <BaseLoading />
+      ) : !classJournal ? (
+        <div className="flex flex-col items-center bg-yellow-50 my-8 p-8 border rounded-md">
+          <h3 className="mb-2 font-semibold text-yellow-800 text-lg">
+            Pilih Kelas Terlebih Dahulu
+          </h3>
+          <p className="text-yellow-700 text-center">
+            Silakan pilih rombongan belajar untuk menampilkan jurnal kelas.
+          </p>
+        </div>
       ) : (
         <>
           <TableJournal journals={journals} />
