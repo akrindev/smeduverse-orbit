@@ -10,6 +10,7 @@ import { useTeacherJournal } from "@/store/useTeacherJournal";
 import BaseLoading from "@/components/base-loading";
 import { useAuth, User } from "@/store/useAuth";
 import { DateRangeSelectorPair } from "./components/date-range-picker";
+import PaginationControls from "@/components/pagination-controls";
 
 export default function TeacherJournalPage() {
   // Filters state
@@ -18,10 +19,12 @@ export default function TeacherJournalPage() {
     from: subDays(new Date(), 7),
     to: new Date(),
   });
+  const [page, setPage] = useState(1);
 
   // Get current user and teacher journals from store
   const { user: currentUser } = useAuth();
-  const { getTeacherJournals, journals, isLoading } = useTeacherJournal();
+  const { getTeacherJournals, journals, isLoading, currentPage, lastPage } =
+    useTeacherJournal();
 
   // On initial load, set the selected teacher to current user if they are a teacher
   useEffect(() => {
@@ -37,9 +40,17 @@ export default function TeacherJournalPage() {
         teacher_id: selectedTeacher,
         from: dateRange?.from || new Date(),
         to: dateRange?.to || null,
+        page,
       });
     }
-  }, [selectedTeacher, dateRange, getTeacherJournals]);
+  }, [selectedTeacher, dateRange, page, getTeacherJournals]);
+
+  // Handle page change
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    // Scroll to top of page
+    window.scrollTo(0, 0);
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -75,7 +86,18 @@ export default function TeacherJournalPage() {
       {isLoading ? (
         <BaseLoading />
       ) : (
-        <TeacherJournalTable journals={journals?.data || []} />
+        <>
+          <TeacherJournalTable journals={journals?.data || []} />
+
+          {/* Pagination */}
+          <div className="flex justify-center mt-4">
+            <PaginationControls
+              currentPage={currentPage}
+              lastPage={lastPage}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        </>
       )}
     </div>
   );

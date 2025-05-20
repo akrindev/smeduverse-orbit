@@ -75,12 +75,15 @@ interface TeacherJournalFilter {
   teacher_id: string;
   from: Date;
   to?: Date | null;
+  page?: number;
 }
 
 interface TeacherJournalState {
   journals: TeacherJournalResponse | null;
   isLoading: boolean;
   error: string | null;
+  currentPage: number;
+  lastPage: number;
   getTeacherJournals: (
     filters: TeacherJournalFilter
   ) => AxiosPromise<TeacherJournalResponse>;
@@ -90,10 +93,12 @@ export const useTeacherJournal = create<TeacherJournalState>((set) => ({
   journals: null,
   isLoading: false,
   error: null,
+  currentPage: 1,
+  lastPage: 1,
   getTeacherJournals: async (filters) => {
     set({ isLoading: true, error: null });
 
-    const { teacher_id, from, to } = filters;
+    const { teacher_id, from, to, page = 1 } = filters;
 
     // Format dates to YYYY-MM-DD
     const formattedFrom = format(from, "yyyy-MM-dd");
@@ -106,10 +111,16 @@ export const useTeacherJournal = create<TeacherJournalState>((set) => ({
           teacher_id,
           from: formattedFrom,
           to: formattedTo,
+          page,
         },
       });
 
-      set({ journals: response.data, isLoading: false });
+      set({
+        journals: response.data,
+        isLoading: false,
+        currentPage: response.data.current_page,
+        lastPage: response.data.last_page,
+      });
       return response;
     } catch (error: any) {
       set({
