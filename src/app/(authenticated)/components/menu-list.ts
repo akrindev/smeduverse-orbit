@@ -6,6 +6,8 @@ import {
   IconPlayerPlay,
   IconReportAnalytics,
   IconUserCheck,
+  IconNotes,
+  IconNotebook,
 } from "@tabler/icons-react";
 
 // list of sidebar menu
@@ -57,6 +59,18 @@ export const menuList: MenuItem[] = [
     title: "Monitoring Presensi",
     icon: IconUserCheck,
     path: "/monitoring-presensi",
+  },
+  {
+    name: "Jurnal Guru",
+    title: "Jurnal Guru",
+    icon: IconNotes,
+    path: "/jurnal-guru",
+  },
+  {
+    name: "Jurnal Kelas",
+    title: "Jurnal Kelas",
+    icon: IconNotebook,
+    path: "/jurnal-kelas",
   },
   {
     name: "Rekap Laporan",

@@ -45,8 +45,8 @@ export default function DialogPresensi({
     description: string;
     date: Date | string | number;
     presenceUuid?: string;
-    subject_schedule_id?: number;
-    subject_schedule_end_id?: number | null;
+    subject_schedule_id?: number | string;
+    subject_schedule_end_id?: number | string;
   };
 }) {
   const [open, setOpen] = useState<boolean>(false);
@@ -56,12 +56,8 @@ export default function DialogPresensi({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [uuid, setUuid] = useState<string>("");
   const [presenceUuid, setPresenceUuid] = useState<string>("");
-  const [subjectScheduleId, setSubjectScheduleId] = useState<number | null>(
-    null
-  );
-  const [subjectScheduleEndId, setSubjectScheduleEndId] = useState<
-    number | null
-  >(null);
+  const [subjectScheduleId, setSubjectScheduleId] = useState<string>("");
+  const [subjectScheduleEndId, setSubjectScheduleEndId] = useState<string>("");
   const [scheduleError, setScheduleError] = useState<string | null>(null);
 
   const [createPresence, updatePresence, destroyPresence] = usePresence(
@@ -82,14 +78,15 @@ export default function DialogPresensi({
 
   // Handle change of start schedule
   const handleStartScheduleChange = (value: string) => {
-    const newStartId = Number(value);
-    setSubjectScheduleId(newStartId);
+    setSubjectScheduleId(value);
     setScheduleError(null); // Clear error when a valid selection is made
 
     // Check if we need to reset the end schedule
     if (subjectScheduleEndId) {
-      const startSchedule = schedules.find((s) => s.id === newStartId);
-      const endSchedule = schedules.find((s) => s.id === subjectScheduleEndId);
+      const startSchedule = schedules.find((s) => s.id.toString() === value);
+      const endSchedule = schedules.find(
+        (s) => s.id.toString() === subjectScheduleEndId
+      );
 
       if (
         startSchedule &&
@@ -99,7 +96,7 @@ export default function DialogPresensi({
           toDate(startSchedule.start_time)
         )
       ) {
-        setSubjectScheduleEndId(null); // Reset end schedule if it's earlier than new start
+        setSubjectScheduleEndId(""); // Reset end schedule if it's earlier than new start
       }
     }
   };
@@ -113,8 +110,12 @@ export default function DialogPresensi({
 
     if (subjectScheduleEndId) {
       // Find the selected schedules in the schedule array
-      const startSchedule = schedules.find((s) => s.id === subjectScheduleId);
-      const endSchedule = schedules.find((s) => s.id === subjectScheduleEndId);
+      const startSchedule = schedules.find(
+        (s) => s.id.toString() === subjectScheduleId
+      );
+      const endSchedule = schedules.find(
+        (s) => s.id.toString() === subjectScheduleEndId
+      );
 
       if (startSchedule && endSchedule) {
         // Compare start times using date-fns parsing for reliable comparison
@@ -154,8 +155,10 @@ export default function DialogPresensi({
       date: format(date as Date, "yyyy-MM-dd"),
       orbit_modul_uuid: uuid,
       presence_uuid: presenceUuid,
-      subject_schedule_id: subjectScheduleId,
-      subject_schedule_end_id: subjectScheduleEndId,
+      subject_schedule_id: subjectScheduleId ? Number(subjectScheduleId) : null,
+      subject_schedule_end_id: subjectScheduleEndId
+        ? Number(subjectScheduleEndId)
+        : null,
     };
 
     const response = await (data
@@ -170,8 +173,8 @@ export default function DialogPresensi({
       // reset input
       setTitle("");
       setDescription("");
-      setSubjectScheduleId(null);
-      setSubjectScheduleEndId(null);
+      setSubjectScheduleId("");
+      setSubjectScheduleEndId("");
 
       // close dialog
       setOpen(false);
@@ -200,24 +203,43 @@ export default function DialogPresensi({
   };
 
   useEffect(() => {
+    // When modulUuid or data changes, update the form fields
     if (modulUuid) {
       setUuid(modulUuid);
     }
 
     if (data) {
-      // console.log(data);
-
+      // Set form fields with the provided data for editing
       setTitle(data.title);
       setDescription(data.description);
       setDate(data.date);
       setPresenceUuid(data.presenceUuid || "");
-      setSubjectScheduleId(data.subject_schedule_id || null);
-      setSubjectScheduleEndId(data.subject_schedule_end_id || null);
+      // Convert schedule IDs to string for Select value
+      setSubjectScheduleId(
+        data.subject_schedule_id !== undefined &&
+          data.subject_schedule_id !== null
+          ? data.subject_schedule_id.toString()
+          : ""
+      );
+      setSubjectScheduleEndId(
+        data.subject_schedule_end_id !== undefined &&
+          data.subject_schedule_end_id !== null
+          ? data.subject_schedule_end_id.toString()
+          : ""
+      );
+    } else {
+      // If no data (creating new), reset fields
+      setTitle("");
+      setDescription("");
+      setDate(new Date());
+      setPresenceUuid("");
+      setSubjectScheduleId("");
+      setSubjectScheduleEndId("");
     }
 
-    // Fetch schedules when component mounts
+    // Fetch schedules when component mounts or modulUuid changes
     fetchSchedules();
-  }, []);
+  }, [modulUuid, data]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -282,7 +304,7 @@ export default function DialogPresensi({
               </Label>
               <Select
                 disabled={isLoading || loadingSchedules}
-                value={subjectScheduleId?.toString() || ""}
+                value={subjectScheduleId}
                 onValueChange={handleStartScheduleChange}
                 required
               >
@@ -307,18 +329,17 @@ export default function DialogPresensi({
               <Label htmlFor="scheduleTo">Jadwal Selesai (Opsional)</Label>
               <Select
                 disabled={isLoading || loadingSchedules || !subjectScheduleId}
-                value={subjectScheduleEndId?.toString() || ""}
+                value={subjectScheduleEndId}
                 onValueChange={(value) => {
-                  const newValue = value === "null" ? null : Number(value);
-                  setSubjectScheduleEndId(newValue);
+                  setSubjectScheduleEndId(value === "null" ? "" : value);
 
                   // Only validate end schedule if a value other than "null" is selected
                   if (value !== "null") {
                     const startSchedule = schedules.find(
-                      (s) => s.id === subjectScheduleId
+                      (s) => s.id.toString() === subjectScheduleId
                     );
                     const endSchedule = schedules.find(
-                      (s) => s.id === Number(value)
+                      (s) => s.id.toString() === value
                     );
 
                     if (
@@ -350,7 +371,7 @@ export default function DialogPresensi({
                       // Show only schedules that have start time >= the selected start schedule
                       if (!subjectScheduleId) return true;
                       const startSchedule = schedules.find(
-                        (s) => s.id === subjectScheduleId
+                        (s) => s.id.toString() === subjectScheduleId
                       );
                       return (
                         startSchedule &&

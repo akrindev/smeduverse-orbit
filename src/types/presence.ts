@@ -16,6 +16,8 @@ export interface Presence {
   title: string;
   description: string;
   date: Date | string | number;
+  subject_schedule_id?: string;
+  subject_schedule_end_id?: string;
   created_at: string;
   updated_at: string;
   deleted_at?: string | null;

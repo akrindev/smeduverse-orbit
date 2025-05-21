@@ -43,6 +43,8 @@ export default function Information({
     date: Date | string | number;
     description: string;
     presenceUuid?: string;
+    subject_schedule_id?: string;
+    subject_schedule_end_id?: string;
   }>();
 
   useEffect(() => {
@@ -51,8 +53,10 @@ export default function Information({
       description: description,
       date: date,
       presenceUuid: presenceUuid,
+      subject_schedule_id: presence?.subject_schedule_id,
+      subject_schedule_end_id: presence?.subject_schedule_end_id,
     });
-  }, [title, description, presenceUuid]);
+  }, [title, description, date, presenceUuid, presence]);
 
   return (
     <div className="gap-3 grid grid-cols-12">

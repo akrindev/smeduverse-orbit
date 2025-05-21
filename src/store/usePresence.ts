@@ -10,16 +10,40 @@ type Data = Pick<Presence, "orbit_modul_uuid" | "title" | "description"> & {
   presence_uuid?: string;
 };
 
+export interface JournalResponse {
+  current_page: number;
+  data: Presence[];
+  first_page_url: string;
+  from: number;
+  last_page: number;
+  last_page_url: string;
+  links: Array<{
+    url: string | null;
+    label: string;
+    active: boolean;
+  }>;
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number;
+  total: number;
+}
+
 type JournalProps = {
   rombel_id: string;
   from: Date;
   to?: Date;
+  page?: number;
 };
 
 type PresenceState = {
   presences: Presence[] | Array<any>;
   presence: Presence | any;
   journals: Presence[] | Array<any>;
+  journalResponse: JournalResponse | null;
+  currentPage: number;
+  lastPage: number;
   fetchPresences: (modulUuid: string) => Promise<void>;
   showPresence: (presenceUuid: string) => AxiosPromise<AxiosResponse>;
   createPresence: (data: Data) => AxiosPromise<AxiosResponse>;
@@ -39,13 +63,16 @@ type PresenceState = {
     attendance: Attendance;
     notes: string | null;
   }) => AxiosPromise<AxiosResponse<{ message: string; in_notes: string }>>;
-  getJournalKelas: (data: JournalProps) => AxiosPromise<Presence[]>;
+  getJournalKelas: (data: JournalProps) => AxiosPromise<JournalResponse>;
 };
 
 export const usePresence = create<PresenceState>((set, get) => ({
   presences: [],
   presence: {},
   journals: [],
+  journalResponse: null,
+  currentPage: 1,
+  lastPage: 1,
   fetchPresences: async (modulUuid) => {
     const response = await api.get(`/modul/presence/${modulUuid}`);
     set({ presences: response.data });
@@ -124,22 +151,27 @@ export const usePresence = create<PresenceState>((set, get) => ({
   // get journal kelas
   getJournalKelas: async (data) => {
     // parse the data
-    const { from, to, rombel_id } = data;
+    const { from, to, rombel_id, page = 1 } = data;
     // from to must be in string format YYYY-MM-DD / 2023-08-22
     const formattedFrom = format(from as Date, "yyyy-MM-dd");
     const formattedTo = to ? format(to as Date, "yyyy-MM-dd") : "";
 
-    // console.log(formattedFrom, formattedTo, to);
-
+    // Changed from POST to GET with query parameters to match API expectations
     const response = await api
       .post(`/modul/presence/recap/journal`, {
         from: formattedFrom,
         to: formattedTo,
         rombel_id,
+        page,
       })
       .then((res) => res.data);
 
-    set({ journals: response.data });
+    set({
+      journals: response.data,
+      journalResponse: response,
+      currentPage: response.current_page,
+      lastPage: response.last_page,
+    });
 
     return response;
   },
