@@ -8,8 +8,9 @@ import { DateRange } from "react-day-picker";
 import { subDays } from "date-fns";
 import BaseLoading from "@/components/base-loading";
 import { Presence } from "@/types/presence";
+import { IAttendance } from "@/types/attendance";
 import { DateRangeSelector } from "../rekap/components/date-range-selector";
-import TableJournal from "../rekap/components/table-journal";
+import TablePresenceJournal from "./components/table-presence-journal";
 import PaginationControls from "@/components/pagination-controls";
 
 export default function JurnalKelasPage() {
@@ -23,7 +24,7 @@ export default function JurnalKelasPage() {
   });
 
   const getJournal = usePresence((state) => state.getJournalKelas);
-  const journals = usePresence<Presence[]>((state) => state.journals);
+  const journals = usePresence((state) => state.journals);
   const currentPage = usePresence((state) => state.currentPage);
   const lastPage = usePresence((state) => state.lastPage);
 
@@ -82,7 +83,7 @@ export default function JurnalKelasPage() {
         </div>
       ) : (
         <>
-          <TableJournal journals={journals} />
+          <TablePresenceJournal data={journals} />
 
           {/* Pagination */}
           <div className="flex justify-center mt-4">

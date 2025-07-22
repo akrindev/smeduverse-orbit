@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Plus, RefreshCw } from "lucide-react";
 import { SubjectScheduleTable } from "./components/subject-schedule-table";
@@ -19,19 +18,16 @@ export default function JadwalPelajaranPage() {
   const { fetchSchedules, loading } = useSubjectSchedule();
   const [refreshing, setRefreshing] = useState(false);
 
-  // Handle opening the form for adding a new schedule
   const handleAddSchedule = () => {
     setScheduleToEdit(undefined);
     setFormOpen(true);
   };
 
-  // Handle opening the form for editing an existing schedule
   const handleEditSchedule = (schedule: SubjectSchedule) => {
     setScheduleToEdit(schedule);
     setFormOpen(true);
   };
 
-  // Handle refresh button click
   const handleRefresh = async () => {
     setRefreshing(true);
     await fetchSchedules();
@@ -61,14 +57,7 @@ export default function JadwalPelajaranPage() {
           </Button>
         </div>
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Daftar Jadwal Pelajaran</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <SubjectScheduleTable onEdit={handleEditSchedule} />
-        </CardContent>
-      </Card>
+      <SubjectScheduleTable onEdit={handleEditSchedule} />
 
       <SubjectScheduleForm
         open={formOpen}

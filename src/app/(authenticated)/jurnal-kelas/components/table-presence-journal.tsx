@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Journal } from "@/types/monitor";
+import { IAttendance, Presence } from "@/types/attendance";
 import {
   Table,
   TableBody,
@@ -16,28 +16,28 @@ import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 
-interface TableJournalProps {
-  data: Journal[];
+interface TablePresenceJournalProps {
+  data: IAttendance[];
 }
 
-export default function TableJournal({ data }: TableJournalProps) {
+export default function TablePresenceJournal({ data }: TablePresenceJournalProps) {
   const [view, setView] = useState<"table" | "grid">("table");
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle>Jurnal Guru</CardTitle>
-          <CardDescription>Daftar jurnal guru yang telah dibuat</CardDescription>
+          <CardTitle>Jurnal Kelas</CardTitle>
+          <CardDescription>Daftar jurnal kelas yang telah dibuat</CardDescription>
         </div>
         <ViewSwitcher onViewChange={setView} />
       </CardHeader>
       <CardContent>
         {data.length > 0 ? (
           view === "table" ? (
-            <JournalTable data={data} />
+            <PresenceJournalTable data={data} />
           ) : (
-            <JournalGrid data={data} />
+            <PresenceJournalGrid data={data} />
           )
         ) : (
           <div className="my-12 flex justify-center items-center h-full">
@@ -54,7 +54,7 @@ export default function TableJournal({ data }: TableJournalProps) {
   );
 }
 
-function JournalTable({ data }: { data: Journal[] }) {
+function PresenceJournalTable({ data }: { data: IAttendance[] }) {
   const router = useRouter();
 
   return (
@@ -64,39 +64,50 @@ function JournalTable({ data }: { data: Journal[] }) {
           <TableHead>Modul</TableHead>
           <TableHead>Judul</TableHead>
           <TableHead>Deskripsi</TableHead>
+          <TableHead>Tanggal</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {data.map((journal) => (
+        {data.map((presence) => (
           <TableRow
-            key={journal.uuid}
-            onClick={() => router.push(`/rekap/presensi/${journal.uuid}`)}
+            key={presence.uuid}
+            onClick={() => router.push(`/rekap/presensi/${presence.uuid}`)}
             className="cursor-pointer"
           >
             <TableCell>
               <div className="flex flex-col">
-                <div className="font-medium">{journal.modul.mapel.nama}</div>
+                <div className="font-medium">{presence.modul?.mapel.nama}</div>
                 <span className="text-muted-foreground">
-                  {journal.modul.teacher.fullname}
+                  {presence.modul?.teacher.fullname}
                 </span>
               </div>
             </TableCell>
             <TableCell>
               <div className="flex flex-col">
-                <div className="font-medium">{journal.title}</div>
+                <div className="font-medium">{presence.title}</div>
                 <span className="text-muted-foreground">
-                  {format(new Date(journal.date), "dd MMMM yyyy", {
-                    locale: id,
-                  })}
+                  {presence.modul?.rombel?.nama}
                 </span>
               </div>
             </TableCell>
             <TableCell>
               <div className="flex flex-col">
                 <div className="text-muted-foreground">
-                  {journal.modul.rombel?.nama}
+                  {presence.description}
                 </div>
-                <span>{journal.description}</span>
+                <span>{presence.description}</span>
+              </div>
+            </TableCell>
+            <TableCell>
+              <div className="flex flex-col">
+                <div className="font-medium">
+                  {format(new Date(presence.date), "dd MMMM yyyy", {
+                    locale: id,
+                  })}
+                </div>
+                <span className="text-muted-foreground">
+                  {presence.title}
+                </span>
               </div>
             </TableCell>
           </TableRow>
@@ -106,26 +117,26 @@ function JournalTable({ data }: { data: Journal[] }) {
   );
 }
 
-function JournalGrid({ data }: { data: Journal[] }) {
+function PresenceJournalGrid({ data }: { data: IAttendance[] }) {
   const router = useRouter();
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {data.map((journal) => (
+      {data.map((presence) => (
         <Card
-          key={journal.uuid}
-          onClick={() => router.push(`/rekap/presensi/${journal.uuid}`)}
+          key={presence.uuid}
+          onClick={() => router.push(`/rekap/presensi/${presence.uuid}`)}
           className="cursor-pointer"
         >
           <CardHeader>
-            <CardTitle>{journal.title}</CardTitle>
-            <CardDescription>{journal.modul.mapel.nama}</CardDescription>
+            <CardTitle>{presence.title}</CardTitle>
+            <CardDescription>{presence.modul?.mapel.nama}</CardDescription>
           </CardHeader>
           <CardContent>
-            <p>{journal.modul.teacher.fullname}</p>
-            <p>{journal.modul.rombel?.nama}</p>
+            <p>{presence.modul?.teacher.fullname}</p>
+            <p>{presence.modul?.rombel?.nama}</p>
             <p>
-              {format(new Date(journal.date), "dd MMMM yyyy", {
+              {format(new Date(presence.date), "dd MMMM yyyy", {
                 locale: id,
               })}
             </p>
@@ -134,4 +145,4 @@ function JournalGrid({ data }: { data: Journal[] }) {
       ))}
     </div>
   );
-}
+} 

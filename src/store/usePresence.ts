@@ -3,7 +3,7 @@ import { create } from "zustand";
 import { api } from "@/lib/api";
 import { Presence } from "@/types/presence";
 import { AxiosPromise, AxiosResponse } from "axios";
-import { Attendance } from "@/types/attendance";
+import { Attendance, IAttendance } from "@/types/attendance";
 import { format } from "date-fns";
 
 type Data = Pick<Presence, "orbit_modul_uuid" | "title" | "description"> & {
@@ -12,7 +12,7 @@ type Data = Pick<Presence, "orbit_modul_uuid" | "title" | "description"> & {
 
 export interface JournalResponse {
   current_page: number;
-  data: Presence[];
+  data: IAttendance[];
   first_page_url: string;
   from: number;
   last_page: number;
@@ -40,7 +40,7 @@ type JournalProps = {
 type PresenceState = {
   presences: Presence[] | Array<any>;
   presence: Presence | any;
-  journals: Presence[] | Array<any>;
+  journals: IAttendance[] | Array<any>;
   journalResponse: JournalResponse | null;
   currentPage: number;
   lastPage: number;

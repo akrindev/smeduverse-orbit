@@ -59,7 +59,7 @@ export default function ClassJournal() {
         </div>
       </div>
 
-      {loading ? <BaseLoading /> : <TableJournal journals={journals} />}
+      {loading ? <BaseLoading /> : <TableJournal data={journals} />}
     </div>
   );
 }
