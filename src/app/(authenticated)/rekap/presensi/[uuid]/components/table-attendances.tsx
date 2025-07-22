@@ -22,6 +22,16 @@ import {
 } from "@tanstack/react-table";
 import { useEffect, useMemo, useState } from "react";
 import SheetDetailAttendance from "./sheet-detail-attendance";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardDescription,
+  CardTitle,
+} from "@/components/ui/card";
+import ViewSwitcher from "@/components/ui/view-switcher";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
 
 interface TableAttendancesProps {
   modulUuid: string;
@@ -31,6 +41,7 @@ export default function TableAttendances({ modulUuid }: TableAttendancesProps) {
   const [data, setData] = useState<Attendance[]>([]);
   //   counted by first student orbit_presence
   const [orbitPresence, setOrbitPresence] = useState<OrbitPresence[]>([]);
+  const [view, setView] = useState<"table" | "grid">("table");
 
   const getRecapAttendances = useAttendance(
     (state) => state.getRecapAttendances
@@ -123,6 +134,50 @@ export default function TableAttendances({ modulUuid }: TableAttendancesProps) {
   if (!data.length) return <BaseLoading />;
 
   return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle>Daftar Kehadiran</CardTitle>
+          <CardDescription>
+            Daftar kehadiran siswa berdasarkan modul
+          </CardDescription>
+        </div>
+        <ViewSwitcher onViewChange={setView} />
+      </CardHeader>
+      <CardContent>
+        {data.length > 0 ? (
+          view === "table" ? (
+            <AttendanceDetailTable data={data} columns={columns} />
+          ) : (
+            <AttendanceDetailGrid data={data} columns={columns} />
+          )
+        ) : (
+          <div className="my-12 flex justify-center items-center h-full">
+            <div className="flex flex-col items-center">
+              <div className="text-2xl font-semibold">Belum ada data</div>
+              <div className="text-md font-normal">
+                Tidak ada data untuk ditampilkan
+              </div>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+interface AttendanceDetailTableProps {
+  data: Attendance[];
+  columns: ColumnDef<Attendance>[];
+}
+
+function AttendanceDetailTable({ data, columns }: AttendanceDetailTableProps) {
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+  return (
     <div className='rounded-md border'>
       <Table>
         <TableHeader>
@@ -164,6 +219,52 @@ export default function TableAttendances({ modulUuid }: TableAttendancesProps) {
         </TableBody>
       </Table>
       {/* <ScrollBar orientation='horizontal' /> */}
+    </div>
+  );
+}
+
+function AttendanceDetailGrid({
+  data,
+  columns,
+}: AttendanceDetailTableProps) {
+  return (
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {data.map((attendance: Attendance) => (
+        <Card key={attendance.student_id} className="cursor-pointer">
+          <CardHeader>
+            <CardTitle>{attendance.fullname}</CardTitle>
+            <CardDescription>{attendance.nipd}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col">
+              {Object.entries(attendance.status_count!).map(
+                ([key, value]) => (
+                  <Badge variant={"outline"} key={key}>
+                    {key.toUpperCase()}: {value}
+                  </Badge>
+                )
+              )}
+            </div>
+            <div className="mt-2 text-sm text-muted-foreground">
+              {attendance.orbit_presence && attendance.orbit_presence.length > 0 && (
+                <p>
+                  Terakhir presensi:
+                  {format(
+                    new Date(
+                      attendance.orbit_presence?.[0].presence.created_at
+                    ),
+                    "dd MMMM yyyy",
+                    {
+                      locale: id,
+                    }
+                  )}
+                </p>
+              )}
+            </div>
+            <SheetDetailAttendance attendance={attendance} />
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }
