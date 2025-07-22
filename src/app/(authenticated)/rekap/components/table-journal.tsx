@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Journal } from "@/types/monitor";
+import { IAttendance } from "@/types/attendance";
 import {
   Table,
   TableBody,
@@ -17,7 +18,7 @@ import { format } from "date-fns";
 import { id } from "date-fns/locale";
 
 interface TableJournalProps {
-  data: Journal[];
+  data: IAttendance[];
 }
 
 export default function TableJournal({ data }: TableJournalProps) {
@@ -54,7 +55,7 @@ export default function TableJournal({ data }: TableJournalProps) {
   );
 }
 
-function JournalTable({ data }: { data: Journal[] }) {
+function JournalTable({ data }: { data: IAttendance[] }) {
   const router = useRouter();
 
   return (
@@ -75,9 +76,9 @@ function JournalTable({ data }: { data: Journal[] }) {
           >
             <TableCell>
               <div className="flex flex-col">
-                <div className="font-medium">{journal.modul.mapel.nama}</div>
+                <div className="font-medium">{journal.modul?.mapel.nama}</div>
                 <span className="text-muted-foreground">
-                  {journal.modul.teacher.fullname}
+                  {journal.modul?.teacher.fullname}
                 </span>
               </div>
             </TableCell>
@@ -94,7 +95,7 @@ function JournalTable({ data }: { data: Journal[] }) {
             <TableCell>
               <div className="flex flex-col">
                 <div className="text-muted-foreground">
-                  {journal.modul.rombel?.nama}
+                  {journal.modul?.rombel?.nama}
                 </div>
                 <span>{journal.description}</span>
               </div>
@@ -106,7 +107,7 @@ function JournalTable({ data }: { data: Journal[] }) {
   );
 }
 
-function JournalGrid({ data }: { data: Journal[] }) {
+function JournalGrid({ data }: { data: IAttendance[] }) {
   const router = useRouter();
 
   return (
@@ -119,11 +120,11 @@ function JournalGrid({ data }: { data: Journal[] }) {
         >
           <CardHeader>
             <CardTitle>{journal.title}</CardTitle>
-            <CardDescription>{journal.modul.mapel.nama}</CardDescription>
+            <CardDescription>{journal.modul?.mapel.nama}</CardDescription>
           </CardHeader>
           <CardContent>
-            <p>{journal.modul.teacher.fullname}</p>
-            <p>{journal.modul.rombel?.nama}</p>
+            <p>{journal.modul?.teacher.fullname}</p>
+            <p>{journal.modul?.rombel?.nama}</p>
             <p>
               {format(new Date(journal.date), "dd MMMM yyyy", {
                 locale: id,

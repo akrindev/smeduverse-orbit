@@ -10,6 +10,7 @@ import BaseLoading from "@/components/base-loading";
 import TableJournal from "./table-journal";
 import { Presence } from "@/types/presence";
 import { DateRangeSelector } from "./date-range-selector";
+import { IAttendance } from "@/types/attendance";
 
 export default function ClassJournal() {
   const [classJournal, setClassJournal] = useState("");
@@ -22,7 +23,7 @@ export default function ClassJournal() {
 
   const getJournal = usePresence((state) => state.getJournalKelas);
 
-  const journals = usePresence<Presence[]>((state) => state.journals);
+  const journals = usePresence<IAttendance[]>((state) => state.journals);
 
   useEffect(() => {
     // set loading
