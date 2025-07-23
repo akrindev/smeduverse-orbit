@@ -7,17 +7,42 @@ import { IconInfoCircle } from "@tabler/icons-react";
 import DialogCreateSemester from "./components/dialog-semester";
 import { useRoleCheck } from "@/lib/auth-role";
 import { redirect } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { api } from "@/lib/api";
+import { useSemester } from "@/store/useSemester";
+import { Semester } from "@/types/semester";
 
 export default function SemesterPage() {
   const { isWakaKurikulum } = useRoleCheck();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [semesters, setSemesters] = useSemester((state) => [
+    state.semesters,
+    state.setSemesters,
+  ]);
 
-  // Check if user is waka kurikulum, if not redirect to dashboard
   useEffect(() => {
     if (!isWakaKurikulum()) {
       redirect("/dashboard");
     }
   }, [isWakaKurikulum]);
+
+  useEffect(() => {
+    setLoading(true);
+    const fetchSemesters = async () => {
+      try {
+        const response = await api.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/semester/list`
+        );
+        setSemesters(response.data);
+      } catch (error) {
+        console.error("Failed to fetch semesters:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSemesters();
+  }, [setSemesters]);
 
   return (
     <div className="flex flex-col space-y-5 h-full">
@@ -45,8 +70,20 @@ export default function SemesterPage() {
           </AlertDescription>
         </Alert>
         <div className="my-4"></div>
-        {/* table of semester that has title and status */}
-        <TableSemester />
+        {loading ? (
+          <div className="animate-pulse p-5">
+            <div className="space-y-1">
+              <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+              <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+            </div>
+            <div className="mt-5 space-y-1">
+              <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+              <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+            </div>
+          </div>
+        ) : (
+          <TableSemester data={semesters} />
+        )}
       </div>
     </div>
   );

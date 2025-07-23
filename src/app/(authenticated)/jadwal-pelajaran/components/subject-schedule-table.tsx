@@ -16,6 +16,8 @@ import {
   useSubjectSchedule,
   SubjectSchedule,
 } from "@/store/useSubjectSchedule";
+import ViewSwitcher from "@/components/ui/view-switcher";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 interface SubjectScheduleTableProps {
   onEdit: (schedule: SubjectSchedule) => void;
@@ -26,8 +28,8 @@ export function SubjectScheduleTable({ onEdit }: SubjectScheduleTableProps) {
     useSubjectSchedule();
   const { toast } = useToast();
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [view, setView] = useState<"table" | "grid">("table");
 
-  // Fetch subject schedules on component mount
   useEffect(() => {
     fetchSchedules();
   }, [fetchSchedules]);
@@ -72,63 +74,146 @@ export function SubjectScheduleTable({ onEdit }: SubjectScheduleTableProps) {
   }
 
   return (
-    <div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">No</TableHead>
-            <TableHead>Subject Key</TableHead>
-            <TableHead>Waktu Mulai</TableHead>
-            <TableHead>Waktu Selesai</TableHead>
-            <TableHead className="text-right">Aksi</TableHead>
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle>Daftar Jadwal Pelajaran</CardTitle>
+          <CardDescription>Daftar semua jadwal pelajaran yang terdaftar</CardDescription>
+        </div>
+        <ViewSwitcher onViewChange={setView} />
+      </CardHeader>
+      <CardContent>
+        {schedules.length === 0 ? (
+          <div className="py-8 text-center">Tidak ada data jadwal</div>
+        ) : view === "table" ? (
+          <ScheduleTable
+            schedules={schedules}
+            onEdit={onEdit}
+            deletingId={deletingId}
+            handleDelete={handleDelete}
+          />
+        ) : (
+          <ScheduleGrid
+            schedules={schedules}
+            onEdit={onEdit}
+            deletingId={deletingId}
+            handleDelete={handleDelete}
+          />
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function ScheduleTable({
+  schedules,
+  onEdit,
+  deletingId,
+  handleDelete,
+}: {
+  schedules: SubjectSchedule[];
+  onEdit: (schedule: SubjectSchedule) => void;
+  deletingId: number | null;
+  handleDelete: (id: number, subjectKey: number) => void;
+}) {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-[100px]">No</TableHead>
+          <TableHead>Subject Key</TableHead>
+          <TableHead>Waktu Mulai</TableHead>
+          <TableHead>Waktu Selesai</TableHead>
+          <TableHead className="text-right">Aksi</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {schedules.map((schedule, index) => (
+          <TableRow key={schedule.id}>
+            <TableCell className="font-medium">{index + 1}</TableCell>
+            <TableCell>{schedule.subject_key}</TableCell>
+            <TableCell>{schedule.start_time}</TableCell>
+            <TableCell>{schedule.end_time}</TableCell>
+            <TableCell className="text-right">
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => onEdit(schedule)}
+                  disabled={deletingId === schedule.id}
+                >
+                  <Edit className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="text-red-500"
+                  onClick={() => handleDelete(schedule.id, schedule.subject_key)}
+                  disabled={deletingId === schedule.id}
+                >
+                  {deletingId === schedule.id ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="w-4 h-4" />
+                  )}
+                </Button>
+              </div>
+            </TableCell>
           </TableRow>
-        </TableHeader>
-        <TableBody>
-          {schedules.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={5} className="py-8 text-center">
-                Tidak ada data jadwal
-              </TableCell>
-            </TableRow>
-          ) : (
-            schedules.map((schedule, index) => (
-              <TableRow key={schedule.id}>
-                <TableCell className="font-medium">{index + 1}</TableCell>
-                <TableCell>{schedule.subject_key}</TableCell>
-                <TableCell>{schedule.start_time}</TableCell>
-                <TableCell>{schedule.end_time}</TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => onEdit(schedule)}
-                      disabled={deletingId === schedule.id}
-                    >
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="text-red-500"
-                      onClick={() =>
-                        handleDelete(schedule.id, schedule.subject_key)
-                      }
-                      disabled={deletingId === schedule.id}
-                    >
-                      {deletingId === schedule.id ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="w-4 h-4" />
-                      )}
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
+function ScheduleGrid({
+  schedules,
+  onEdit,
+  deletingId,
+  handleDelete,
+}: {
+  schedules: SubjectSchedule[];
+  onEdit: (schedule: SubjectSchedule) => void;
+  deletingId: number | null;
+  handleDelete: (id: number, subjectKey: number) => void;
+}) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {schedules.map((schedule) => (
+        <Card key={schedule.id}>
+          <CardHeader>
+            <CardTitle>Subject Key: {schedule.subject_key}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <p>
+              {schedule.start_time} - {schedule.end_time}
+            </p>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => onEdit(schedule)}
+                disabled={deletingId === schedule.id}
+              >
+                <Edit className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="text-red-500"
+                onClick={() => handleDelete(schedule.id, schedule.subject_key)}
+                disabled={deletingId === schedule.id}
+              >
+                {deletingId === schedule.id ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Trash2 className="w-4 h-4" />
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }

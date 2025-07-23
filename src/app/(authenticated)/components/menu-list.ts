@@ -55,10 +55,10 @@ export const menuList: MenuItem[] = [
     path: "/modul",
   },
   {
-    name: "Monitoring Presensi",
-    title: "Monitoring Presensi",
+    name: "Monitoring",
+    title: "Monitoring",
     icon: IconUserCheck,
-    path: "/monitoring-presensi",
+    path: "/monitoring",
   },
   {
     name: "Jurnal Guru",

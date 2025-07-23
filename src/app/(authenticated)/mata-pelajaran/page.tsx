@@ -7,17 +7,24 @@ import DialogMataPelajaran from "./components/dialog-mata-pelajaran";
 import TableMataPelajaran from "./components/table-mata-pelajaran";
 import { useRoleCheck } from "@/lib/auth-role";
 import { redirect } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useMapel } from "@/store/useMapel";
 
 export default function MataPelajaranPage() {
   const { isWakaKurikulum } = useRoleCheck();
+  const [mapels, refetch] = useMapel((state) => [state.mapels, state.refetch]);
+  const [loading, setLoading] = useState(false);
 
-  // Check if user is waka kurikulum, if not redirect to dashboard
   useEffect(() => {
     if (!isWakaKurikulum()) {
       redirect("/dashboard");
     }
   }, [isWakaKurikulum]);
+
+  useEffect(() => {
+    setLoading(true);
+    refetch().finally(() => setLoading(false));
+  }, [refetch]);
 
   return (
     <div className="flex flex-col space-y-5 h-full">
@@ -31,7 +38,6 @@ export default function MataPelajaranPage() {
               Kelola data Mata Pelajaran
             </p>
           </div>
-          {/* dialog */}
           <DialogMataPelajaran />
         </div>
         <Separator className="my-4" />
@@ -41,8 +47,20 @@ export default function MataPelajaranPage() {
           <AlertDescription>Kelola data mata pelajaran.</AlertDescription>
         </Alert>
         <div className="my-4"></div>
-        {/* table */}
-        <TableMataPelajaran />
+        {loading ? (
+          <div className="p-5 animate-pulse">
+            <div className="space-y-1">
+              <div className="bg-gray-300 rounded w-1/2 h-4"></div>
+              <div className="bg-gray-300 rounded w-1/4 h-4"></div>
+            </div>
+            <div className="space-y-1 mt-5">
+              <div className="bg-gray-300 rounded w-1/2 h-4"></div>
+              <div className="bg-gray-300 rounded w-1/4 h-4"></div>
+            </div>
+          </div>
+        ) : (
+          <TableMataPelajaran data={mapels} />
+        )}
       </div>
     </div>
   );

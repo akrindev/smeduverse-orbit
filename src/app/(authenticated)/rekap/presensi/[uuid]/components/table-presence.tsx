@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -10,53 +13,87 @@ import { usePresence } from "@/store/usePresence";
 import { Presence } from "@/types/presence";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import { useEffect } from "react";
+import ViewSwitcher from "@/components/ui/view-switcher";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 export default function TablePresences({ modulUuid }: { modulUuid: string }) {
   const [presences, fetchPresences] = usePresence((state) => [
     state.presences,
     state.fetchPresences,
   ]);
+  const [view, setView] = useState<"table" | "grid">("table");
 
   useEffect(() => {
     fetchPresences(modulUuid);
-  }, [modulUuid]);
+  }, [modulUuid, fetchPresences]);
 
   return (
-    <div className='border rounded-md'>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className='text-left w-10'>No</TableHead>
-            <TableHead className='text-left'>Judul</TableHead>
-            <TableHead className='text-left'>Deskripsi</TableHead>
-            <TableHead className='text-left'>Tanggal</TableHead>
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle>Daftar Presensi</CardTitle>
+          <CardDescription>Daftar semua presensi yang terdaftar</CardDescription>
+        </div>
+        <ViewSwitcher onViewChange={setView} />
+      </CardHeader>
+      <CardContent>
+        {presences.length === 0 ? (
+          <div className="text-center py-8">Tidak ada presensi</div>
+        ) : view === "table" ? (
+          <PresenceTable presences={presences} />
+        ) : (
+          <PresenceGrid presences={presences} />
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function PresenceTable({ presences }: { presences: Presence[] }) {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="text-left w-10">No</TableHead>
+          <TableHead className="text-left">Judul</TableHead>
+          <TableHead className="text-left">Deskripsi</TableHead>
+          <TableHead className="text-left">Tanggal</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {presences.map((presence: Presence, i) => (
+          <TableRow key={presence.uuid} className="cursor-pointer">
+            <TableCell>{presences.length - i}</TableCell>
+            <TableCell>{presence.title}</TableCell>
+            <TableCell>{presence.description}</TableCell>
+            <TableCell>
+              {format(new Date(presence.date), "EEEE, PPP", {
+                locale: id,
+              })}
+            </TableCell>
           </TableRow>
-        </TableHeader>
-        <TableBody>
-          {/* list of all presences */}
-          {presences.length ? (
-            presences.map((presence: Presence, i) => (
-              <TableRow key={presence.uuid} className='cursor-pointer'>
-                <TableCell>{presences.length - i}</TableCell>
-                <TableCell>{presence.title}</TableCell>
-                <TableCell>{presence.description}</TableCell>
-                <TableCell>
-                  {format(new Date(presence.date), "EEEE, PPP", {
-                    locale: id,
-                  })}
-                </TableCell>
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={3} className='text-center'>
-                Tidak ada presensi
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
+function PresenceGrid({ presences }: { presences: Presence[] }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {presences.map((presence) => (
+        <Card key={presence.uuid} className="cursor-pointer">
+          <CardHeader>
+            <CardTitle>{presence.title}</CardTitle>
+            <CardDescription>{presence.description}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {format(new Date(presence.date), "EEEE, PPP", {
+              locale: id,
+            })}
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }
