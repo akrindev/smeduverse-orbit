@@ -3,11 +3,12 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import ModulList from "../modul/components/modul-list";
-import { api } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthQuery } from "@/hooks/useAuthQuery";
 import { useRouter } from "next/navigation";
+import { menuList } from "../components/menu-list";
+import Link from "next/link";
 
 // revalidate every 5 seconds
 // export const revalidate = 5;
@@ -20,7 +21,6 @@ import { useRouter } from "next/navigation";
 export default function Page() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading, user } = useAuthQuery();
-  const [analyticsData, setAnalyticsData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Ensure user is authenticated
@@ -31,31 +31,27 @@ export default function Page() {
       return;
     }
 
+    if (!authLoading && isAuthenticated) {
+      setIsLoading(false);
+    }
+
     // No need to call requireAuth() here as it can cause redirect loops
     // Just check the authenticated state from the store
   }, [isAuthenticated, authLoading, router]);
 
-  // Only fetch analytics if authenticated and don't have data yet
-  useEffect(() => {
-    async function fetchAnalytics() {
-      if (!isAuthenticated || !user) return;
-
-      try {
-        const response = await api.get("/analytics");
-        setAnalyticsData(response.data);
-      } catch (error) {
-        console.error("Error fetching analytics:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    if (isAuthenticated && isLoading) {
-      fetchAnalytics();
-    }
-  }, [isAuthenticated, user, isLoading]);
-
   // console.log(analyticsData);
+  const filteredMenu = menuList.filter((item) => {
+    if (item.name === "Dashboard") return false;
+    // check if item.roles has user roles
+    if (!item.roles) return true;
+
+    if (item.separator) return false;
+
+    return (
+      item.roles &&
+      item.roles.some((role) => user?.roles?.map((r) => r.name).includes(role))
+    );
+  });
 
   if (authLoading || isLoading) {
     return (
@@ -72,41 +68,36 @@ export default function Page() {
       <div className="flex flex-col h-full">
         <div className="flex justify-between items-center">
           <div className="space-y-1">
-            <h2 className="font-semibold text-2xl tracking-tight">Dashboard</h2>
+            <h2 className="font-semibold text-2xl tracking-tight">Quick Menu</h2>
             <p className="text-muted-foreground text-sm">
-              Selamat datang kembali
+              Selamat datang kembali, {user?.teacher?.fullname}
             </p>
           </div>
         </div>
 
-        <div className="gap-4 grid md:grid-cols-2 lg:grid-cols-4 mt-5">
-          {analyticsData &&
-            analyticsData.map((item) => (
-              <Card
-                key={item.name}
-                className="shadow-md hover:scale-105 duration-500 cursor-pointer"
-              >
+        <div className="gap-4 grid grid-cols-2 lg:grid-cols-4 mt-5">
+          {filteredMenu.map((item) => (
+            <Link href={item.path} key={item.name}>
+              <Card className="shadow-md hover:scale-105 duration-500 cursor-pointer h-full">
                 <CardHeader className="flex flex-row justify-between items-center space-y-0 pb-2">
-                  <CardTitle className="font-medium text-sm">
+                  {/* <CardTitle className="font-medium text-sm">
                     {item.name}
-                  </CardTitle>
-                  {/* <DollarSign className="w-4 h-4 text-muted-foreground" /> */}
+                  </CardTitle> */}
+                  <item.icon className="w-4 h-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="font-bold text-2xl">{item.value}</div>
-                  {/* <p className="text-muted-foreground text-xs">
-                  jumlah keseluruhan mapel
-                </p> */}
+                  <div className="font-bold text-md">{item.name}</div>
                 </CardContent>
               </Card>
-            ))}
+            </Link>
+          ))}
         </div>
 
         <div className="mt-5">
           <div className="space-y-1 mt-6">
             <h2 className="font-semibold text-2xl tracking-tight">Modul</h2>
             <p className="text-muted-foreground text-sm">
-              Modul yang kamu kelola
+              Modul yang Anda kelola
             </p>
           </div>
           <Separator className="my-4" />

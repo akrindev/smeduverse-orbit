@@ -35,6 +35,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import ViewSwitcher from "@/components/ui/view-switcher";
+import SelectRombel from "./components/select-rombel";
+import { useRombel } from "@/store/useRombel";
 
 export default function RekapPage() {
   const [status, setStatus] = useState("no");
@@ -45,6 +47,7 @@ export default function RekapPage() {
   });
   const [data, setData] = useState<AttendancePagination>();
   const [view, setView] = useState<"table" | "grid">("table");
+  const rombelId = useRombel((state) => state.selectedRombelId);
 
   const recapByDateRange = useAttendance((state) => state.getRecapByDateRange);
 
@@ -54,11 +57,12 @@ export default function RekapPage() {
       status,
       from: date?.from ? date.from : new Date(),
       to: date?.to,
+      rombel_id: rombelId,
     })
       // @ts-ignore
       .then((res) => setData(res.data))
       .finally(() => setIsLoading(false));
-  }, [status, date]);
+  }, [status, date, rombelId]);
 
   return (
     <div className="flex flex-col space-y-5 h-full">
@@ -75,11 +79,19 @@ export default function RekapPage() {
         </div>
         <Separator className="my-4" />
         <div className="gap-5 grid grid-cols-12">
-          <div className="col-span-12 md:col-span-3">
-            <div className="mb-3 font-medium">Status kehadiran</div>
-            <SelectAttendanceStatus onSelected={(value) => setStatus(value)} />
+          <div className="col-span-12 md:col-span-6 flex gap-3">
+            <div className="flex-1">
+              <div className="mb-3 font-medium">Status kehadiran</div>
+              <SelectAttendanceStatus
+                onSelected={(value) => setStatus(value)}
+              />
+            </div>
+            <div className="flex-1">
+              <div className="mb-3 font-medium">Kelas</div>
+              <SelectRombel />
+            </div>
           </div>
-          <div className="col-span-12 md:col-span-9">
+          <div className="col-span-12 md:col-span-6">
             <DateRangeSelector onSelect={setDate} initialDateRange={date} />
           </div>
         </div>
@@ -126,14 +138,22 @@ interface AttendanceTableProps {
 }
 
 function AttendanceTable({ data }: AttendanceTableProps) {
+  const statusMap: { [key: string]: string } = {
+    h: "Hadir",
+    a: "Alpa",
+    b: "Bolos",
+    s: "Sakit",
+    i: "Izin",
+    no: "Tidak Hadir",
+  };
+
   return (
     <div className="border rounded-md">
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Nama</TableHead>
-            <TableHead>Kelas</TableHead>
-            <TableHead>Status</TableHead>
+            <TableHead>Kelas & Status</TableHead>
             <TableHead>Presensi</TableHead>
             <TableHead className="flex justify-end items-center">
               Tanggal
@@ -156,29 +176,24 @@ function AttendanceTable({ data }: AttendanceTableProps) {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>{item.modul?.rombel?.nama}</TableCell>
-                    <TableCell className="max-w-[130px] truncate">
-                      {/* wrap with span then color it based status */}
+                    <TableCell className="max-w-[200px] truncate">
                       <div className="flex flex-col">
+                        <span>
+                          {item.modul?.rombel?.nama || '-'}
+                        </span>
                         <span
                           className={cn({
-                            "text-green-500":
-                              attendance.presence?.status === "h",
-                            // red if status is a or b
-                            "text-red-500":
-                              attendance.presence?.status === "a" ||
-                              attendance.presence?.status === "b",
-                            "text-yellow-500":
-                              attendance.presence?.status === "s",
-                            "text-blue-500":
-                              attendance.presence?.status === "i",
+                            "text-green-500": attendance.presence?.status === "h",
+                            "text-red-500": attendance.presence?.status === "a" || attendance.presence?.status === "b",
+                            "text-yellow-500": attendance.presence?.status === "s",
+                            "text-blue-500": attendance.presence?.status === "i",
                           })}
                         >
-                          {attendance.presence?.status}
+                          {statusMap[attendance.presence?.status || "no"]}
                         </span>
-                        <span className="text-muted-foreground">
-                          {attendance.presence?.notes}
-                        </span>
+                        {attendance.presence?.notes && (
+                          <span className="text-muted-foreground">{attendance.presence?.notes}</span>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell className="max-w-[150px] truncate">
@@ -199,7 +214,7 @@ function AttendanceTable({ data }: AttendanceTableProps) {
                       <div className="flex justify-end items-center gap-3">
                         <Calendar className="w-4 h-4 text-gray-400" />
                         <span>
-                          {format(new Date(item.date), "E, dd LLL y", {
+                          {format(new Date(item.date), "E, dd LLL y HH:mm", {
                             locale: id,
                           })}
                         </span>
@@ -230,6 +245,15 @@ function AttendanceTable({ data }: AttendanceTableProps) {
 }
 
 function AttendanceGrid({ data }: AttendanceTableProps) {
+  const statusMap: { [key: string]: string } = {
+    h: "Hadir",
+    a: "Alpa",
+    b: "Bolos",
+    s: "Sakit",
+    i: "Izin",
+    no: "Tidak Hadir",
+  };
+
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
       {data.map((item: IAttendance) => (
@@ -244,21 +268,22 @@ function AttendanceGrid({ data }: AttendanceTableProps) {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col">
+                  <span>
+                    <span className="font-medium">Kelas:</span> {item.modul?.rombel?.nama || '-'}
+                  </span>
                   <span
                     className={cn({
                       "text-green-500": attendance.presence?.status === "h",
-                      "text-red-500":
-                        attendance.presence?.status === "a" ||
-                        attendance.presence?.status === "b",
+                      "text-red-500": attendance.presence?.status === "a" || attendance.presence?.status === "b",
                       "text-yellow-500": attendance.presence?.status === "s",
                       "text-blue-500": attendance.presence?.status === "i",
                     })}
                   >
-                    Status: {attendance.presence?.status}
+                    <span className="font-medium">Status:</span> {statusMap[attendance.presence?.status || "no"]}
                   </span>
-                  <span className="text-muted-foreground">
-                    Catatan: {attendance.presence?.notes}
-                  </span>
+                  {attendance.presence?.notes && (
+                    <span className="text-muted-foreground">Catatan: {attendance.presence?.notes}</span>
+                  )}
                   <Link href={`/modul/${item.modul?.uuid}`}>
                     <div className="flex flex-col">
                       <span className="text-gray-400 dark:text-gray-600">

@@ -88,8 +88,7 @@ function PresensiTable({
       <TableHeader>
         <TableRow>
           <TableHead className="text-left w-10">No</TableHead>
-          <TableHead className="text-left">Judul</TableHead>
-          <TableHead className="text-left">Deskripsi</TableHead>
+          <TableHead className="text-left">Judul & Deskripsi</TableHead>
           <TableHead className="text-left">Tanggal</TableHead>
         </TableRow>
       </TableHeader>
@@ -101,11 +100,13 @@ function PresensiTable({
             className="cursor-pointer"
           >
             <TableCell>{presences.length - i}</TableCell>
-            <TableCell className="p-2 text-left max-w-[130px] whitespace-pre-line truncate">
-              <TooltipText text={presence.title} />
-            </TableCell>
             <TableCell className="p-2 text-left max-w-[420px] whitespace-pre-line truncate">
-              {presence.description}
+              <TooltipText text={presence.title} />
+              {presence.description && (
+                <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                  {presence.description}
+                </div>
+              )}
             </TableCell>
             <TableCell className="p-2 text-left">
               <div className="flex flex-wrap gap-1 text-left">
@@ -126,7 +127,7 @@ function PresensiTable({
                 )}
               </div>
               <div className="text-muted-foreground">
-                {format(new Date(presence.date), "EEEE, PPP", {
+                {format(new Date(presence.date), "EEEE, PPP HH:mm", {
                   locale: id,
                 })}
               </div>
