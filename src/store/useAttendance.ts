@@ -9,6 +9,7 @@ import { format } from "date-fns";
 
 type DataDateRange = {
   status: string | "no" | "h" | "i" | "s" | "a" | "b";
+  rombel_id?: string;
 } & DateRange;
 
 type AttendanceState = {
@@ -40,7 +41,7 @@ export const useAttendance = create<AttendanceState>((set, get) => ({
   },
   getRecapByDateRange: async (data) => {
     // parse the data
-    const { from, to, status } = data;
+    const { from, to, status, rombel_id } = data;
     // from to must be in string format YYYY-MM-DD / 2023-08-22
     const formattedFrom = format(from as Date, "yyyy-MM-dd");
     const formattedTo = to ? format(to as Date, "yyyy-MM-dd") : "";
@@ -51,6 +52,7 @@ export const useAttendance = create<AttendanceState>((set, get) => ({
       from: formattedFrom,
       to: formattedTo,
       status,
+      rombel_id,
     });
 
     return response;
