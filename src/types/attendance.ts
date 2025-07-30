@@ -6,6 +6,8 @@ export interface IAttendance {
 	title: string;
 	description: string;
 	date: Date | string | number;
+	start_time?: string;
+	end_time?: string;
 	created_at: string;
 	updated_at: string;
 	attendances: Attendance[];
