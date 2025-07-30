@@ -34,7 +34,7 @@ export default function TablePresenceJournal({
 
 	return (
 		<Card>
-			<CardHeader className="flex flex-row items-center justify-between">
+			<CardHeader className="flex flex-row justify-between items-center">
 				<div>
 					<CardTitle>Jurnal Kelas</CardTitle>
 					<CardDescription>
@@ -51,10 +51,10 @@ export default function TablePresenceJournal({
 						<PresenceJournalGrid data={data} />
 					)
 				) : (
-					<div className="my-12 flex justify-center items-center h-full">
+					<div className="flex justify-center items-center my-12 h-full">
 						<div className="flex flex-col items-center">
-							<div className="text-2xl font-semibold">Belum ada data</div>
-							<div className="text-md font-normal">
+							<div className="font-semibold text-2xl">Belum ada data</div>
+							<div className="font-normal text-md">
 								Tidak ada data untuk ditampilkan
 							</div>
 						</div>
@@ -72,8 +72,8 @@ function PresenceJournalTable({ data }: { data: IAttendance[] }) {
 		<Table>
 			<TableHeader>
 				<TableRow>
-					<TableHead>Modul</TableHead>
 					<TableHead>Judul</TableHead>
+					<TableHead>Modul</TableHead>
 					<TableHead>Tanggal</TableHead>
 					<TableHead>Kehadiran</TableHead>
 				</TableRow>
@@ -83,19 +83,11 @@ function PresenceJournalTable({ data }: { data: IAttendance[] }) {
 					return (
 						<TableRow
 							key={presence.uuid}
-							onClick={() => router.push(`/rekap/presensi/${presence.uuid}`)}
+							onClick={() =>
+								router.push(`/rekap/presensi/${presence.orbit_modul_uuid}`)
+							}
 							className="cursor-pointer"
 						>
-							<TableCell>
-								<div className="flex flex-col">
-									<div className="font-medium">
-										{presence.modul?.mapel.nama}
-									</div>
-									<span className="text-muted-foreground">
-										{presence.modul?.teacher.fullname}
-									</span>
-								</div>
-							</TableCell>
 							<TableCell>
 								<div className="flex flex-col">
 									<div className="font-medium">{presence.title}</div>
@@ -106,12 +98,34 @@ function PresenceJournalTable({ data }: { data: IAttendance[] }) {
 							</TableCell>
 							<TableCell>
 								<div className="flex flex-col">
-									<span className="font-medium ">{presence.title}</span>
-									<div className="font-normal text-muted-foreground">
+									<div className="font-medium">
+										{presence.modul?.mapel.kode}
+									</div>
+									<span className="text-muted-foreground">
+										{presence.modul?.teacher.fullname}
+									</span>
+								</div>
+							</TableCell>
+							<TableCell>
+								<div className="flex flex-col">
+									<div className="font-normal">
 										{format(new Date(presence.date), "dd MMMM yyyy", {
 											locale: id,
 										})}
 									</div>
+									{presence.start_time && presence.end_time && (
+										<div className="text-muted-foreground text-xs">
+											{format(
+												new Date(`1970-01-01T${presence.start_time}`),
+												"HH:mm",
+											)}{" "}
+											-{" "}
+											{format(
+												new Date(`1970-01-01T${presence.end_time}`),
+												"HH:mm",
+											)}
+										</div>
+									)}
 								</div>
 							</TableCell>
 							<TableCell>
@@ -151,7 +165,7 @@ function PresenceJournalGrid({ data }: { data: IAttendance[] }) {
 	const router = useRouter();
 
 	return (
-		<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+		<div className="gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
 			{data.map((presence) => {
 				return (
 					<Card
