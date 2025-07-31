@@ -110,7 +110,7 @@ export default function RekapPage() {
 							</div>
 							<ViewSwitcher onViewChange={setView} />
 						</CardHeader>
-						<CardContent className="p-0">
+						<CardContent>
 							{data?.data && data.data.length > 0 ? (
 								view === "table" ? (
 									<AttendanceTable data={data.data} />
@@ -152,9 +152,9 @@ function AttendanceTable({ data }: AttendanceTableProps) {
 			<Table>
 				<TableHeader>
 					<TableRow>
-						<TableHead>Nama</TableHead>
-						<TableHead>Presensi</TableHead>
-						<TableHead className="flex justify-end items-center">
+						<TableHead className="whitespace-nowrap">Nama</TableHead>
+						<TableHead className="whitespace-nowrap">Presensi</TableHead>
+						<TableHead className="flex justify-start items-center whitespace-nowrap">
 							Tanggal
 						</TableHead>
 					</TableRow>
@@ -167,22 +167,25 @@ function AttendanceTable({ data }: AttendanceTableProps) {
 									<TableRow key={nanoid()}>
 										<TableCell>
 											<div className="flex flex-col">
-												<div className="font-medium">{attendance.fullname}</div>
-												<div className="text-muted-foreground">
+												<div className="font-normal">{attendance.fullname}</div>
+												<div className="text-muted-foreground text-xs">
 													{attendance.nipd} ({item.modul?.rombel?.nama || "-"})
 													-{" "}
 													<span
-														className={cn({
-															"text-green-500":
-																attendance.presence?.status === "h",
-															"text-red-500":
-																attendance.presence?.status === "a" ||
-																attendance.presence?.status === "b",
-															"text-yellow-500":
-																attendance.presence?.status === "s",
-															"text-blue-500":
-																attendance.presence?.status === "i",
-														})}
+														className={cn(
+															{
+																"text-green-500":
+																	attendance.presence?.status === "h",
+																"text-red-500":
+																	attendance.presence?.status === "a" ||
+																	attendance.presence?.status === "b",
+																"text-yellow-500":
+																	attendance.presence?.status === "s",
+																"text-blue-500":
+																	attendance.presence?.status === "i",
+															},
+															"font-bold",
+														)}
 													>
 														{statusMap[attendance.presence?.status || "no"]}
 													</span>
@@ -204,7 +207,7 @@ function AttendanceTable({ data }: AttendanceTableProps) {
 											</Link>
 										</TableCell>
 										<TableCell>
-											<div className="flex justify-end items-center gap-3">
+											<div className="flex justify-start items-center gap-3">
 												<Calendar className="w-4 h-4 text-gray-400" />
 												<span>
 													{format(

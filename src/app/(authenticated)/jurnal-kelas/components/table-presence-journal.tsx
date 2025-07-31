@@ -2,6 +2,7 @@
 
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
+import { ExternalLink } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -89,8 +90,11 @@ function PresenceJournalTable({ data }: { data: IAttendance[] }) {
 							className="cursor-pointer"
 						>
 							<TableCell>
-								<div className="flex flex-col">
-									<div className="font-medium">{presence.title}</div>
+								<div className="flex flex-col hover:underline">
+									<div className="flex items-center gap-1 font-medium">
+										{presence.title}
+										<ExternalLink className="w-3 h-3 text-blue-500" />
+									</div>
 									<span className="text-muted-foreground">
 										{presence.modul?.rombel?.nama}
 									</span>

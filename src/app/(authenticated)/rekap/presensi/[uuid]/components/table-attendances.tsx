@@ -93,12 +93,28 @@ export default function TableAttendances({ modulUuid }: TableAttendancesProps) {
 				cell: (cell) => {
 					return (
 						<div className="flex gap-3">
-							{Object.entries(cell.row.original.status_count!).map(
-								([key, value]) => (
-									<Badge variant={"outline"} key={key}>
-										{key.toUpperCase()}: {value}
-									</Badge>
-								),
+							{Object.entries(cell.row.original?.status_count || {}).map(
+								([key, value]) => {
+									const colors = {
+										H: "bg-green-500",
+										S: "bg-yellow-500",
+										I: "bg-blue-500",
+										A: "bg-red-500",
+										B: "bg-red-500",
+									};
+
+									const matchedColor = colors[key.toUpperCase()];
+
+									return (
+										<Badge
+											variant={"outline"}
+											className={matchedColor}
+											key={key}
+										>
+											{key.toUpperCase()}: {value}
+										</Badge>
+									);
+								},
 							)}
 						</div>
 					);
@@ -134,7 +150,7 @@ export default function TableAttendances({ modulUuid }: TableAttendancesProps) {
 
 	return (
 		<Card>
-			<CardHeader className="flex flex-row items-center justify-between">
+			<CardHeader className="flex flex-row justify-between items-center">
 				<div>
 					<CardTitle>Daftar Kehadiran</CardTitle>
 					<CardDescription>
@@ -151,10 +167,10 @@ export default function TableAttendances({ modulUuid }: TableAttendancesProps) {
 						<AttendanceDetailGrid data={data} columns={columns} />
 					)
 				) : (
-					<div className="my-12 flex justify-center items-center h-full">
+					<div className="flex justify-center items-center my-12 h-full">
 						<div className="flex flex-col items-center">
-							<div className="text-2xl font-semibold">Belum ada data</div>
-							<div className="text-md font-normal">
+							<div className="font-semibold text-2xl">Belum ada data</div>
+							<div className="font-normal text-md">
 								Tidak ada data untuk ditampilkan
 							</div>
 						</div>
@@ -177,7 +193,7 @@ function AttendanceDetailTable({ data, columns }: AttendanceDetailTableProps) {
 		getCoreRowModel: getCoreRowModel(),
 	});
 	return (
-		<div className="rounded-md border">
+		<div className="border rounded-md">
 			<Table>
 				<TableHeader>
 					{table.getHeaderGroups().map((headerGroup) => (
@@ -226,7 +242,7 @@ function AttendanceDetailTable({ data, columns }: AttendanceDetailTableProps) {
 
 function AttendanceDetailGrid({ data, columns }: AttendanceDetailTableProps) {
 	return (
-		<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+		<div className="gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
 			{data.map((attendance: Attendance) => (
 				<Card key={attendance.student_id} className="cursor-pointer">
 					<CardHeader>
@@ -241,7 +257,7 @@ function AttendanceDetailGrid({ data, columns }: AttendanceDetailTableProps) {
 								</Badge>
 							))}
 						</div>
-						<div className="mt-2 text-sm text-muted-foreground">
+						<div className="mt-2 text-muted-foreground text-sm">
 							{attendance.orbit_presence &&
 								attendance.orbit_presence.length > 0 && (
 									<p>

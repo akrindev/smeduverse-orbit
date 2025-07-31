@@ -78,7 +78,9 @@ function JournalTable({ journals }: { journals: TeacherJournalEntry[] }) {
 				accessorKey: "modul",
 				cell: ({ row }) => (
 					<div className="flex flex-col w-">
-						<div className="font-medium">{row.original.modul.mapel.kode}</div>
+						<div className="font-medium">
+							{row.original.modul.mapel.kode} - {row.original.modul.rombel.nama}
+						</div>
 						<span className="text-muted-foreground">
 							{row.original.modul.teacher.fullname} (
 							{row.original.modul.teacher.niy})
@@ -87,12 +89,7 @@ function JournalTable({ journals }: { journals: TeacherJournalEntry[] }) {
 				),
 			},
 			{
-				header: "Kelas",
-				accessorKey: "modul.rombel.nama",
-				cell: ({ row }) => row.original.modul.rombel.nama,
-			},
-			{
-				header: "Topik",
+				header: "Judul",
 				accessorKey: "title",
 				cell: ({ row }) => (
 					<Link
@@ -112,28 +109,25 @@ function JournalTable({ journals }: { journals: TeacherJournalEntry[] }) {
 				),
 			},
 			{
-				header: "Tanggal",
+				header: "Tanggal dan Waktu",
 				accessorKey: "date",
 				cell: ({ row }) => (
-					<div className="flex items-center gap-2">
-						<CalendarIcon className="w-4 h-4 text-muted-foreground" />
-						<span>
-							{format(new Date(row.original.date), "E, dd MMMM yyyy", {
-								locale: id,
-							})}
-						</span>
-					</div>
-				),
-			},
-			{
-				header: "Waktu",
-				accessorKey: "time",
-				cell: ({ row }) => (
-					<div className="flex items-center gap-2">
-						<Clock className="w-4 h-4 text-muted-foreground" />
-						<span>
-							{row.original.start_time} - {row.original.end_time}
-						</span>
+					<div className="flex flex-col">
+						<div className="flex items-center gap-2">
+							<CalendarIcon className="w-4 h-4 text-muted-foreground" />
+							<span>
+								{format(new Date(row.original.date), "E, dd MMMM yyyy", {
+									locale: id,
+								})}
+							</span>
+						</div>
+
+						<div className="flex items-center gap-2">
+							<Clock className="w-4 h-4 text-muted-foreground" />
+							<span>
+								{row.original.start_time} - {row.original.end_time}
+							</span>
+						</div>
 					</div>
 				),
 			},
