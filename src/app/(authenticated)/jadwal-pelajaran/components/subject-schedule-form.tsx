@@ -30,7 +30,7 @@ import {
 
 // Validation schema for subject schedule
 const formSchema = z.object({
-  subject_key: z.coerce.number().min(1, "Subject key is required"),
+  subject_key: z.coerce.number().min(0, "Subject key is required"),
   start_time: z.string().min(1, "Start time is required"),
   end_time: z.string().min(1, "End time is required"),
 });
