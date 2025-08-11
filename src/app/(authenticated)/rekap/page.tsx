@@ -1,14 +1,15 @@
 "use client";
 
-import { IconExternalLink } from "@tabler/icons-react";
+import { IconDownload, IconExternalLink } from "@tabler/icons-react";
 import { format, subDays } from "date-fns";
 import { id } from "date-fns/locale";
-import { Calendar } from "lucide-react";
+import { Calendar, Loader2 } from "lucide-react";
 import { nanoid } from "nanoid";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
 import type { DateRange } from "react-day-picker";
 import BaseLoading from "@/components/base-loading";
+import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -27,6 +28,7 @@ import {
 } from "@/components/ui/table";
 import ViewSwitcher from "@/components/ui/view-switcher";
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/api";
 import { useAttendance } from "@/store/useAttendance";
 import { useRombel } from "@/store/useRombel";
 import type {
@@ -45,6 +47,7 @@ export default function RekapPage() {
 		from: subDays(new Date(), 7),
 		to: new Date(),
 	});
+    const [exportLoading, setExportLoading] = useState<boolean>(false);
 	const [data, setData] = useState<AttendancePagination>();
 	const [view, setView] = useState<"table" | "grid">("table");
 	const rombelId = useRombel((state) => state.selectedRombelId);
@@ -63,6 +66,39 @@ export default function RekapPage() {
 			.then((res) => setData(res.data))
 			.finally(() => setIsLoading(false));
 	}, [status, date, rombelId, recapByDateRange]);
+
+    const handleExport = async () => {
+        try {
+            setExportLoading(true);
+            const fromDate = date?.from ?? new Date();
+            const toDate = date?.to ?? undefined;
+            const formattedFrom = format(fromDate, "yyyy-MM-dd");
+            const formattedTo = toDate ? format(toDate, "yyyy-MM-dd") : "";
+
+            const response = await api.post(
+                "/modul/presence/recap/export/date-range",
+                {
+                    status,
+                    from: formattedFrom,
+                    to: formattedTo,
+                    rombel_id: rombelId ? String(rombelId) : "",
+                },
+                { responseType: "blob" },
+            );
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            const filename = `rekap-presensi-${status}-${formattedFrom}${formattedTo ? `-${formattedTo}` : ""}.xlsx`;
+            link.setAttribute("download", filename);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } finally {
+            setExportLoading(false);
+        }
+    };
 
 	return (
 		<div className="flex flex-col space-y-5 h-full">
@@ -100,15 +136,25 @@ export default function RekapPage() {
 				{isLoading ? (
 					<BaseLoading />
 				) : (
-					<Card>
-						<CardHeader className="flex flex-row justify-between items-center">
+                    <Card>
+                        <CardHeader className="flex flex-row justify-between items-center">
 							<div>
 								<CardTitle>Rekap Kehadiran</CardTitle>
 								<CardDescription>
 									Daftar rekap kehadiran siswa berdasarkan tanggal
 								</CardDescription>
 							</div>
-							<ViewSwitcher onViewChange={setView} />
+                            <div className="flex items-center gap-2">
+                                <Button onClick={handleExport} disabled={exportLoading}>
+                                    {exportLoading ? (
+                                        <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                                    ) : (
+                                        <IconDownload className="mr-2 w-4 h-4" />
+                                    )}
+                                    Unduh
+                                </Button>
+                                <ViewSwitcher onViewChange={setView} />
+                            </div>
 						</CardHeader>
 						<CardContent>
 							{data?.data && data.data.length > 0 ? (
