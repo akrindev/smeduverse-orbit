@@ -11,6 +11,7 @@ import { useModulQuery } from "@/queries/useModulQuery";
 import { useAuth } from "@/store/useAuth";
 import { useEffect, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import ModuleAttendanceAnalytics from "./module-attendance-analytics";
 
 export default function ModulClient({ modulUuid }: { modulUuid: string }) {
   const router = useRouter();
@@ -70,6 +71,9 @@ export default function ModulClient({ modulUuid }: { modulUuid: string }) {
           </Link>
         </div>
       </div>
+      <Separator />
+      {/* analytics for this module */}
+      {/* <ModuleAttendanceAnalytics modulUuid={modulUuid} /> */}
       <Separator />
       <Alert>
         <Info className="w-4 h-4" />
