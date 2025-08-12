@@ -16,6 +16,8 @@ import { useModul } from "@/store/useModul";
 import type { Modul } from "@/types/modul";
 import TableAttendances from "./components/table-attendances";
 import TablePresences from "./components/table-presence";
+import ModuleAttendanceAnalytics from "./components/module-attendance-analytics";
+
 
 interface RekapPageProps {
 	params: {
@@ -114,8 +116,9 @@ export default function RekapPage({ params }: RekapPageProps) {
             )} */}
 					</div>
 				</div>
-				<Separator className="my-4" />
-				{/* table */}
+                <Separator className="my-4" />
+                
+                {/* table */}
 				<Tabs defaultValue="rekap">
 					<TabsList className="grid grid-cols-2 max-w-md">
 						<TabsTrigger value="rekap">Kehadiran</TabsTrigger>

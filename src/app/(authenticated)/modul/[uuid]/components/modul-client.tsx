@@ -12,6 +12,7 @@ import { useAuth } from "@/store/useAuth";
 import { useEffect, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
+
 export default function ModulClient({ modulUuid }: { modulUuid: string }) {
   const router = useRouter();
   const { modulInfoQuery } = useModulQuery(modulUuid);
@@ -70,6 +71,8 @@ export default function ModulClient({ modulUuid }: { modulUuid: string }) {
           </Link>
         </div>
       </div>
+      <Separator />
+      
       <Separator />
       <Alert>
         <Info className="w-4 h-4" />

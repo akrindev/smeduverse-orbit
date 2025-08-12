@@ -1,17 +1,20 @@
+// src/app/(authenticated)/dashboard/components/analytics.tsx
 "use client";
 
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import React, { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { api } from "@/lib/api";
-import { useEffect, useState } from "react";
 
 type Analytics = {
-  name: string;
-  value: number;
+  // Define the structure of your analytics data here
+  // Example:
+  totalUsers: number;
+  totalModules: number;
 };
 
-async function getAnalytics() {
+async function getAnalytics(): Promise<Analytics[]> {
   const response = await api.get<Analytics[]>("/analytics");
-  return response.data;
+  return response.data; // Assuming response.data directly contains the array
 }
 
 export default function AnalyticsCard() {
@@ -19,26 +22,24 @@ export default function AnalyticsCard() {
 
   useEffect(() => {
     getAnalytics().then((data) => setAnalitycs(data));
-  }, [analitycs]);
+  }, []);
 
   return (
-    <div className='gap-4 grid md:grid-cols-2 lg:grid-cols-4 mt-5'>
-      {analitycs.map((item) => (
-        <Card
-          key={item.name}
-          className='shadow-md hover:scale-105 duration-500 cursor-pointer'>
-          <CardHeader className='flex flex-row justify-between items-center space-y-0 pb-2'>
-            <CardTitle className='font-medium text-sm'>{item.name}</CardTitle>
-            {/* <DollarSign className="w-4 h-4 text-muted-foreground" /> */}
-          </CardHeader>
-          <CardContent>
-            <div className='font-bold text-2xl'>{item.value}</div>
-            {/* <p className="text-muted-foreground text-xs">
-                  jumlah keseluruhan mapel
-                </p> */}
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Dashboard Analytics</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {analitycs.length > 0 ? (
+          <div>
+            {/* Display your analytics data here */}
+            <p>Total Users: {analitycs[0]?.totalUsers}</p>
+            <p>Total Modules: {analitycs[0]?.totalModules}</p>
+          </div>
+        ) : (
+          <p>Loading analytics data...</p>
+        )}
+      </CardContent>
+    </Card>
   );
 }
