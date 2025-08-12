@@ -46,8 +46,8 @@ export default function TableAttendances({ modulUuid }: TableAttendancesProps) {
 		(state) => state.getRecapAttendances,
 	);
 
-	const columns: ColumnDef<Attendance>[] = useMemo(
-		() => [
+  const columns: ColumnDef<Attendance>[] = useMemo(
+    () => [
 			{
 				header: "No",
 				cell: (cell) => cell.row.index + 1,
@@ -60,33 +60,42 @@ export default function TableAttendances({ modulUuid }: TableAttendancesProps) {
 					<SheetDetailAttendance attendance={cell.row.original} />
 				),
 			},
-			...orbitPresence.map((presence, i) => ({
-				header: () => i + 1,
-				accessorKey: presence.uuid,
+      ...orbitPresence.map((presence, i) => ({
+        header: () => i + 1,
+        accessorKey: presence.uuid,
 
-				//   the cell is the presence status coming from orbit_presence
-				cell: (cell) => {
-					const status =
-						cell.row.original.orbit_presence[
-							i
-						]?.presence.status.toUpperCase() || "";
+        //   the cell is the presence status coming from orbit_presence
+        //   Match by stable identifiers instead of index to handle missing entries
+        cell: (cell) => {
+          const rowPresenceList = cell.row.original.orbit_presence || [];
 
-					// colors the status
-					const colors = [
-						{ status: "H", color: "text-green-500" },
-						{ status: "S", color: "text-yellow-500" },
-						{ status: "I", color: "text-blue-500" },
-						{ status: "A", color: "text-red-500" },
-						{ status: "B", color: "text-red-500" },
-					];
+          const matchedPresence = rowPresenceList.find((p: OrbitPresence) => {
+            const sameSession =
+              p.uuid === presence.uuid ||
+              p.presence?.orbit_presence_uuid ===
+                presence.presence?.orbit_presence_uuid;
+            const sameModule = p.orbit_modul_uuid === presence.orbit_modul_uuid;
+            return sameSession && sameModule;
+          });
 
-					const matchedColor = colors.find(
-						(color) => color.status === status,
-					)?.color;
+          const status = (matchedPresence?.presence?.status || "").toUpperCase();
 
-					return <div className={`${matchedColor} font-medium`}>{status}</div>;
-				},
-			})),
+          // colors the status
+          const colors = [
+            { status: "H", color: "text-green-500" },
+            { status: "S", color: "text-yellow-500" },
+            { status: "I", color: "text-blue-500" },
+            { status: "A", color: "text-red-500" },
+            { status: "B", color: "text-red-500" },
+          ];
+
+          const matchedColor =
+            colors.find((color) => color.status === status)?.color || "";
+
+          const displayStatus = status || "-";
+          return <div className={`${matchedColor} font-medium`}>{displayStatus}</div>;
+        },
+      })),
 			{
 				header: "Rekap",
 				accessorKey: "status_count",
@@ -130,21 +139,39 @@ export default function TableAttendances({ modulUuid }: TableAttendancesProps) {
 		getCoreRowModel: getCoreRowModel(),
 	});
 
-	useEffect(() => {
-		getRecapAttendances(modulUuid)
-			.then((res) => {
-				if (res.status === 200) {
-					// @ts-ignore
-					setData(res.data);
+  useEffect(() => {
+    getRecapAttendances(modulUuid)
+      .then((res) => {
+        if (res.status === 200) {
+          // @ts-ignore
+          const attendances: Attendance[] = res.data;
+          setData(attendances);
 
-					//   set countedPresence by the first student orbit_presence
-					setOrbitPresence(res.data[0].orbit_presence);
-				}
-			})
-			.catch((error) => {
-				// console.log(error);
-			});
-	}, [modulUuid, getRecapAttendances]);
+          // Build a union of all presence sessions across students to avoid relying on index
+          const presenceMap = new Map<string, OrbitPresence>();
+          attendances.forEach((attendance) => {
+            (attendance.orbit_presence || [])
+              .filter((p: OrbitPresence) => p.orbit_modul_uuid === modulUuid)
+              .forEach((p: OrbitPresence) => {
+                if (!presenceMap.has(p.uuid)) {
+                  presenceMap.set(p.uuid, p);
+                }
+              });
+          });
+
+          const unifiedPresence = Array.from(presenceMap.values()).sort((a, b) => {
+            const aDate = new Date(a.created_at || 0).getTime();
+            const bDate = new Date(b.created_at || 0).getTime();
+            return aDate - bDate;
+          });
+
+          setOrbitPresence(unifiedPresence);
+        }
+      })
+      .catch(() => {
+        // no-op
+      });
+  }, [modulUuid, getRecapAttendances]);
 
 	if (!data.length) return <BaseLoading />;
 
@@ -160,13 +187,17 @@ export default function TableAttendances({ modulUuid }: TableAttendancesProps) {
 				<ViewSwitcher onViewChange={setView} />
 			</CardHeader>
 			<CardContent>
-				{data.length > 0 ? (
-					view === "table" ? (
-						<AttendanceDetailTable data={data} columns={columns} />
-					) : (
-						<AttendanceDetailGrid data={data} columns={columns} />
-					)
-				) : (
+            {data.length > 0 ? (
+                view === "table" ? (
+                    <AttendanceDetailTable data={data} columns={columns} />
+                ) : (
+                    <AttendanceDetailGrid
+                        data={data}
+                        columns={columns}
+                        modulUuid={modulUuid}
+                    />
+                )
+            ) : (
 					<div className="flex justify-center items-center my-12 h-full">
 						<div className="flex flex-col items-center">
 							<div className="font-semibold text-2xl">Belum ada data</div>
@@ -182,8 +213,8 @@ export default function TableAttendances({ modulUuid }: TableAttendancesProps) {
 }
 
 interface AttendanceDetailTableProps {
-	data: Attendance[];
-	columns: ColumnDef<Attendance>[];
+    data: Attendance[];
+    columns: ColumnDef<Attendance>[];
 }
 
 function AttendanceDetailTable({ data, columns }: AttendanceDetailTableProps) {
@@ -240,7 +271,7 @@ function AttendanceDetailTable({ data, columns }: AttendanceDetailTableProps) {
 	);
 }
 
-function AttendanceDetailGrid({ data, columns }: AttendanceDetailTableProps) {
+function AttendanceDetailGrid({ data, columns, modulUuid }: AttendanceDetailTableProps & { modulUuid?: string }) {
 	return (
 		<div className="gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
 			{data.map((attendance: Attendance) => (
@@ -257,23 +288,24 @@ function AttendanceDetailGrid({ data, columns }: AttendanceDetailTableProps) {
 								</Badge>
 							))}
 						</div>
-						<div className="mt-2 text-muted-foreground text-sm">
-							{attendance.orbit_presence &&
-								attendance.orbit_presence.length > 0 && (
-									<p>
-										Terakhir presensi:
-										{format(
-											new Date(
-												attendance.orbit_presence?.[0].presence.created_at,
-											),
-											"dd MMMM yyyy",
-											{
-												locale: id,
-											},
-										)}
-									</p>
-								)}
-						</div>
+                        <div className="mt-2 text-muted-foreground text-sm">
+                            {attendance.orbit_presence && attendance.orbit_presence.length > 0 && (
+                                (() => {
+                                    const latest = attendance.orbit_presence
+                                        .filter((p: OrbitPresence) => !modulUuid || p.orbit_modul_uuid === modulUuid)
+                                        .sort((a: OrbitPresence, b: OrbitPresence) =>
+                                            new Date(b.presence?.created_at || 0).getTime() -
+                                            new Date(a.presence?.created_at || 0).getTime(),
+                                        )[0];
+                                    return latest ? (
+                                        <p>
+                                            Terakhir presensi:
+                                            {format(new Date(latest.presence.created_at), "dd MMMM yyyy", { locale: id })}
+                                        </p>
+                                    ) : null;
+                                })()
+                            )}
+                        </div>
 						<SheetDetailAttendance attendance={attendance} />
 					</CardContent>
 				</Card>

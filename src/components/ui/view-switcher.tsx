@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { List, Grid } from "lucide-react";
 import { useView, type ViewMode } from "@/store/useView";
@@ -8,9 +8,10 @@ import { useView, type ViewMode } from "@/store/useView";
 interface ViewSwitcherProps {
   defaultView?: ViewMode;
   withLabels?: boolean;
+  onViewChange?: Dispatch<SetStateAction<ViewMode>>;
 }
 
-export default function ViewSwitcher({ defaultView = "table", withLabels = false }: ViewSwitcherProps) {
+export default function ViewSwitcher({ defaultView = "table", withLabels = false, onViewChange }: ViewSwitcherProps) {
   const { selectedView, setSelectedView } = useView();
   const [view, setView] = useState<ViewMode>(selectedView ?? defaultView);
 
@@ -18,6 +19,7 @@ export default function ViewSwitcher({ defaultView = "table", withLabels = false
     const nextView = newView as ViewMode;
     setView(nextView);
     setSelectedView(nextView);
+    onViewChange?.(nextView);
   };
 
   return (
