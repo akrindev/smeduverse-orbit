@@ -18,6 +18,7 @@ import TableAttendances from "./components/table-attendances";
 import TablePresences from "./components/table-presence";
 import ModuleAttendanceAnalytics from "./components/module-attendance-analytics";
 
+
 interface RekapPageProps {
 	params: {
 		uuid: string;
@@ -116,10 +117,7 @@ export default function RekapPage({ params }: RekapPageProps) {
 					</div>
 				</div>
                 <Separator className="my-4" />
-                {/* analytics charts for this module */}
-                {/* <div className="mb-6">
-                  <ModuleAttendanceAnalytics modulUuid={params.uuid} />
-                </div> */}
+                
                 {/* table */}
 				<Tabs defaultValue="rekap">
 					<TabsList className="grid grid-cols-2 max-w-md">

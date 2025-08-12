@@ -4,6 +4,7 @@ import {
   IconGridPattern,
   IconListDetails,
   IconPlayerPlay,
+
   IconReportAnalytics,
   IconUserCheck,
   IconNotes,
@@ -78,6 +79,7 @@ export const menuList: MenuItem[] = [
     icon: IconReportAnalytics,
     path: "/rekap",
   },
+  
   {
     name: "separator",
     title: "separator",

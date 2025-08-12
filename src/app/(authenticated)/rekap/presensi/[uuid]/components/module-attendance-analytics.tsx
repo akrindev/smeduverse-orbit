@@ -69,14 +69,13 @@ export default function ModuleAttendanceAnalytics({ modulUuid }: { modulUuid: st
     getRecapAttendances(modulUuid)
       .then((res) => {
         if (res.status === 200) {
-          setRows(res.data as Attendance[]);
+          setRows(res.data.data as Attendance[]);
         }
       })
       .finally(() => setLoading(false));
   }, [modulUuid, getRecapAttendances]);
 
   const { sessions, totals, maxValue, totalAll } = useMemo(() => {
-    // Collect all presence sessions (per meeting) across students
     const sessionMap = new Map<string, { meta: OrbitPresence; counts: Counts }>();
     const totals: Counts = { h: 0, s: 0, i: 0, a: 0, b: 0 };
 
@@ -86,7 +85,6 @@ export default function ModuleAttendanceAnalytics({ modulUuid }: { modulUuid: st
       );
 
       for (const p of presenceList) {
-        // Ensure session entry exists
         if (!sessionMap.has(p.uuid)) {
           sessionMap.set(p.uuid, {
             meta: p,
@@ -149,7 +147,7 @@ export default function ModuleAttendanceAnalytics({ modulUuid }: { modulUuid: st
     <div className="gap-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
       <Card className="col-span-1 md:col-span-2">
         <CardHeader className="pb-2">
-          <CardTitle>Analytics Presensi Modul</CardTitle>
+          <CardTitle>Analytics Presensi</CardTitle>
           <CardDescription>Ringkasan per pertemuan</CardDescription>
         </CardHeader>
         <CardContent>
@@ -157,7 +155,7 @@ export default function ModuleAttendanceAnalytics({ modulUuid }: { modulUuid: st
             <AreaChart data={sessions} margin={{ left: 12, right: 12 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis
-                dataKey={(row: any, idx: number) => `${idx + 1}`}
+                tickFormatter={(value, index) => `${index + 1}`}
                 tickLine={false}
                 axisLine={false}
               />
@@ -181,7 +179,7 @@ export default function ModuleAttendanceAnalytics({ modulUuid }: { modulUuid: st
         </CardHeader>
         <CardContent>
           <ChartContainer config={chartConfig as any} className="w-full h-[260px]">
-            <BarChart data={[{ key: "total", ...totals }]}> 
+            <BarChart data={[{ key: "total", ...totals }]}>
               <CartesianGrid vertical={false} />
               <XAxis dataKey={() => "Total"} tickLine={false} axisLine={false} />
               <YAxis hide />
@@ -206,7 +204,7 @@ export default function ModuleAttendanceAnalytics({ modulUuid }: { modulUuid: st
           <ChartContainer config={chartConfig as any} className="w-full h-[260px]">
             <LineChart data={sessions} margin={{ left: 12, right: 12 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey={(row: any, idx: number) => `${idx + 1}`} tickLine={false} axisLine={false} />
+              <XAxis tickFormatter={(value, index) => `${index + 1}`} tickLine={false} axisLine={false} />
               <YAxis hide domain={[0, Math.max(5, maxValue)]} />
               <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
               <Line type="monotone" dataKey="h" name={STATUS_LABEL.h} stroke={STATUS_COLORS.h} strokeWidth={2} dot={false} />
@@ -285,5 +283,3 @@ export default function ModuleAttendanceAnalytics({ modulUuid }: { modulUuid: st
     </div>
   );
 }
-
-

@@ -69,7 +69,7 @@ export default function ModuleAttendanceAnalytics({ modulUuid }: { modulUuid: st
     getRecapAttendances(modulUuid)
       .then((res) => {
         if (res.status === 200) {
-          setRows(res.data as Attendance[]);
+          setRows(res.data.data as Attendance[]);
         }
       })
       .finally(() => setLoading(false));
@@ -155,7 +155,7 @@ export default function ModuleAttendanceAnalytics({ modulUuid }: { modulUuid: st
             <AreaChart data={sessions} margin={{ left: 12, right: 12 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis
-                dataKey={(row: any, idx: number) => `${idx + 1}`}
+                tickFormatter={(value, index) => `${index + 1}`}
                 tickLine={false}
                 axisLine={false}
               />
@@ -179,7 +179,7 @@ export default function ModuleAttendanceAnalytics({ modulUuid }: { modulUuid: st
         </CardHeader>
         <CardContent>
           <ChartContainer config={chartConfig as any} className="w-full h-[260px]">
-            <BarChart data={[{ key: "total", ...totals }]}> 
+            <BarChart data={[{ key: "total", ...totals }]}>
               <CartesianGrid vertical={false} />
               <XAxis dataKey={() => "Total"} tickLine={false} axisLine={false} />
               <YAxis hide />
@@ -204,7 +204,7 @@ export default function ModuleAttendanceAnalytics({ modulUuid }: { modulUuid: st
           <ChartContainer config={chartConfig as any} className="w-full h-[260px]">
             <LineChart data={sessions} margin={{ left: 12, right: 12 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey={(row: any, idx: number) => `${idx + 1}`} tickLine={false} axisLine={false} />
+              <XAxis tickFormatter={(value, index) => `${index + 1}`} tickLine={false} axisLine={false} />
               <YAxis hide domain={[0, Math.max(5, maxValue)]} />
               <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
               <Line type="monotone" dataKey="h" name={STATUS_LABEL.h} stroke={STATUS_COLORS.h} strokeWidth={2} dot={false} />
@@ -283,5 +283,3 @@ export default function ModuleAttendanceAnalytics({ modulUuid }: { modulUuid: st
     </div>
   );
 }
-
-

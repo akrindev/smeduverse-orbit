@@ -41,7 +41,7 @@ import type {
 import { DateRangeSelector } from "./components/date-range-selector";
 import SelectAttendanceStatus from "./components/select-attendance-status";
 import SelectRombel from "./components/select-rombel";
-import AttendanceAnalytics from "./components/attendance-analytics";
+
 
 export default function RekapPage() {
 	const [status, setStatus] = useState("no");
@@ -135,12 +135,6 @@ export default function RekapPage() {
 					</div>
 				</div>
                 <Separator className="my-4" />
-                {/* analytics charts */}
-                {/* {data?.data && data.data.length > 0 ? (
-                    <div className="mb-6">
-                        <AttendanceAnalytics items={data.data as any} />
-                    </div>
-                ) : null} */}
                 {/* loop data with table */}
 				{isLoading ? (
 					<BaseLoading />
