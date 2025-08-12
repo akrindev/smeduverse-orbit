@@ -10,6 +10,8 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { AxiosPromise, AxiosResponse } from "axios";
 import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/store/useAuth";
+import { useModulQuery } from "@/queries/useModulQuery";
 
 interface PresensiPageProps {
   params: {
@@ -30,6 +32,8 @@ export default function PreseniPage({ params }: PresensiPageProps) {
   }, [params.presensiUuid]);
 
   const router = useRouter();
+  const { user } = useAuth();
+  const { modulInfoQuery } = useModulQuery(params.uuid);
 
   useEffect(() => {
     updatingPresence().catch((res) => {
@@ -43,6 +47,17 @@ export default function PreseniPage({ params }: PresensiPageProps) {
       }
     });
   }, []);
+
+  // Redirect if current user is not the owner (teacher) of the module
+  useEffect(() => {
+    if (
+      modulInfoQuery?.data &&
+      user &&
+      modulInfoQuery.data.teacher.teacher_id !== user.id
+    ) {
+      router.push(`/rekap/presensi/${params.uuid}`);
+    }
+  }, [modulInfoQuery?.data, user, params.uuid, router]);
 
   return (
     <div>
