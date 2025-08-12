@@ -3,27 +3,37 @@
 import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { List, Grid } from "lucide-react";
+import { useView, type ViewMode } from "@/store/useView";
 
 interface ViewSwitcherProps {
-  onViewChange: (view: "table" | "grid") => void;
+  defaultView?: ViewMode;
+  withLabels?: boolean;
 }
 
-export default function ViewSwitcher({ onViewChange }: ViewSwitcherProps) {
-  const [view, setView] = useState("table");
+export default function ViewSwitcher({ defaultView = "table", withLabels = false }: ViewSwitcherProps) {
+  const { selectedView, setSelectedView } = useView();
+  const [view, setView] = useState<ViewMode>(selectedView ?? defaultView);
 
   const handleViewChange = (newView: string) => {
-    setView(newView);
-    onViewChange(newView as "table" | "grid");
+    const nextView = newView as ViewMode;
+    setView(nextView);
+    setSelectedView(nextView);
   };
 
   return (
     <Tabs defaultValue={view} onValueChange={handleViewChange}>
       <TabsList>
         <TabsTrigger value="table">
-          <List className="h-4 w-4" />
+          <div className="flex items-center gap-2">
+            <List className="w-4 h-4" />
+            {withLabels && <span className="text-xs md:text-sm">Tabel</span>}
+          </div>
         </TabsTrigger>
         <TabsTrigger value="grid">
-          <Grid className="h-4 w-4" />
+          <div className="flex items-center gap-2">
+            <Grid className="w-4 h-4" />
+            {withLabels && <span className="text-xs md:text-sm">Grid</span>}
+          </div>
         </TabsTrigger>
       </TabsList>
     </Tabs>
