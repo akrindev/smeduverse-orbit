@@ -139,7 +139,7 @@ export default function RekapPage() {
 					<BaseLoading />
 				) : (
                     <Card>
-                        <CardHeader className="flex flex-row justify-between items-center">
+                        <CardHeader className="flex md:flex-row flex-col justify-between items-center">
 							<div>
                                 <CardTitle>Rekap Kehadiran</CardTitle>
                                 <CardDescription>
@@ -236,7 +236,7 @@ function AttendanceTable({ data }: AttendanceTableProps) {
                                                 <div className="text-muted-foreground text-xs">{attendance.nipd}</div>
                                                 <div className="space-y-0.5 md:hidden mt-1">
                                                     <div className="text-muted-foreground text-xs">
-                                                        {item.modul?.mapel?.nama || "-"}
+                                                        {item.modul?.mapel?.kode || "-"}
                                                     </div>
                                                     <div className="text-muted-foreground text-xs">
                                                         {item.title}
@@ -245,7 +245,7 @@ function AttendanceTable({ data }: AttendanceTableProps) {
                                             </div>
                                         </TableCell>
                                         <TableCell className="hidden md:table-cell">{item.modul?.rombel?.nama || "-"}</TableCell>
-                                        <TableCell className="hidden md:table-cell">{item.modul?.mapel?.nama || "-"}</TableCell>
+                                        <TableCell className="hidden md:table-cell">{item.modul?.mapel?.kode || "-"}</TableCell>
                                         <TableCell>
                                             <Badge variant="outline" className={cn("whitespace-nowrap", statusStyle(attendance.presence?.status))}>
                                                 {statusMap[attendance.presence?.status || "no"]}
