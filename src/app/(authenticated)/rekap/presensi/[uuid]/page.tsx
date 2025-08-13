@@ -4,7 +4,8 @@ import { IconDownload } from "@tabler/icons-react";
 import type { AxiosPromise, AxiosResponse } from "axios";
 import { ArrowLeft, Loader } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+// import ModuleAttendanceAnalytics from "./components/module-attendance-analytics";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import BaseLoading from "@/components/base-loading";
 import { Button } from "@/components/ui/button";
@@ -16,16 +17,9 @@ import { useModul } from "@/store/useModul";
 import type { Modul } from "@/types/modul";
 import TableAttendances from "./components/table-attendances";
 import TablePresences from "./components/table-presence";
-import ModuleAttendanceAnalytics from "./components/module-attendance-analytics";
 
-
-interface RekapPageProps {
-	params: {
-		uuid: string;
-	};
-}
-
-export default function RekapPage({ params }: RekapPageProps) {
+export default function RekapPage() {
+	const { uuid } = useParams<{ uuid: string }>();
 	const [loading, setLoading] = useState(false);
 	const [modul, fetchModul] = useModul<
 		[
@@ -37,13 +31,13 @@ export default function RekapPage({ params }: RekapPageProps) {
 	const router = useRouter();
 
 	// Use the custom auth store instead of next-auth
-	const { user, isAuthenticated, isLoading } = useAuth();
+	const { user, isLoading } = useAuth();
 
 	useEffect(() => {
-		fetchModul(params.uuid).catch((e) => {
+		fetchModul(uuid).catch(() => {
 			router.push("/modul");
 		});
-	}, [params.uuid, fetchModul, router]);
+	}, [uuid, fetchModul, router]);
 
 	if (!user || isLoading || !modul) {
 		return <BaseLoading />;
@@ -53,8 +47,8 @@ export default function RekapPage({ params }: RekapPageProps) {
 	const handleExport = async () => {
 		setLoading(true);
 		// download data using axios api
-		const response = await api
-			.get(`/modul/presence/recap/export/${params.uuid}`, {
+		await api
+			.get(`/modul/presence/recap/export/${uuid}`, {
 				responseType: "blob",
 			})
 			.then((response) => {
@@ -96,7 +90,7 @@ export default function RekapPage({ params }: RekapPageProps) {
 							)}
 						</Button>
 						<div className="flex mb-2">
-							<Link href={`/modul/${params.uuid}`}>
+							<Link href={`/modul/${uuid}`}>
 								<Button
 									variant="outline"
 									className="flex items-center gap-2 w-fit"
@@ -116,19 +110,19 @@ export default function RekapPage({ params }: RekapPageProps) {
             )} */}
 					</div>
 				</div>
-                <Separator className="my-4" />
-                
-                {/* table */}
+				<Separator className="my-4" />
+
+				{/* table */}
 				<Tabs defaultValue="rekap">
 					<TabsList className="grid grid-cols-2 max-w-md">
 						<TabsTrigger value="rekap">Kehadiran</TabsTrigger>
 						<TabsTrigger value="presensi">Presensi</TabsTrigger>
 					</TabsList>
 					<TabsContent value="rekap">
-						<TableAttendances modulUuid={params.uuid} />
+						<TableAttendances modulUuid={uuid} />
 					</TabsContent>
 					<TabsContent value="presensi">
-						<TablePresences modulUuid={params.uuid} />
+						<TablePresences modulUuid={uuid} />
 					</TabsContent>
 				</Tabs>
 				{/* end: table */}

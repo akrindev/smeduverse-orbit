@@ -1,4 +1,4 @@
-import { Attendance } from "@/types/attendance";
+import type { Attendance } from "@/types/attendance";
 // example response data
 // {
 //     "uuid": "dcfc8987-3e95-4406-a2d7-658a1b29f19b",
@@ -11,20 +11,22 @@ import { Attendance } from "@/types/attendance";
 // },
 
 export interface Presence {
-  uuid: string;
-  orbit_modul_uuid: string;
-  title: string;
-  description: string;
-  date: Date | string | number;
-  subject_schedule_id?: string;
-  subject_schedule_end_id?: string;
-  created_at: string;
-  updated_at: string;
-  deleted_at?: string | null;
-  attendances?: Attendance[];
-  count_h: number; // count of attendances with status "h"
-  count_i: number; // count of attendances with status "i"
-  count_s: number; // count of attendances with status "s"
-  count_a: number; // count of attendances with status "a"
-  count_b: number; // count of attendances with status "b"
+	uuid: string;
+	orbit_modul_uuid: string;
+	title: string;
+	description: string;
+	date: Date | string | number;
+	start_time?: string;
+	end_time?: string;
+	subject_schedule_id?: string;
+	subject_schedule_end_id?: string;
+	created_at: string;
+	updated_at: string;
+	deleted_at?: string | null;
+	attendances?: Attendance[];
+	count_h: number; // count of attendances with status "h"
+	count_i: number; // count of attendances with status "i"
+	count_s: number; // count of attendances with status "s"
+	count_a: number; // count of attendances with status "a"
+	count_b: number; // count of attendances with status "b"
 }

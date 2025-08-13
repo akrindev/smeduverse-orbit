@@ -1,13 +1,15 @@
+import { use } from "react";
 import { LayoutClient } from "./components/layout-client";
 
 export default function Layout({
-  children,
-  params,
+	children,
+	params,
 }: {
-  children: React.ReactNode;
-  params: {
-    uuid: string;
-  };
+	children: React.ReactNode;
+	params: Promise<{
+		uuid: string;
+	}>;
 }) {
-  return <LayoutClient modulUuid={params.uuid}>{children}</LayoutClient>;
+	const { uuid } = use(params);
+	return <LayoutClient modulUuid={uuid}>{children}</LayoutClient>;
 }
