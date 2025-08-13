@@ -1,6 +1,17 @@
 "use client";
 
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
+import { Calendar, Clock } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
 import {
 	Table,
 	TableBody,
@@ -9,19 +20,9 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import { usePresence } from "@/store/usePresence";
-import { Presence } from "@/types/presence";
-import { format } from "date-fns";
-import { id } from "date-fns/locale";
 import ViewSwitcher from "@/components/ui/view-switcher";
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-	CardDescription,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { usePresence } from "@/store/usePresence";
+import type { Presence } from "@/types/presence";
 
 export default function TablePresences({ modulUuid }: { modulUuid: string }) {
 	const [presences, fetchPresences] = usePresence((state) => [
@@ -36,7 +37,7 @@ export default function TablePresences({ modulUuid }: { modulUuid: string }) {
 
 	return (
 		<Card>
-			<CardHeader className="flex flex-row items-center justify-between">
+			<CardHeader className="flex flex-row justify-between items-center">
 				<div>
 					<CardTitle>Daftar Presensi</CardTitle>
 					<CardDescription>
@@ -47,7 +48,7 @@ export default function TablePresences({ modulUuid }: { modulUuid: string }) {
 			</CardHeader>
 			<CardContent>
 				{presences.length === 0 ? (
-					<div className="text-center py-8">Tidak ada presensi</div>
+					<div className="py-8 text-center">Tidak ada presensi</div>
 				) : view === "table" ? (
 					<PresenceTable presences={presences} />
 				) : (
@@ -77,7 +78,7 @@ function PresenceTable({ presences }: { presences: Presence[] }) {
 		<Table>
 			<TableHeader>
 				<TableRow>
-					<TableHead className="text-left w-10">No</TableHead>
+					<TableHead className="w-10 text-left">No</TableHead>
 					<TableHead className="text-left">Judul & Deskripsi</TableHead>
 					<TableHead className="text-left">Tanggal</TableHead>
 				</TableRow>
@@ -89,7 +90,7 @@ function PresenceTable({ presences }: { presences: Presence[] }) {
 						<TableCell>
 							<div className="font-medium">{presence.title}</div>
 							{presence.description && (
-								<div className="text-sm text-muted-foreground">
+								<div className="text-muted-foreground text-sm">
 									{presence.description}
 								</div>
 							)}
@@ -111,11 +112,22 @@ function PresenceTable({ presences }: { presences: Presence[] }) {
 										) : null;
 									})}
 								</div>
-								<span>
-									{format(new Date(presence.date), "EEEE, PPP HH:mm", {
-										locale: id,
-									})}
-								</span>
+								<div className="flex items-center gap-3 text-muted-foreground">
+									<span className="inline-flex items-center gap-1">
+										<Calendar className="w-4 h-4" />
+										{format(new Date(presence.date), "EEEE, PPP", {
+											locale: id,
+										})}
+									</span>
+									<span className="inline-flex items-center gap-1">
+										<Clock className="w-4 h-4" />
+										{presence.start_time && presence.end_time
+											? `${presence.start_time}–${presence.end_time}`
+											: format(new Date(presence.date), "HH:mm", {
+													locale: id,
+												})}
+									</span>
+								</div>
 							</div>
 						</TableCell>
 					</TableRow>
@@ -127,7 +139,7 @@ function PresenceTable({ presences }: { presences: Presence[] }) {
 
 function PresenceGrid({ presences }: { presences: Presence[] }) {
 	return (
-		<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+		<div className="gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
 			{presences.map((presence) => (
 				<Card key={presence.uuid} className="cursor-pointer">
 					<CardHeader>
