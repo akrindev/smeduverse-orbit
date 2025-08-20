@@ -12,6 +12,7 @@ import {
 	Calendar,
 	CheckCircle2,
 	Clock,
+	Download,
 	Loader2,
 	NotebookPen,
 	RefreshCw,
@@ -20,8 +21,14 @@ import {
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
@@ -33,6 +40,7 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { toast } from "@/components/ui/use-toast";
+import { api } from "@/lib/api";
 import {
 	useAssignmentShowQuery,
 	usePatchAssignmentGradeMutation,
@@ -43,6 +51,7 @@ import type { AssignmentSheet } from "@/store/useAssignment";
 export default function AssignmentPage() {
 	const { assignmentUuid } = useParams<{ assignmentUuid: string }>();
 	const [isRefreshing, setRefreshing] = useState(false);
+	const [isExporting, setIsExporting] = useState(false);
 
 	const showQuery = useAssignmentShowQuery(assignmentUuid);
 	const patchGrade = usePatchAssignmentGradeMutation(assignmentUuid);
@@ -147,6 +156,46 @@ export default function AssignmentPage() {
 		setRefreshing(false);
 	};
 
+	const handleExport = async () => {
+		setIsExporting(true);
+		try {
+			const res = await api.get(
+				`/modul/assignment/export/single/${assignmentUuid}`,
+				{ responseType: "blob" },
+			);
+			const contentType =
+				(res.headers as any)["content-type"] || "application/octet-stream";
+			const blob = new Blob([res.data], { type: contentType });
+			let filename = `penilaian-${assignmentUuid}`;
+			const disposition = (res.headers as any)["content-disposition"] as
+				| string
+				| undefined;
+			if (disposition) {
+				const match = /filename\*=UTF-8''([^;]+)|filename="?([^";]+)"?/i.exec(
+					disposition,
+				);
+				const name = decodeURIComponent(match?.[1] || match?.[2] || "");
+				if (name) filename = name;
+			}
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement("a");
+			a.href = url;
+			a.download = filename;
+			document.body.appendChild(a);
+			a.click();
+			a.remove();
+			URL.revokeObjectURL(url);
+		} catch {
+			toast({
+				title: "Gagal",
+				description: "Tidak dapat mengunduh laporan",
+				variant: "destructive",
+			});
+		} finally {
+			setIsExporting(false);
+		}
+	};
+
 	const formatDate = (d?: string | null) => {
 		if (!d) return "-";
 		try {
@@ -186,19 +235,34 @@ export default function AssignmentPage() {
 						</div>
 					</div>
 				</div>
-				<Button
-					variant="outline"
-					onClick={handleRefresh}
-					disabled={isRefreshing || showQuery.isFetching}
-					className="flex items-center gap-2"
-				>
-					{showQuery.isFetching ? (
-						<Loader2 className="w-4 h-4 animate-spin" />
-					) : (
-						<RefreshCw className="w-4 h-4" />
-					)}
-					Refresh
-				</Button>
+				<div className="flex items-center gap-2">
+					<Button
+						variant="outline"
+						onClick={handleExport}
+						disabled={isExporting}
+						className="flex items-center gap-2"
+					>
+						{isExporting ? (
+							<Loader2 className="w-4 h-4 animate-spin" />
+						) : (
+							<Download className="w-4 h-4" />
+						)}
+						Export
+					</Button>
+					<Button
+						variant="outline"
+						onClick={handleRefresh}
+						disabled={isRefreshing || showQuery.isFetching}
+						className="flex items-center gap-2"
+					>
+						{showQuery.isFetching ? (
+							<Loader2 className="w-4 h-4 animate-spin" />
+						) : (
+							<RefreshCw className="w-4 h-4" />
+						)}
+						Refresh
+					</Button>
+				</div>
 			</div>
 			{/* add table information on count tuntas, tidak tuntas and belum dinilai */}
 			<ScrollArea>
