@@ -1,3 +1,9 @@
+"use client";
+
+import { useParams } from "next/navigation";
+import PenilaianClient from "./components/penilaian-client";
+
 export default function PenilaianPage() {
-  return <div>akan datang ✨</div>;
+	const { uuid } = useParams<{ uuid: string }>();
+	return <PenilaianClient modulUuid={uuid} />;
 }
