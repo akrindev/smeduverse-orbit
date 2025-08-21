@@ -111,3 +111,15 @@ export function usePatchAssignmentNotesMutation(assignmentUuid: string) {
 		},
 	});
 }
+
+export function useAssignmentRecapQuery(modulUuid: string) {
+	return useQuery({
+		queryKey: ["assignment-recap", modulUuid],
+		queryFn: async (): Promise<any> => {
+			const response = await api.get(`/modul/assignment/recap/${modulUuid}`);
+			return response.data;
+		},
+		refetchOnWindowFocus: false,
+		enabled: !!modulUuid,
+	});
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { FileText, Info, Loader2 } from "lucide-react";
+import { BookOpen, FileText, Info, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { notFound, useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -65,6 +65,12 @@ export default function ModulClient({ modulUuid }: { modulUuid: string }) {
 						<Button variant={`outline`}>
 							<FileText className="w-4 h-4" />
 							Rekap Presensi
+						</Button>
+					</Link>
+					<Link href={`/modul/assignment/recap/${modulUuid}`}>
+						<Button variant={`outline`}>
+							<BookOpen className="w-4 h-4" />
+							Rekap Tugas
 						</Button>
 					</Link>
 				</div>
