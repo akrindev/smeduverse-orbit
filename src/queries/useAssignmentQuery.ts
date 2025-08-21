@@ -1,6 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import type { Assignment, CreateAssignmentBody } from "@/store/useAssignment";
+import type {
+	Assignment,
+	CreateAssignmentBody,
+	UpdateAssignmentBody,
+} from "@/store/useAssignment";
 
 type AssignmentPagination = {
 	data?: Assignment[];
@@ -108,6 +112,25 @@ export function usePatchAssignmentNotesMutation(assignmentUuid: string) {
 				`/modul/assignment/patch-sheet/${assignmentUuid}/notes`,
 				payload,
 			);
+		},
+	});
+}
+
+export function useUpdateAssignmentMutation() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			assignmentUuid,
+			body,
+		}: {
+			assignmentUuid: string;
+			body: UpdateAssignmentBody;
+		}) => {
+			return api.put(`/modul/assignment/update/${assignmentUuid}`, body);
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["assignment"] });
+			queryClient.invalidateQueries({ queryKey: ["assignments"] });
 		},
 	});
 }

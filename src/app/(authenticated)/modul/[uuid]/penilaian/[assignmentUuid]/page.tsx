@@ -12,6 +12,7 @@ import {
 	Calendar,
 	Clock,
 	Download,
+	Edit,
 	Loader2,
 	NotebookPen,
 	RefreshCw,
@@ -20,7 +21,12 @@ import {
 import { useParams } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
@@ -37,17 +43,32 @@ import {
 	useAssignmentShowQuery,
 	usePatchAssignmentGradeMutation,
 	usePatchAssignmentNotesMutation,
+	useUpdateAssignmentMutation,
 } from "@/queries/useAssignmentQuery";
 import type { AssignmentSheet } from "@/store/useAssignment";
 
 export default function AssignmentPage() {
-	const { assignmentUuid } = useParams<{ assignmentUuid: string }>();
+	const { assignmentUuid, uuid: modulUuid } = useParams<{
+		assignmentUuid: string;
+		uuid: string;
+	}>();
 	const [isRefreshing, setRefreshing] = useState(false);
 	const [isExporting, setIsExporting] = useState(false);
+	const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+	// Form state for edit dialog
+	const [editForm, setEditForm] = useState({
+		title: "",
+		body: "",
+		kkm_value: "",
+		date: "",
+		due_date: "",
+	});
 
 	const showQuery = useAssignmentShowQuery(assignmentUuid);
 	const patchGrade = usePatchAssignmentGradeMutation(assignmentUuid);
 	const patchNotes = usePatchAssignmentNotesMutation(assignmentUuid);
+	const updateAssignment = useUpdateAssignmentMutation();
 
 	const sheets: AssignmentSheet[] = useMemo(() => {
 		const list = showQuery.data?.sheets;
@@ -197,6 +218,40 @@ export default function AssignmentPage() {
 		}
 	};
 
+	const handleEditDialogOpen = () => {
+		// Populate form with current data
+		setEditForm({
+			title: showQuery.data?.title || "",
+			body: showQuery.data?.body || "",
+			kkm_value: showQuery.data?.kkm_value?.toString() || "",
+			date: showQuery.data?.date ? String(showQuery.data.date) : "",
+			due_date: showQuery.data?.due_date ? String(showQuery.data.due_date) : "",
+		});
+		setIsEditDialogOpen(true);
+	};
+
+	const handleSave = async () => {
+		try {
+			await updateAssignment.mutateAsync({
+				assignmentUuid,
+				body: {
+					orbit_modul_uuid: modulUuid,
+					teacher_id: (showQuery.data as any)?.teacher?.teacher_id || "",
+					title: editForm.title,
+					body: editForm.body || null,
+					kkm_value: editForm.kkm_value ? Number(editForm.kkm_value) : null,
+					date: editForm.date || null,
+					due_date: editForm.due_date || null,
+				},
+			});
+
+			setIsEditDialogOpen(false);
+		} catch (error) {
+			// Error handling is done by the mutation
+			console.error("Failed to update assignment:", error);
+		}
+	};
+
 	return (
 		<div>
 			<div className="flex flex-row justify-between items-center mb-5">
@@ -228,6 +283,14 @@ export default function AssignmentPage() {
 					</div>
 				</div>
 				<div className="flex items-center gap-2">
+					<Button
+						variant="outline"
+						onClick={handleEditDialogOpen}
+						className="flex items-center gap-2"
+					>
+						<Edit className="w-4 h-4" />
+						Edit
+					</Button>
 					<Button
 						variant="outline"
 						onClick={handleExport}
@@ -340,6 +403,106 @@ export default function AssignmentPage() {
 					<ScrollBar orientation="horizontal" />
 				</ScrollArea>
 			</div>
+
+			<Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+				<DialogContent className="sm:max-w-[600px]">
+					<DialogHeader>
+						<DialogTitle>Edit Penilaian</DialogTitle>
+					</DialogHeader>
+					<div className="gap-4 grid py-4">
+						<div className="items-center gap-4 grid grid-cols-4">
+							<label htmlFor="title" className="text-right">
+								Judul
+							</label>
+							<Input
+								id="title"
+								value={editForm.title}
+								onChange={(e) =>
+									setEditForm((prev) => ({ ...prev, title: e.target.value }))
+								}
+								className="col-span-3"
+							/>
+						</div>
+						<div className="items-center gap-4 grid grid-cols-4">
+							<label htmlFor="body" className="text-right">
+								Deskripsi
+							</label>
+							<Input
+								id="body"
+								value={editForm.body}
+								onChange={(e) =>
+									setEditForm((prev) => ({ ...prev, body: e.target.value }))
+								}
+								className="col-span-3"
+							/>
+						</div>
+						<div className="items-center gap-4 grid grid-cols-4">
+							<label htmlFor="date" className="text-right">
+								Tanggal Mulai
+							</label>
+							<Input
+								id="date"
+								type="datetime-local"
+								value={editForm.date}
+								onChange={(e) =>
+									setEditForm((prev) => ({ ...prev, date: e.target.value }))
+								}
+								className="col-span-3"
+							/>
+						</div>
+						<div className="items-center gap-4 grid grid-cols-4">
+							<label htmlFor="due_date" className="text-right">
+								Tanggal Selesai
+							</label>
+							<Input
+								id="due_date"
+								type="datetime-local"
+								value={editForm.due_date}
+								onChange={(e) =>
+									setEditForm((prev) => ({ ...prev, due_date: e.target.value }))
+								}
+								className="col-span-3"
+							/>
+						</div>
+						<div className="items-center gap-4 grid grid-cols-4">
+							<label htmlFor="kkm" className="text-right">
+								KKM
+							</label>
+							<Input
+								id="kkm"
+								type="number"
+								value={editForm.kkm_value}
+								onChange={(e) =>
+									setEditForm((prev) => ({
+										...prev,
+										kkm_value: e.target.value,
+									}))
+								}
+								className="col-span-3"
+							/>
+						</div>
+					</div>
+					<div className="flex justify-end gap-2">
+						<Button
+							variant="outline"
+							onClick={() => setIsEditDialogOpen(false)}
+							disabled={updateAssignment.isPending}
+						>
+							Batal
+						</Button>
+						<Button onClick={handleSave} disabled={updateAssignment.isPending}>
+							{updateAssignment.isPending ? (
+								<>
+									<Loader2 className="mr-2 w-4 h-4 animate-spin" />
+									Menyimpan...
+								</>
+							) : (
+								"Simpan"
+							)}
+						</Button>
+					</div>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 }
