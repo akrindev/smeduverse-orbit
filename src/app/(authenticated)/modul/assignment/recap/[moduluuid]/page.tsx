@@ -10,8 +10,9 @@ import {
 	type SortingState,
 	useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, Search } from "lucide-react";
-import { useParams } from "next/navigation";
+import { ArrowLeft, ArrowUpDown, Search } from "lucide-react";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import BaseLoading from "@/components/base-loading";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -35,7 +36,9 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import ViewSwitcher from "@/components/ui/view-switcher";
 import { useAssignmentRecapQuery } from "@/queries/useAssignmentQuery";
+import { useView } from "@/store/useView";
 
 interface StudentAssignmentData {
 	student_id: string;
@@ -78,6 +81,7 @@ interface StudentAssignmentData {
 
 export default function AssignmentRecapPage() {
 	const { moduluuid } = useParams<{ moduluuid: string }>();
+	const router = useRouter();
 
 	const {
 		data: recapData,
@@ -132,24 +136,40 @@ export default function AssignmentRecapPage() {
 		<div className="flex flex-col space-y-5 h-full">
 			<div className="flex flex-col h-full">
 				<div className="flex md:flex-row flex-col justify-between">
-					<div className="space-y-1 mt-5">
-						<h2 className="font-semibold text-2xl tracking-tight">
-							Rekap Tugas Siswa
-						</h2>
-						<p className="text-muted-foreground text-sm">
-							Rekapitulasi pengumpulan dan penilaian tugas siswa
-						</p>
+					<div className="flex items-center gap-4 mt-5">
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => router.back()}
+							className="flex items-center gap-2"
+						>
+							<ArrowLeft className="w-4 h-4" />
+							Kembali
+						</Button>
+						<div className="space-y-1">
+							<h2 className="font-semibold text-2xl tracking-tight">
+								Rekap Tugas Siswa
+							</h2>
+							<p className="text-muted-foreground text-sm">
+								Rekapitulasi pengumpulan dan penilaian tugas siswa
+							</p>
+						</div>
 					</div>
 				</div>
 				<Separator className="my-4" />
 				<Card>
-					<CardHeader>
-						<CardTitle>Rekap Tugas Modul</CardTitle>
-						<CardDescription>
-							{studentData && studentData.length > 0
-								? `Daftar rekap tugas (${studentData.length} siswa)`
-								: "Tidak ada data tugas"}
-						</CardDescription>
+					<CardHeader className="flex md:flex-row flex-col justify-between items-center">
+						<div>
+							<CardTitle>Rekap Tugas Modul</CardTitle>
+							<CardDescription>
+								{studentData && studentData.length > 0
+									? `Daftar rekap tugas (${studentData.length} siswa)`
+									: "Tidak ada data tugas"}
+							</CardDescription>
+						</div>
+						<div className="flex items-center gap-2">
+							<ViewSwitcher withLabels />
+						</div>
 					</CardHeader>
 					<CardContent>
 						{studentData && studentData.length > 0 ? (
@@ -179,6 +199,7 @@ function StudentAssignmentRecapTable({
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 	const [globalFilter, setGlobalFilter] = useState("");
+	const { selectedView } = useView();
 
 	const getGradeColor = useCallback((grade: number | null) => {
 		if (!grade) return "text-muted-foreground";
@@ -398,51 +419,196 @@ function StudentAssignmentRecapTable({
 					/>
 				</div>
 			</div>
-			<div className="border rounded-md">
-				<Table>
-					<TableHeader>
-						{table.getHeaderGroups().map((headerGroup) => (
-							<TableRow key={headerGroup.id}>
-								{headerGroup.headers.map((header) => (
-									<TableHead key={header.id}>
-										{header.isPlaceholder
-											? null
-											: flexRender(
-													header.column.columnDef.header,
-													header.getContext(),
-												)}
-									</TableHead>
+			{selectedView === "table" ? (
+				<AssignmentRecapTableView
+					table={table}
+					columns={columns}
+					filteredData={table
+						.getFilteredRowModel()
+						.rows.map((row) => row.original)}
+					getGradeColor={getGradeColor}
+					getGradingStatusColor={getGradingStatusColor}
+				/>
+			) : (
+				<AssignmentRecapGridView
+					data={table.getFilteredRowModel().rows.map((row) => row.original)}
+					getGradeColor={getGradeColor}
+					getGradingStatusColor={getGradingStatusColor}
+				/>
+			)}
+		</div>
+	);
+}
+
+interface AssignmentRecapTableViewProps {
+	table: any;
+	columns: ColumnDef<StudentAssignmentData>[];
+	filteredData: StudentAssignmentData[];
+	getGradeColor: (grade: number | null) => string;
+	getGradingStatusColor: (graded: number, submitted: number) => string;
+}
+
+function AssignmentRecapTableView({
+	table,
+	columns,
+	filteredData,
+	getGradeColor,
+	getGradingStatusColor,
+}: AssignmentRecapTableViewProps) {
+	return (
+		<div className="border rounded-md">
+			<Table>
+				<TableHeader>
+					{table.getHeaderGroups().map((headerGroup) => (
+						<TableRow key={headerGroup.id}>
+							{headerGroup.headers.map((header) => (
+								<TableHead key={header.id} className="whitespace-nowrap">
+									{header.isPlaceholder
+										? null
+										: flexRender(
+												header.column.columnDef.header,
+												header.getContext(),
+											)}
+								</TableHead>
+							))}
+						</TableRow>
+					))}
+				</TableHeader>
+				<TableBody>
+					{table.getRowModel().rows?.length ? (
+						table.getRowModel().rows.map((row) => (
+							<TableRow key={row.id}>
+								{row.getVisibleCells().map((cell) => (
+									<TableCell key={cell.id}>
+										{flexRender(cell.column.columnDef.cell, cell.getContext())}
+									</TableCell>
 								))}
 							</TableRow>
-						))}
-					</TableHeader>
-					<TableBody>
-						{table.getRowModel().rows?.length ? (
-							table.getRowModel().rows.map((row) => (
-								<TableRow key={row.id}>
-									{row.getVisibleCells().map((cell) => (
-										<TableCell key={cell.id}>
-											{flexRender(
-												cell.column.columnDef.cell,
-												cell.getContext(),
-											)}
-										</TableCell>
-									))}
-								</TableRow>
-							))
-						) : (
-							<TableRow>
-								<TableCell
-									colSpan={columns.length}
-									className="h-24 text-center"
+						))
+					) : (
+						<TableRow>
+							<TableCell colSpan={columns.length} className="h-24 text-center">
+								Tidak ada data siswa.
+							</TableCell>
+						</TableRow>
+					)}
+				</TableBody>
+			</Table>
+		</div>
+	);
+}
+
+interface AssignmentRecapGridViewProps {
+	data: StudentAssignmentData[];
+	getGradeColor: (grade: number | null) => string;
+	getGradingStatusColor: (graded: number, submitted: number) => string;
+}
+
+function AssignmentRecapGridView({
+	data,
+	getGradeColor,
+	getGradingStatusColor,
+}: AssignmentRecapGridViewProps) {
+	return (
+		<div className="gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+			{data.map((student) => {
+				const stats = student.assignment_stats;
+				const gradingRate =
+					stats.submitted_count > 0
+						? (stats.graded_count / stats.submitted_count) * 100
+						: 0;
+
+				return (
+					<Card key={student.student_id}>
+						<CardHeader className="pb-3">
+							<div className="flex justify-between items-start gap-3">
+								<div>
+									<CardTitle className="text-base md:text-lg">
+										{student.fullname}
+									</CardTitle>
+									<CardDescription>{student.nipd}</CardDescription>
+								</div>
+								{stats.average_grade !== null && (
+									<div
+										className={`text-2xl font-bold ${getGradeColor(stats.average_grade)}`}
+									>
+										{stats.average_grade.toFixed(1)}
+									</div>
+								)}
+							</div>
+						</CardHeader>
+						<CardContent className="space-y-3">
+							<div className="flex justify-between items-center">
+								<Badge
+									variant="outline"
+									className={getGradingStatusColor(
+										stats.graded_count,
+										stats.submitted_count,
+									)}
 								>
-									Tidak ada data siswa.
-								</TableCell>
-							</TableRow>
-						)}
-					</TableBody>
-				</Table>
-			</div>
+									{gradingRate.toFixed(0)}% dinilai ({stats.graded_count}/
+									{stats.submitted_count})
+								</Badge>
+								<Progress value={gradingRate} className="w-16 h-2" />
+							</div>
+
+							<div className="space-y-2 pt-2 border-t">
+								<div className="text-sm">
+									<span className="font-medium">Total tugas:</span>{" "}
+									{stats.total_assignments}
+								</div>
+								<div className="text-sm">
+									<span className="font-medium">Dikumpulkan:</span>{" "}
+									{stats.submitted_count}
+								</div>
+								<div className="text-sm">
+									<span className="font-medium">Dinilai:</span>{" "}
+									{stats.graded_count}
+								</div>
+							</div>
+
+							{student.orbit_assignment_sheets.length > 0 && (
+								<div className="space-y-2 pt-2 border-t">
+									<div className="font-medium text-sm">Tugas terbaru:</div>
+									{student.orbit_assignment_sheets
+										.slice(0, 2)
+										.map((assignment) => (
+											<div key={assignment.uuid} className="space-y-1 text-xs">
+												<div className="flex justify-between items-center">
+													<span className="flex-1 truncate">
+														{assignment.assignment.title}
+													</span>
+													{assignment.grade !== null ? (
+														<span
+															className={`font-medium ml-2 ${getGradeColor(assignment.grade)}`}
+														>
+															{assignment.grade}
+														</span>
+													) : (
+														<span className="ml-2 text-muted-foreground">
+															-
+														</span>
+													)}
+												</div>
+												{assignment.notes && (
+													<div className="text-muted-foreground truncate">
+														{assignment.notes}
+													</div>
+												)}
+											</div>
+										))}
+									{student.orbit_assignment_sheets.length > 2 && (
+										<div className="text-muted-foreground text-xs">
+											+{student.orbit_assignment_sheets.length - 2} tugas
+											lainnya
+										</div>
+									)}
+								</div>
+							)}
+						</CardContent>
+					</Card>
+				);
+			})}
 		</div>
 	);
 }
