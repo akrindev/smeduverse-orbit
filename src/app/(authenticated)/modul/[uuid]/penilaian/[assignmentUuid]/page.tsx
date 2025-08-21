@@ -10,25 +10,17 @@ import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import {
 	Calendar,
-	CheckCircle2,
 	Clock,
 	Download,
 	Loader2,
 	NotebookPen,
 	RefreshCw,
 	Target,
-	XCircle,
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
+
 import { Input } from "@/components/ui/input";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {

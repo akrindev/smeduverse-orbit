@@ -151,49 +151,81 @@ export default function PenilaianClient({ modulUuid }: { modulUuid: string }) {
 						<DialogTitle>Buat Penilaian</DialogTitle>
 					</DialogHeader>
 					<div className="space-y-3">
-						<Input
-							placeholder="Judul penilaian"
-							value={form.title}
-							onChange={(e) =>
-								setForm((p) => ({ ...p, title: e.target.value }))
-							}
-						/>
-						<Textarea
-							placeholder="Keterangan / body (opsional)"
-							value={form.body}
-							onChange={(e) => setForm((p) => ({ ...p, body: e.target.value }))}
-						/>
+						<div className="space-y-2">
+							<label htmlFor="title" className="font-medium text-sm">
+								Judul Penilaian *
+							</label>
+							<Input
+								id="title"
+								placeholder="Masukkan judul penilaian"
+								value={form.title}
+								onChange={(e) =>
+									setForm((p) => ({ ...p, title: e.target.value }))
+								}
+							/>
+						</div>
+						<div className="space-y-2">
+							<label htmlFor="body" className="font-medium text-sm">
+								Keterangan (Opsional)
+							</label>
+							<Textarea
+								id="body"
+								placeholder="Masukkan keterangan atau deskripsi penilaian"
+								value={form.body}
+								onChange={(e) =>
+									setForm((p) => ({ ...p, body: e.target.value }))
+								}
+							/>
+						</div>
 						<div className="gap-3 grid grid-cols-1 md:grid-cols-3">
-							<Input
-								type="number"
-								placeholder="KKM (opsional)"
-								value={form.kkm_value ?? ""}
-								onChange={(e) =>
-									setForm((p) => ({
-										...p,
-										kkm_value:
-											e.target.value === ""
-												? undefined
-												: Number(e.target.value),
-									}))
-								}
-							/>
-							<Input
-								type="date"
-								placeholder="Tanggal (opsional)"
-								value={form.date}
-								onChange={(e) =>
-									setForm((p) => ({ ...p, date: e.target.value }))
-								}
-							/>
-							<Input
-								type="date"
-								placeholder="Batas waktu (opsional)"
-								value={form.due_date}
-								onChange={(e) =>
-									setForm((p) => ({ ...p, due_date: e.target.value }))
-								}
-							/>
+							<div className="space-y-2">
+								<label htmlFor="kkm" className="font-medium text-sm">
+									KKM (Opsional)
+								</label>
+								<Input
+									id="kkm"
+									type="number"
+									placeholder="Masukkan nilai KKM"
+									value={form.kkm_value ?? ""}
+									onChange={(e) =>
+										setForm((p) => ({
+											...p,
+											kkm_value:
+												e.target.value === ""
+													? undefined
+													: Number(e.target.value),
+										}))
+									}
+								/>
+							</div>
+							<div className="space-y-2">
+								<label htmlFor="date" className="font-medium text-sm">
+									Tanggal (Opsional)
+								</label>
+								<Input
+									id="date"
+									type="date"
+									placeholder="Pilih tanggal"
+									value={form.date}
+									onChange={(e) =>
+										setForm((p) => ({ ...p, date: e.target.value }))
+									}
+								/>
+							</div>
+							<div className="space-y-2">
+								<label htmlFor="due_date" className="font-medium text-sm">
+									Batas Waktu (Opsional)
+								</label>
+								<Input
+									id="due_date"
+									type="date"
+									placeholder="Pilih batas waktu"
+									value={form.due_date}
+									onChange={(e) =>
+										setForm((p) => ({ ...p, due_date: e.target.value }))
+									}
+								/>
+							</div>
 						</div>
 					</div>
 					<DialogFooter>
@@ -249,6 +281,33 @@ function AssignmentReactTable({ data }: AssignmentReactTableProps) {
 					</div>
 				),
 			},
+			{
+				header: "Tanggal",
+				accessorKey: "date",
+				cell: (ctx) => {
+					const dateValue = ctx.getValue() as string;
+					if (!dateValue)
+						return <div className="max-w-[120px] truncate">-</div>;
+
+					const date = new Date(dateValue);
+					const formattedDate = date.toLocaleDateString("id-ID", {
+						day: "2-digit",
+						month: "2-digit",
+						year: "numeric",
+					});
+
+					return <div className="max-w-[120px] truncate">{formattedDate}</div>;
+				},
+			},
+			{
+				header: "KKM",
+				accessorKey: "kkm_value",
+				cell: (ctx) => (
+					<div className="max-w-[60px] truncate">
+						{ctx.getValue() as string}
+					</div>
+				),
+			},
 		],
 		[],
 	);
@@ -287,6 +346,7 @@ function AssignmentReactTable({ data }: AssignmentReactTableProps) {
 									`/modul/${modulUuid}/penilaian/${row.original.uuid}`,
 								)
 							}
+							className="cursor-pointer"
 						>
 							{row.getVisibleCells().map((cell) => (
 								<TableCell key={cell.id} className="p-2">
