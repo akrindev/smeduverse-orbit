@@ -6,9 +6,11 @@ import {
 	getCoreRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
-import { Loader2, PlusCircle, RefreshCw, Save, Trash2 } from "lucide-react";
+import { BookOpen, Loader2, PlusCircle, RefreshCw, Save } from "lucide-react";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { DatePicker } from "@/app/(authenticated)/components/date-picker";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -118,6 +120,12 @@ export default function PenilaianClient({ modulUuid }: { modulUuid: string }) {
 					<CardDescription>Tugas/penilaian pada modul ini</CardDescription>
 				</div>
 				<div className="flex items-center gap-2">
+					<Link href={`/modul/assignment/recap/${modulUuid}`}>
+						<Button variant={`outline`}>
+							<BookOpen className="w-4 h-4" />
+							Rekap Tugas
+						</Button>
+					</Link>
 					<Button
 						variant="outline"
 						onClick={() => listQuery.refetch()}
@@ -202,28 +210,24 @@ export default function PenilaianClient({ modulUuid }: { modulUuid: string }) {
 								<label htmlFor="date" className="font-medium text-sm">
 									Tanggal (Opsional)
 								</label>
-								<Input
-									id="date"
-									type="date"
-									placeholder="Pilih tanggal"
-									value={form.date}
-									onChange={(e) =>
-										setForm((p) => ({ ...p, date: e.target.value }))
-									}
+								<DatePicker
+									selectedDate={form.date || undefined}
+									onSelect={(date) => {
+										const formattedDate = date.toISOString().split("T")[0];
+										setForm((p) => ({ ...p, date: formattedDate }));
+									}}
 								/>
 							</div>
 							<div className="space-y-2">
 								<label htmlFor="due_date" className="font-medium text-sm">
 									Batas Waktu (Opsional)
 								</label>
-								<Input
-									id="due_date"
-									type="date"
-									placeholder="Pilih batas waktu"
-									value={form.due_date}
-									onChange={(e) =>
-										setForm((p) => ({ ...p, due_date: e.target.value }))
-									}
+								<DatePicker
+									selectedDate={form.due_date || undefined}
+									onSelect={(date) => {
+										const formattedDate = date.toISOString().split("T")[0];
+										setForm((p) => ({ ...p, due_date: formattedDate }));
+									}}
 								/>
 							</div>
 						</div>

@@ -67,12 +67,6 @@ export default function ModulClient({ modulUuid }: { modulUuid: string }) {
 							Rekap Presensi
 						</Button>
 					</Link>
-					<Link href={`/modul/assignment/recap/${modulUuid}`}>
-						<Button variant={`outline`}>
-							<BookOpen className="w-4 h-4" />
-							Rekap Tugas
-						</Button>
-					</Link>
 				</div>
 			</div>
 			<Separator />

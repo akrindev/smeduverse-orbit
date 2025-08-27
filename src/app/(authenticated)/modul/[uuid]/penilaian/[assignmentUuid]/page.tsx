@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
+import { DatePicker } from "@/app/(authenticated)/components/date-picker";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -440,29 +441,32 @@ export default function AssignmentPage() {
 							<label htmlFor="date" className="text-right">
 								Tanggal Mulai
 							</label>
-							<Input
-								id="date"
-								type="datetime-local"
-								value={editForm.date}
-								onChange={(e) =>
-									setEditForm((prev) => ({ ...prev, date: e.target.value }))
-								}
-								className="col-span-3"
-							/>
+							<div className="col-span-3">
+								<DatePicker
+									selectedDate={editForm.date || undefined}
+									onSelect={(date) => {
+										const formattedDate = date.toISOString().split("T")[0];
+										setEditForm((prev) => ({ ...prev, date: formattedDate }));
+									}}
+								/>
+							</div>
 						</div>
 						<div className="items-center gap-4 grid grid-cols-4">
 							<label htmlFor="due_date" className="text-right">
 								Tanggal Selesai
 							</label>
-							<Input
-								id="due_date"
-								type="datetime-local"
-								value={editForm.due_date}
-								onChange={(e) =>
-									setEditForm((prev) => ({ ...prev, due_date: e.target.value }))
-								}
-								className="col-span-3"
-							/>
+							<div className="col-span-3">
+								<DatePicker
+									selectedDate={editForm.due_date || undefined}
+									onSelect={(date) => {
+										const formattedDate = date.toISOString().split("T")[0];
+										setEditForm((prev) => ({
+											...prev,
+											due_date: formattedDate,
+										}));
+									}}
+								/>
+							</div>
 						</div>
 						<div className="items-center gap-4 grid grid-cols-4">
 							<label htmlFor="kkm" className="text-right">
@@ -576,7 +580,7 @@ function GradeAction({
 					} finally {
 						setLoading(false);
 					}
-				}, 1000);
+				}, 2000);
 			}}
 		/>
 	);
@@ -631,7 +635,7 @@ function NotesAction({
 					} finally {
 						setLoading(false);
 					}
-				}, 1000);
+				}, 2000);
 			}}
 		/>
 	);
