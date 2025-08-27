@@ -8,13 +8,13 @@ Smeduverse Orbit adalah sebuah aplikasi yang didesain untuk memudahkan pengelola
 
 - **Rekam Presensi Siswa**: Aplikasi ini memungkinkan pengajar untuk merekam kehadiran siswa, mengurangi kesalahan manual dan meningkatkan efisiensi dalam proses presensi.
 
-- **Penilaian yang Terintegrasi**: Dengan fitur penilaian yang lengkap dan fleksibel, pengguna dapat dengan mudah menilai prestasi belajar siswa berdasarkan kriteria yang telah ditentukan sebelumnya, seperti tes, tugas, partisipasi, dan lain sebagainya.
+- **Penilaian yang Terintegrasi**: Dengan fitur penilaian yang lengkap dan fleksibel, pengguna dapat dengan mudah menilai prestasi belajar siswa berdasarkan kriteria yang telah ditentukan sebelumnya, seperti tes, tugas, partisipasi, dan lain sebagainya. Fitur ini memungkinkan guru untuk:
+  - Membuat, mengubah, dan menghapus penilaian atau tugas.
+  - Menentukan judul, deskripsi, KKM (Kriteria Ketuntasan Minimal), tanggal, dan batas waktu untuk setiap penilaian.
 
-- **Analisis dan Pelaporan**: Aplikasi ini dapat menghasilkan laporan yang terperinci dan komprehensif tentang kehadiran siswa, hasil penilaian, dan perkembangan belajar. Pengguna dapat memanfaatkan informasi ini untuk menganalisis kinerja siswa dan memberikan umpan balik yang lebih efektif.
+- **Analisis dan Pelaporan**: Aplikasi ini dapat menghasilkan laporan yang terperinci dan komprehensif tentang kehadiran siswa, hasil penilaian, dan perkembangan belajar. Pengguna dapat memanfaatkan informasi ini untuk menganalisis kinerja siswa dan memberikan umpan balik yang lebih efektif. Laporan penilaian dapat diekspor dalam format spreadsheet.
 
 - **Kemudahan Akses dan Penggunaan**: Smeduverse Orbit menyediakan antarmuka yang intuitif dan mudah digunakan, memastikan bahwa pengguna dapat dengan cepat mengakses dan mengelola data presensi dan penilaian dengan nyaman.
-
-  > *Fitur penilaian* akan tersedia dalam versi selanjutnya
 
 ### Cara Menggunakan
 
