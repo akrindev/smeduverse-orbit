@@ -216,7 +216,7 @@ export default function PenilaianClient({ modulUuid }: { modulUuid: string }) {
 				)}
 			</CardContent>
 			<Dialog open={open} onOpenChange={setOpen}>
-				<DialogContent>
+				<DialogContent className="max-w-2xl">
 					<DialogHeader>
 						<DialogTitle>Buat Penilaian</DialogTitle>
 					</DialogHeader>
