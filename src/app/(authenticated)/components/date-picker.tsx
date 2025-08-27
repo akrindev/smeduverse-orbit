@@ -21,19 +21,28 @@ export function DatePicker({
 	selectedDate?: Date | string | number;
 	onSelect: (date: Date) => void;
 }) {
-	const [date, setDate] = React.useState<Date>(new Date());
-
-	React.useEffect(() => {
-		if (date) {
-			onSelect(date);
-		}
-	}, [date, onSelect]);
-
-	React.useEffect(() => {
+	const [date, setDate] = React.useState<Date>(() => {
 		if (selectedDate) {
-			setDate(new Date(selectedDate) as Date);
+			return new Date(selectedDate);
 		}
+		return new Date();
+	});
+	const isUpdatingRef = React.useRef(false);
+
+	React.useEffect(() => {
+		if (selectedDate && !isUpdatingRef.current) {
+			setDate(new Date(selectedDate));
+		}
+		isUpdatingRef.current = false;
 	}, [selectedDate]);
+
+	const handleDateSelect = (day: Date | undefined) => {
+		if (day) {
+			isUpdatingRef.current = true;
+			setDate(day);
+			onSelect(day);
+		}
+	};
 
 	return (
 		<Popover>
@@ -53,7 +62,7 @@ export function DatePicker({
 				<Calendar
 					mode="single"
 					selected={date}
-					onSelect={(day: Date | undefined) => day && setDate(day)}
+					onSelect={handleDateSelect}
 					initialFocus
 					disabled={(date) => date > new Date()}
 				/>
