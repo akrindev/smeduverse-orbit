@@ -6,7 +6,14 @@ import {
 	getCoreRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
-import { BookOpen, Loader2, PlusCircle, RefreshCw, Save } from "lucide-react";
+import {
+	BookOpen,
+	Download,
+	Loader2,
+	PlusCircle,
+	RefreshCw,
+	Save,
+} from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -36,6 +43,8 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/components/ui/use-toast";
+import { api } from "@/lib/api";
 import {
 	useAssignmentsQuery,
 	useCreateAssignmentMutation,
@@ -47,6 +56,7 @@ import { useAuth } from "@/store/useAuth";
 export default function PenilaianClient({ modulUuid }: { modulUuid: string }) {
 	const [loading, setLoading] = useState(false);
 	const [open, setOpen] = useState(false);
+	const [isExporting, setIsExporting] = useState(false);
 	const { user } = useAuth();
 	const teacherId = user?.teacher?.teacher_id || "";
 	const [form, setForm] = useState({
@@ -112,6 +122,45 @@ export default function PenilaianClient({ modulUuid }: { modulUuid: string }) {
 		}
 	};
 
+	const handleExport = async () => {
+		setIsExporting(true);
+		try {
+			const res = await api.get(`/modul/assignment/export/${modulUuid}`, {
+				responseType: "blob",
+			});
+			const contentType =
+				(res.headers["content-type"] as string) || "application/octet-stream";
+			const blob = new Blob([res.data], { type: contentType });
+			let filename = `penilaian-${modulUuid}`;
+			const disposition = res.headers["content-disposition"] as
+				| string
+				| undefined;
+			if (disposition) {
+				const match = /filename\*=UTF-8''([^;]+)|filename="?([^";]+)"?/i.exec(
+					disposition,
+				);
+				const name = decodeURIComponent(match?.[1] || match?.[2] || "");
+				if (name) filename = name;
+			}
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement("a");
+			a.href = url;
+			a.download = filename;
+			document.body.appendChild(a);
+			a.click();
+			a.remove();
+			URL.revokeObjectURL(url);
+		} catch {
+			toast({
+				title: "Gagal",
+				description: "Tidak dapat mengunduh laporan",
+				variant: "destructive",
+			});
+		} finally {
+			setIsExporting(false);
+		}
+	};
+
 	return (
 		<Card>
 			<CardHeader className="flex flex-row justify-between items-center">
@@ -126,6 +175,19 @@ export default function PenilaianClient({ modulUuid }: { modulUuid: string }) {
 							Rekap Tugas
 						</Button>
 					</Link>
+					<Button
+						onClick={handleExport}
+						disabled={isExporting}
+						variant={`outline`}
+						className="flex items-center gap-2"
+					>
+						{isExporting ? (
+							<Loader2 className="w-4 h-4 animate-spin" />
+						) : (
+							<Download className="w-4 h-4" />
+						)}
+						Export
+					</Button>
 					<Button
 						variant="outline"
 						onClick={() => listQuery.refetch()}
