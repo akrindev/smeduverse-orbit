@@ -15,6 +15,24 @@ export interface RombelWithPresence {
   presence: ActivePresence | null;
 }
 
+export type PresenceStatus = "h" | "s" | "i" | "a" | "b";
+
+export interface AttendanceRecord {
+  student_id: string;
+  fullname: string;
+  nisn: string;
+  nipd: string;
+  photo: string | null;
+  presence: {
+    orbit_presence_uuid: string;
+    student_id: string;
+    status: PresenceStatus;
+    notes: string | null;
+    created_at: string;
+    updated_at: string;
+  };
+}
+
 export interface ActivePresence {
   uuid: string;
   orbit_modul_uuid: string;
@@ -24,6 +42,7 @@ export interface ActivePresence {
   start_time: string;
   end_time: string;
   subject_schedule_id: number;
+  subject_schedule_end_id?: number;
   created_at: string;
   updated_at: string;
   count_h: number;
@@ -31,6 +50,7 @@ export interface ActivePresence {
   count_i: number;
   count_a: number;
   count_b: number;
+  attendances?: AttendanceRecord[];
   modul: {
     uuid: string;
     rombongan_belajar_id: string;
