@@ -242,7 +242,7 @@ function RombelCard({ rombel }: { rombel: RombelWithPresence }) {
                     {statusLabel[(selectedStatus || "h") as "h"]} - {rombel.nama}
                   </DialogTitle>
                   <DialogDescription>
-                    Daftar siswa dengan status "{selectedStatus ? statusLabel[selectedStatus] : ""}" pada sesi ini.
+                    Daftar siswa dengan status &quot;{selectedStatus ? statusLabel[selectedStatus] : ''}&quot; pada sesi ini.
                   </DialogDescription>
                 </DialogHeader>
 
