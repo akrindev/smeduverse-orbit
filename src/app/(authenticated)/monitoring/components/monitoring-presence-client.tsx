@@ -1,6 +1,6 @@
 "use client";
 
-import { RombelWithPresence } from "@/types/monitor";
+import { RombelWithPresence, AttendanceRecord, PresenceStatus, ActivePresence } from "@/types/monitor";
 import { useMonitorPresenceQuery } from "@/queries/useMonitorPresenceQuery";
 import {
   Card,
@@ -11,6 +11,14 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, CalendarClock, User, BookOpen } from "lucide-react";
+import { useMemo, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function MonitoringPresenceClient() {
   // Gunakan query hook untuk mengambil presensi aktif dengan refresh 10 detik
@@ -81,6 +89,42 @@ export default function MonitoringPresenceClient() {
 // Komponen untuk menampilkan kartu rombel tunggal
 function RombelCard({ rombel }: { rombel: RombelWithPresence }) {
   const hasActivePresence = !!rombel.presence;
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState<PresenceStatus | null>(null);
+
+  const hasAttendances = (p: ActivePresence): p is ActivePresence & { attendances: AttendanceRecord[] } => {
+    return Array.isArray((p as unknown as { attendances?: unknown }).attendances);
+  };
+
+  const statusLabel: Record<"h" | "s" | "i" | "a" | "b", string> = {
+    h: "Hadir",
+    s: "Sakit",
+    i: "Izin",
+    a: "Alpha",
+    b: "Bolos",
+  };
+
+  const filteredStudents = useMemo(() => {
+    if (!rombel.presence || !selectedStatus) return [] as Array<{
+      student_id: string;
+      fullname: string;
+      nisn: string | null;
+      nipd: string | null;
+      photo: string | null;
+    }>;
+    const attendances: AttendanceRecord[] = hasAttendances(rombel.presence)
+      ? rombel.presence.attendances
+      : [];
+    return attendances
+      .filter((a) => a.presence.status === selectedStatus)
+      .map((a) => ({
+        student_id: a.student_id,
+        fullname: a.fullname,
+        nisn: a.nisn ?? null,
+        nipd: a.nipd ?? null,
+        photo: a.photo ?? null,
+      }));
+  }, [rombel.presence, selectedStatus]);
 
   return (
     <Card className={hasActivePresence ? "border-green-500 border-2" : ""}>
@@ -125,7 +169,11 @@ function RombelCard({ rombel }: { rombel: RombelWithPresence }) {
               <div className="gap-1 grid grid-cols-5">
                 <Badge
                   variant="outline"
-                  className="flex flex-col items-center p-1"
+                  className="flex flex-col items-center p-1 cursor-pointer"
+                  onClick={() => {
+                    setSelectedStatus("h");
+                    setIsDialogOpen(true);
+                  }}
                 >
                   <span className="font-bold text-green-600">
                     {rombel.presence?.count_h || 0}
@@ -134,7 +182,11 @@ function RombelCard({ rombel }: { rombel: RombelWithPresence }) {
                 </Badge>
                 <Badge
                   variant="outline"
-                  className="flex flex-col items-center p-1"
+                  className="flex flex-col items-center p-1 cursor-pointer"
+                  onClick={() => {
+                    setSelectedStatus("s");
+                    setIsDialogOpen(true);
+                  }}
                 >
                   <span className="font-bold text-yellow-600">
                     {rombel.presence?.count_s || 0}
@@ -143,7 +195,11 @@ function RombelCard({ rombel }: { rombel: RombelWithPresence }) {
                 </Badge>
                 <Badge
                   variant="outline"
-                  className="flex flex-col items-center p-1"
+                  className="flex flex-col items-center p-1 cursor-pointer"
+                  onClick={() => {
+                    setSelectedStatus("i");
+                    setIsDialogOpen(true);
+                  }}
                 >
                   <span className="font-bold text-blue-600">
                     {rombel.presence?.count_i || 0}
@@ -152,7 +208,11 @@ function RombelCard({ rombel }: { rombel: RombelWithPresence }) {
                 </Badge>
                 <Badge
                   variant="outline"
-                  className="flex flex-col items-center p-1"
+                  className="flex flex-col items-center p-1 cursor-pointer"
+                  onClick={() => {
+                    setSelectedStatus("a");
+                    setIsDialogOpen(true);
+                  }}
                 >
                   <span className="font-bold text-red-600">
                     {rombel.presence?.count_a || 0}
@@ -161,7 +221,11 @@ function RombelCard({ rombel }: { rombel: RombelWithPresence }) {
                 </Badge>
                 <Badge
                   variant="outline"
-                  className="flex flex-col items-center p-1"
+                  className="flex flex-col items-center p-1 cursor-pointer"
+                  onClick={() => {
+                    setSelectedStatus("b");
+                    setIsDialogOpen(true);
+                  }}
                 >
                   <span className="font-bold text-purple-600">
                     {rombel.presence?.count_b || 0}
@@ -170,6 +234,48 @@ function RombelCard({ rombel }: { rombel: RombelWithPresence }) {
                 </Badge>
               </div>
             </div>
+
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogContent className="sm:max-w-lg">
+                <DialogHeader>
+                  <DialogTitle>
+                    {statusLabel[(selectedStatus || "h") as "h"]} - {rombel.nama}
+                  </DialogTitle>
+                  <DialogDescription>
+                    Daftar siswa dengan status "{selectedStatus ? statusLabel[selectedStatus] : ""}" pada sesi ini.
+                  </DialogDescription>
+                </DialogHeader>
+
+                {(!rombel.presence || !selectedStatus) && (
+                  <div className="text-sm text-muted-foreground">
+                    Tidak ada data.
+                  </div>
+                )}
+
+                {rombel.presence && selectedStatus && (
+                  <div className="max-h-80 overflow-auto">
+                    {filteredStudents.length === 0 ? (
+                      <div className="text-sm text-muted-foreground">
+                        Tidak ada siswa.
+                      </div>
+                    ) : (
+                      <ul className="divide-y">
+                        {filteredStudents.map((s) => (
+                          <li key={s.student_id} className="py-2">
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium">{s.fullname}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {s.nipd ? `${s.nipd}` : s.nisn ? `${s.nisn}` : null}
+                              </span>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
+              </DialogContent>
+            </Dialog>
           </div>
         ) : (
           <div className="py-2 text-muted-foreground text-sm">
