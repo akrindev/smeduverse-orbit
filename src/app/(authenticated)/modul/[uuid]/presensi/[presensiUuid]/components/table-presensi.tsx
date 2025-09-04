@@ -1,6 +1,5 @@
 "use client";
 
-import { type BaseSyntheticEvent, useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
 	Select,
@@ -20,6 +19,7 @@ import {
 import { toast } from "@/components/ui/use-toast";
 import { usePresence } from "@/store/usePresence";
 import type { Attendance } from "@/types/attendance";
+import { type BaseSyntheticEvent, useEffect, useRef, useState } from "react";
 
 // Status config map
 const STATUS_OPTIONS = {
@@ -43,7 +43,7 @@ export default function TablePresensi({
 		<Table>
 			<TableHeader>
 				<TableRow>
-					<TableHead className="md:flex hidden"></TableHead>
+					<TableHead className="hidden md:flex"></TableHead>
 					<TableHead>Nama</TableHead>
 					<TableHead>Status</TableHead>
 					<TableHead>Note</TableHead>
@@ -52,7 +52,7 @@ export default function TablePresensi({
 			<TableBody>
 				{attendances.map((attendance, i) => (
 					<TableRow key={attendance.student_id}>
-						<TableCell className="md:flex justify-center items-center hidden p-2 w-[40px]">
+						<TableCell className="hidden md:flex justify-center items-center p-2 w-[40px]">
 							{i + 1}
 						</TableCell>
 						<TableCell className="p-2 max-w-[500px] font-normal md:font-medium truncate">
@@ -175,7 +175,7 @@ function NoteAction({
 					setLoading(false);
 				}
 			}
-		}, 500);
+		}, 2000);
 		return () => clearTimeout(debounceRef.current);
 	}, [notes, attendance, updateAttendanceNotes, onUpdateAction]);
 
