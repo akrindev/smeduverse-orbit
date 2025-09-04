@@ -1,25 +1,5 @@
 "use client";
 
-import {
-	type ColumnDef,
-	flexRender,
-	getCoreRowModel,
-	useReactTable,
-} from "@tanstack/react-table";
-import { format } from "date-fns";
-import { id as localeId } from "date-fns/locale";
-import {
-	Calendar,
-	Clock,
-	Download,
-	Edit,
-	Loader2,
-	NotebookPen,
-	RefreshCw,
-	Target,
-} from "lucide-react";
-import { useParams } from "next/navigation";
-import { useMemo, useRef, useState } from "react";
 import { DatePicker } from "@/app/(authenticated)/components/date-picker";
 import { Button } from "@/components/ui/button";
 import {
@@ -47,6 +27,26 @@ import {
 	useUpdateAssignmentMutation,
 } from "@/queries/useAssignmentQuery";
 import type { AssignmentSheet } from "@/store/useAssignment";
+import {
+	type ColumnDef,
+	flexRender,
+	getCoreRowModel,
+	useReactTable,
+} from "@tanstack/react-table";
+import { format } from "date-fns";
+import { id as localeId } from "date-fns/locale";
+import {
+	Calendar,
+	Clock,
+	Download,
+	Edit,
+	Loader2,
+	NotebookPen,
+	RefreshCw,
+	Target,
+} from "lucide-react";
+import { useParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export default function AssignmentPage() {
 	const { assignmentUuid, uuid: modulUuid } = useParams<{
@@ -120,7 +120,7 @@ export default function AssignmentPage() {
 						| string
 						| undefined;
 					return (
-						<div className="flex flex-col">
+						<div className="flex flex-col w-40">
 							<span className="font-medium">{name}</span>
 							{nis && (
 								<span className="text-muted-foreground text-xs">{nis}</span>
@@ -255,7 +255,7 @@ export default function AssignmentPage() {
 
 	return (
 		<div>
-			<div className="flex flex-row justify-between items-center mb-5">
+			<div className="flex flex-col justify-between items-start mb-5">
 				<div>
 					<div className="flex items-center gap-2">
 						<NotebookPen className="w-5 h-5" />
@@ -283,7 +283,7 @@ export default function AssignmentPage() {
 						</div>
 					</div>
 				</div>
-				<div className="flex items-center gap-2">
+				<div className="flex items-center gap-2 mt-3">
 					<Button
 						variant="outline"
 						onClick={handleEditDialogOpen}
@@ -533,6 +533,17 @@ function GradeAction({
 	const [loading, setLoading] = useState(false);
 	const debounceRef = useRef<NodeJS.Timeout>();
 
+	// Update local state when initial prop changes, but only if we haven't made local changes
+	const [hasLocalChanges, setHasLocalChanges] = useState(false);
+
+	useEffect(() => {
+		if (!hasLocalChanges) {
+			setGrade(
+				initial === null || initial === undefined ? "" : String(initial),
+			);
+		}
+	}, [initial, hasLocalChanges]);
+
 	const numericGrade = grade === "" ? null : Number(grade);
 	const kkmNum =
 		typeof kkmValue === "number"
@@ -559,6 +570,7 @@ function GradeAction({
 			onChange={(e) => {
 				const nextVal = e.currentTarget.value;
 				setGrade(nextVal);
+				setHasLocalChanges(true);
 				if (debounceRef.current) clearTimeout(debounceRef.current);
 				debounceRef.current = setTimeout(async () => {
 					const num = nextVal === "" ? null : Number(nextVal);
@@ -570,6 +582,8 @@ function GradeAction({
 							title: "Berhasil",
 							description: "Nilai berhasil disimpan",
 						});
+						// Reset the local changes flag after successful save
+						setHasLocalChanges(false);
 						onUpdated?.();
 					} catch {
 						toast({
@@ -604,6 +618,15 @@ function NotesAction({
 	const [loading, setLoading] = useState(false);
 	const debounceRef = useRef<NodeJS.Timeout>();
 
+	// Update local state when initial prop changes, but only if we haven't made local changes
+	const [hasLocalChanges, setHasLocalChanges] = useState(false);
+
+	useEffect(() => {
+		if (!hasLocalChanges) {
+			setNotes(initial ?? "");
+		}
+	}, [initial, hasLocalChanges]);
+
 	return (
 		<Input
 			value={notes}
@@ -613,6 +636,7 @@ function NotesAction({
 			onChange={(e) => {
 				const nextVal = e.currentTarget.value;
 				setNotes(nextVal);
+				setHasLocalChanges(true);
 				if (debounceRef.current) clearTimeout(debounceRef.current);
 				debounceRef.current = setTimeout(async () => {
 					setLoading(true);
@@ -625,6 +649,8 @@ function NotesAction({
 							title: "Berhasil",
 							description: "Catatan berhasil disimpan",
 						});
+						// Reset the local changes flag after successful save
+						setHasLocalChanges(false);
 						onUpdated?.();
 					} catch {
 						toast({
