@@ -17,8 +17,12 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { toast } from "@/components/ui/use-toast";
-import { usePresence } from "@/store/usePresence";
+import {
+	useUpdateAttendanceNotesMutation,
+	useUpdateAttendanceStatusMutation,
+} from "@/queries/useAttendanceQuery";
 import type { Attendance } from "@/types/attendance";
+import { useParams } from "next/navigation";
 import { type BaseSyntheticEvent, useEffect, useRef, useState } from "react";
 
 // Status config map
@@ -91,34 +95,43 @@ function StatusAction({
 	const [status, setStatus] = useState<StatusType>(
 		(attendance.presence?.status as StatusType) ?? "a",
 	);
-	const [loading, setLoading] = useState(false);
-	const updateAttendance = usePresence((state) => state.updateAttendance);
 
-	async function handleChange(newStatus: StatusType) {
+	const params = useParams();
+	const presensiUuid = params?.presensiUuid as string | undefined;
+
+	const updateAttendanceMutation = useUpdateAttendanceStatusMutation(
+		presensiUuid || "",
+	);
+
+	function handleChange(newStatus: StatusType) {
 		setStatus(newStatus);
-		setLoading(true);
-		try {
-			const res = await updateAttendance({ attendance, status: newStatus });
-			if (res.status === 200) {
-				toast({
-					title: "Berhasil",
-					description: "Status kehadiran berhasil diubah",
-				});
-				onUpdateAction?.();
-			}
-		} catch {
-			toast({
-				title: "Gagal",
-				description: "Tidak dapat mengubah status kehadiran",
-				variant: "destructive",
-			});
-		} finally {
-			setLoading(false);
-		}
+		updateAttendanceMutation.mutate(
+			{ attendance, status: newStatus },
+			{
+				onSuccess: () => {
+					toast({
+						title: "Berhasil",
+						description: "Status kehadiran berhasil diubah",
+					});
+					onUpdateAction?.();
+				},
+				onError: () => {
+					toast({
+						title: "Gagal",
+						description: "Tidak dapat mengubah status kehadiran",
+						variant: "destructive",
+					});
+				},
+			},
+		);
 	}
 
 	return (
-		<Select value={status} onValueChange={handleChange} disabled={loading}>
+		<Select
+			value={status}
+			onValueChange={handleChange}
+			disabled={updateAttendanceMutation.isPending}
+		>
 			<SelectTrigger className={`w-[150px] ${STATUS_OPTIONS[status]?.color}`}>
 				<SelectValue placeholder="Status Kehadiran" />
 			</SelectTrigger>
@@ -144,47 +157,55 @@ function NoteAction({
 	attendance: Attendance;
 	onUpdateAction?: () => void;
 }) {
+	const params = useParams();
+	const presensiUuid = params?.presensiUuid as string | undefined;
+
 	const [notes, setNotes] = useState(attendance.presence?.notes ?? "");
-	const [loading, setLoading] = useState(false);
-	const updateAttendanceNotes = usePresence(
-		(state) => state.updateAttendanceNotes,
-	);
 	const debounceRef = useRef<NodeJS.Timeout>();
+
+	const updateNotesMutation = useUpdateAttendanceNotesMutation(
+		presensiUuid || "",
+	);
+
+	// reset local notes when attendance or presence uuid changes to avoid leaking state across pages
+	useEffect(() => {
+		setNotes(attendance.presence?.notes ?? "");
+	}, [attendance]);
 
 	useEffect(() => {
 		if (debounceRef.current) clearTimeout(debounceRef.current);
-		debounceRef.current = setTimeout(async () => {
+		debounceRef.current = setTimeout(() => {
 			if (notes !== (attendance.presence?.notes ?? "")) {
-				setLoading(true);
-				try {
-					const res = await updateAttendanceNotes({ attendance, notes });
-					if (res.status === 200) {
-						toast({
-							title: "Berhasil",
-							description: "Catatan kehadiran berhasil diubah",
-						});
-						onUpdateAction?.();
-					}
-				} catch {
-					toast({
-						title: "Gagal",
-						description: "Tidak dapat mengubah catatan kehadiran",
-						variant: "destructive",
-					});
-				} finally {
-					setLoading(false);
-				}
+				updateNotesMutation.mutate(
+					{ attendance, notes },
+					{
+						onSuccess: () => {
+							toast({
+								title: "Berhasil",
+								description: "Catatan kehadiran berhasil diubah",
+							});
+							onUpdateAction?.();
+						},
+						onError: () => {
+							toast({
+								title: "Gagal",
+								description: "Tidak dapat mengubah catatan kehadiran",
+								variant: "destructive",
+							});
+						},
+					},
+				);
 			}
 		}, 2000);
 		return () => clearTimeout(debounceRef.current);
-	}, [notes, attendance, updateAttendanceNotes, onUpdateAction]);
+	}, [notes, attendance, updateNotesMutation, onUpdateAction]);
 
 	return (
 		<Input
 			value={notes}
 			onChange={(e: BaseSyntheticEvent) => setNotes(e.target.value)}
 			placeholder="Catatan Kehadiran"
-			disabled={loading}
+			disabled={updateNotesMutation.isPending}
 			className="min-w-[150px]"
 		/>
 	);

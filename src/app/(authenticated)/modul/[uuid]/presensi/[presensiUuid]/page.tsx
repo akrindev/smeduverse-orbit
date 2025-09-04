@@ -1,14 +1,12 @@
 "use client";
 
-import type { AxiosPromise, AxiosResponse } from "axios";
-import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { toast } from "@/components/ui/use-toast";
 import { useModulQuery } from "@/queries/useModulQuery";
+import { usePresenceQuery } from "@/queries/usePresenceQuery";
 import { useAuth } from "@/store/useAuth";
-import { usePresence } from "@/store/usePresence";
-import type { Presence } from "@/types/presence";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import Information from "./components/information";
 import TablePresensi from "./components/table-presensi";
 
@@ -17,32 +15,27 @@ export default function PreseniPage() {
 		uuid: string;
 		presensiUuid: string;
 	}>();
-	const [loading, setLoading] = useState(false);
-	const [presence, showPresence] = usePresence<
-		[Presence, (uuid: string) => AxiosPromise<AxiosResponse>]
-	>((state) => [state.presence, state.showPresence]);
-
-	const updatingPresence = useCallback(() => {
-		setLoading(true);
-		return showPresence(presensiUuid).finally(() => setLoading(false));
-	}, [presensiUuid, showPresence]);
 
 	const router = useRouter();
 	const { user } = useAuth();
 	const { modulInfoQuery } = useModulQuery(uuid);
+	const {
+		data: presence,
+		isLoading,
+		error,
+		refetch,
+	} = usePresenceQuery(presensiUuid);
 
+	// Handle 404 error
 	useEffect(() => {
-		updatingPresence().catch((res) => {
-			if (res.response.status === 404) {
-				toast({
-					title: "Presensi tidak ditemukan",
-					description: "Presensi yang anda cari tidak ditemukan",
-				});
-
-				router.push(`/modul/${uuid}`);
-			}
-		});
-	}, [router, updatingPresence, uuid]);
+		if (error && error.message === "Presence not found") {
+			toast({
+				title: "Presensi tidak ditemukan",
+				description: "Presensi yang anda cari tidak ditemukan",
+			});
+			router.push(`/modul/${uuid}`);
+		}
+	}, [error, router, uuid]);
 
 	// Redirect if current user is not the owner (teacher) of the module
 	useEffect(() => {
@@ -55,6 +48,18 @@ export default function PreseniPage() {
 		}
 	}, [modulInfoQuery?.data, user, uuid, router]);
 
+	const handleRefresh = () => {
+		refetch();
+	};
+
+	if (isLoading) {
+		return <div>Loading...</div>;
+	}
+
+	if (!presence) {
+		return <div>Presence not found</div>;
+	}
+
 	return (
 		<div>
 			<Information
@@ -65,15 +70,14 @@ export default function PreseniPage() {
 				description={presence?.description}
 				date={presence?.date}
 				presence={presence}
-				onRefreshAction={updatingPresence}
-				isLoading={loading}
+				onRefreshAction={handleRefresh}
+				isLoading={isLoading}
 			/>
-			{/* <Separator className="my-4" /> */}
 			<div className="relative mt-5 border rounded-md w-full">
 				<ScrollArea>
 					<TablePresensi
 						attendances={presence?.attendances ?? []}
-						onUpdateAction={updatingPresence}
+						onUpdateAction={handleRefresh}
 					/>
 					<ScrollBar orientation="horizontal" />
 				</ScrollArea>

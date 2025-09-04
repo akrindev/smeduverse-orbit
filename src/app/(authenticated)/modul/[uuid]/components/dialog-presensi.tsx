@@ -24,8 +24,12 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
+import {
+	useCreatePresenceMutation,
+	useDeletePresenceMutation,
+	useUpdatePresenceMutation,
+} from "@/queries/usePresenceQuery";
 import { useSubjectSchedulesQuery } from "@/queries/useSubjectScheduleQuery";
-import { usePresence } from "@/store/usePresence";
 import { IconEditCircle, IconPlus, IconTrash } from "@tabler/icons-react";
 import { format, isBefore, parse } from "date-fns";
 import { InfoIcon, Loader } from "lucide-react";
@@ -60,13 +64,9 @@ export default function DialogPresensi({
 	const [subjectScheduleEndId, setSubjectScheduleEndId] = useState<string>("");
 	const [scheduleError, setScheduleError] = useState<string | null>(null);
 
-	const [createPresence, updatePresence, destroyPresence] = usePresence(
-		(state) => [
-			state.createPresence,
-			state.updatePresence,
-			state.destroyPresence,
-		],
-	);
+	const createPresenceMutation = useCreatePresenceMutation();
+	const updatePresenceMutation = useUpdatePresenceMutation();
+	const deletePresenceMutation = useDeletePresenceMutation();
 
 	const { data: schedules = [], isLoading: loadingSchedules } =
 		useSubjectSchedulesQuery();
@@ -156,46 +156,39 @@ export default function DialogPresensi({
 			subject_schedule_end_id: subjectScheduleEndId
 				? Number(subjectScheduleEndId)
 				: null,
-		};
+		} as any;
 
-		const response = await (data
-			? updatePresence(body)
-			: createPresence(body)
-		).finally(() => {
-			setIsLoading(false);
-		});
-
-		// is success
-		if (response.status !== 422) {
+		try {
+			const isEdit = Boolean(data);
+			if (isEdit) {
+				await updatePresenceMutation.mutateAsync(body);
+			} else {
+				await createPresenceMutation.mutateAsync(body);
+			}
 			// reset input
 			setTitle("");
 			setDescription("");
 			setSubjectScheduleId("");
 			setSubjectScheduleEndId("");
-
 			// close dialog
 			setOpen(false);
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
 	// handle delete presensi
 	const handleDeletePresensi = async () => {
 		setIsLoading(true);
-
-		const response = await destroyPresence(presenceUuid).finally(() => {
-			setIsLoading(false);
-		});
-
-		// is success
-		if (response.status !== 422) {
-			// add toast
+		try {
+			await deletePresenceMutation.mutateAsync(presenceUuid);
 			toast({
 				title: "Berhasil menghapus presensi",
 				description: "Presensi berhasil dihapus",
 			});
-
-			// redirect to modul
 			router.push(`/modul/${modulUuid}`);
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
