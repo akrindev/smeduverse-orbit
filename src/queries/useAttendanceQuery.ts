@@ -109,9 +109,27 @@ export function useAttendanceRecapQuery(modulUuid: string) {
  */
 export function useAttendanceRecapByDateRangeQuery() {
 	return useMutation({
-		mutationFn: async (data: DateRangeRecapBody): Promise<any> => {
+		mutationFn: async (data: DateRangeRecapBody): Promise<unknown> => {
 			const response = await api.post(`/modul/presence/recap/date-range`, data);
-			return response.data;
+			return response.data as unknown;
+		},
+	});
+}
+
+/**
+ * React Query hook for exporting attendance recap by date range (returns Blob)
+ */
+export function useAttendanceExportByDateRangeMutation() {
+	return useMutation({
+		mutationFn: async (data: DateRangeRecapBody): Promise<Blob> => {
+			const response = await api.post(
+				`/modul/presence/recap/export/date-range`,
+				data,
+				{
+					responseType: "blob",
+				},
+			);
+			return response.data as Blob;
 		},
 	});
 }
