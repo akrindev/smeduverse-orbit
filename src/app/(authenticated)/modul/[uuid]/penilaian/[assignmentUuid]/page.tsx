@@ -48,6 +48,13 @@ import {
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+// Extend ColumnMeta to include className
+declare module "@tanstack/react-table" {
+	interface ColumnMeta<TData, TValue> {
+		className?: string;
+	}
+}
+
 export default function AssignmentPage() {
 	const { assignmentUuid, uuid: modulUuid } = useParams<{
 		assignmentUuid: string;
@@ -110,21 +117,60 @@ export default function AssignmentPage() {
 
 	const columns = useMemo<ColumnDef<AssignmentSheet>[]>(
 		() => [
-			{ header: "No", cell: (ctx) => ctx.row.index + 1, maxSize: 60 },
+			{
+				header: "No",
+				cell: (ctx) => ctx.row.index + 1,
+				maxSize: 60,
+				meta: { className: "hidden sm:table-cell" },
+			},
 			{
 				header: "Siswa",
 				accessorKey: "student_name",
 				cell: (ctx) => {
 					const name = (ctx.getValue() as string) || "-";
-					const nis = (ctx.row.original as any).student_nis as
-						| string
-						| undefined;
+					const nis = (
+						ctx.row.original as AssignmentSheet & { student_nis?: string }
+					).student_nis;
+					const grade = ctx.row.original.grade;
+					const notes = ctx.row.original.notes;
+
 					return (
-						<div className="flex flex-col w-40">
-							<span className="font-medium">{name}</span>
-							{nis && (
-								<span className="text-muted-foreground text-xs">{nis}</span>
-							)}
+						<div className="flex flex-col w-full sm:w-40">
+							<div className="flex justify-between items-center">
+								<div className="flex flex-col">
+									<span className="font-medium">{name}</span>
+									{nis && (
+										<span className="text-muted-foreground text-xs">{nis}</span>
+									)}
+								</div>
+								<span className="sm:hidden text-muted-foreground text-xs">
+									#{ctx.row.index + 1}
+								</span>
+							</div>
+							{/* Mobile-only content */}
+							<div className="sm:hidden space-y-2 mt-2">
+								<div className="flex items-center gap-2">
+									<span className="font-medium text-sm">Nilai:</span>
+									<GradeAction
+										studentId={String(ctx.row.original.student_id || "")}
+										initial={grade as number | string | null}
+										kkmValue={
+											showQuery.data?.kkm_value as number | null | undefined
+										}
+										onUpdated={() => showQuery.refetch()}
+										mutate={(payload) => patchGrade.mutateAsync(payload)}
+									/>
+								</div>
+								<div className="flex flex-col gap-1">
+									<span className="font-medium text-sm">Catatan:</span>
+									<NotesAction
+										studentId={String(ctx.row.original.student_id || "")}
+										initial={(notes as string | null) ?? ""}
+										onUpdated={() => showQuery.refetch()}
+										mutate={(payload) => patchNotes.mutateAsync(payload)}
+									/>
+								</div>
+							</div>
 						</div>
 					);
 				},
@@ -141,6 +187,7 @@ export default function AssignmentPage() {
 						mutate={(payload) => patchGrade.mutateAsync(payload)}
 					/>
 				),
+				meta: { className: "hidden sm:table-cell" },
 			},
 			{
 				header: "Catatan",
@@ -153,6 +200,7 @@ export default function AssignmentPage() {
 						mutate={(payload) => patchNotes.mutateAsync(payload)}
 					/>
 				),
+				meta: { className: "hidden sm:table-cell" },
 			},
 		],
 		[patchGrade, patchNotes, showQuery],
@@ -178,12 +226,13 @@ export default function AssignmentPage() {
 				{ responseType: "blob" },
 			);
 			const contentType =
-				(res.headers as any)["content-type"] || "application/octet-stream";
+				(res.headers as Record<string, string>)["content-type"] ||
+				"application/octet-stream";
 			const blob = new Blob([res.data], { type: contentType });
 			let filename = `penilaian-${assignmentUuid}`;
-			const disposition = (res.headers as any)["content-disposition"] as
-				| string
-				| undefined;
+			const disposition = (res.headers as Record<string, string>)[
+				"content-disposition"
+			];
 			if (disposition) {
 				const match = /filename\*=UTF-8''([^;]+)|filename="?([^";]+)"?/i.exec(
 					disposition,
@@ -237,7 +286,9 @@ export default function AssignmentPage() {
 				assignmentUuid,
 				body: {
 					orbit_modul_uuid: modulUuid,
-					teacher_id: (showQuery.data as any)?.teacher?.teacher_id || "",
+					teacher_id:
+						(showQuery.data as { teacher?: { teacher_id?: string } })?.teacher
+							?.teacher_id || "",
 					title: editForm.title,
 					body: editForm.body || null,
 					kkm_value: editForm.kkm_value ? Number(editForm.kkm_value) : null,
@@ -255,8 +306,8 @@ export default function AssignmentPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col justify-between items-start mb-5">
-				<div>
+			<div className="flex md:flex-row flex-col justify-between items-start mb-5">
+				<div className="flex-1">
 					<div className="flex items-center gap-2">
 						<NotebookPen className="w-5 h-5" />
 						{showQuery.data?.title ?? "Detail Penilaian"}
@@ -264,7 +315,7 @@ export default function AssignmentPage() {
 					<div className="text-muted-foreground text-sm">
 						{showQuery.data?.body ?? "Detail tugas/penilaian"}
 					</div>
-					<div className="flex flex-wrap gap-4 mt-2 text-sm">
+					<div className="flex sm:flex-row flex-col sm:flex-wrap gap-2 sm:gap-4 mt-2 text-sm">
 						<div className="flex items-center gap-2">
 							<Calendar className="w-4 h-4" />
 							<span>
@@ -283,11 +334,11 @@ export default function AssignmentPage() {
 						</div>
 					</div>
 				</div>
-				<div className="flex items-center gap-2 mt-3">
+				<div className="flex sm:flex-row flex-col items-stretch sm:items-center gap-2 mt-3 md:mt-0">
 					<Button
 						variant="outline"
 						onClick={handleEditDialogOpen}
-						className="flex items-center gap-2"
+						className="flex justify-center items-center gap-2"
 					>
 						<Edit className="w-4 h-4" />
 						Edit
@@ -296,7 +347,7 @@ export default function AssignmentPage() {
 						variant="outline"
 						onClick={handleExport}
 						disabled={isExporting}
-						className="flex items-center gap-2"
+						className="flex justify-center items-center gap-2"
 					>
 						{isExporting ? (
 							<Loader2 className="w-4 h-4 animate-spin" />
@@ -309,7 +360,7 @@ export default function AssignmentPage() {
 						variant="outline"
 						onClick={handleRefresh}
 						disabled={isRefreshing || showQuery.isFetching}
-						className="flex items-center gap-2"
+						className="flex justify-center items-center gap-2"
 					>
 						{showQuery.isFetching ? (
 							<Loader2 className="w-4 h-4 animate-spin" />
@@ -321,9 +372,9 @@ export default function AssignmentPage() {
 				</div>
 			</div>
 			{/* add table information on count tuntas, tidak tuntas and belum dinilai */}
-			<ScrollArea>
-				<div className="font-medium">Rekap Penilaian</div>
-				<div className="flex flex-wrap gap-3">
+			<div className="mb-4">
+				<div className="mb-3 font-medium">Rekap Penilaian</div>
+				<div className="border rounded-md">
 					<Table>
 						<TableHeader>
 							<TableRow>
@@ -365,16 +416,18 @@ export default function AssignmentPage() {
 						</TableBody>
 					</Table>
 				</div>
-				<ScrollBar orientation="horizontal" />
-			</ScrollArea>
-			<div className="relative mt-2 border rounded-md w-full">
+			</div>
+			<div className="relative border rounded-md w-full">
 				<ScrollArea>
 					<Table>
 						<TableHeader>
 							{table.getHeaderGroups().map((headerGroup) => (
 								<TableRow key={headerGroup.id}>
 									{headerGroup.headers.map((header) => (
-										<TableHead key={header.id} className="p-2">
+										<TableHead
+											key={header.id}
+											className={`p-2 ${header.column.columnDef.meta?.className || ""}`}
+										>
 											{header.isPlaceholder
 												? null
 												: flexRender(
@@ -390,7 +443,10 @@ export default function AssignmentPage() {
 							{table.getRowModel().rows.map((row) => (
 								<TableRow key={row.id}>
 									{row.getVisibleCells().map((cell) => (
-										<TableCell key={cell.id} className="p-2">
+										<TableCell
+											key={cell.id}
+											className={`p-2 ${cell.column.columnDef.meta?.className || ""}`}
+										>
 											{flexRender(
 												cell.column.columnDef.cell,
 												cell.getContext(),
@@ -406,13 +462,13 @@ export default function AssignmentPage() {
 			</div>
 
 			<Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-				<DialogContent className="sm:max-w-[600px]">
+				<DialogContent className="w-[95vw] max-w-[600px] max-h-[90vh] overflow-y-auto">
 					<DialogHeader>
 						<DialogTitle>Edit Penilaian</DialogTitle>
 					</DialogHeader>
 					<div className="gap-4 grid py-4">
-						<div className="items-center gap-4 grid grid-cols-4">
-							<label htmlFor="title" className="text-right">
+						<div className="space-y-2">
+							<label htmlFor="title" className="font-medium text-sm">
 								Judul
 							</label>
 							<Input
@@ -421,11 +477,11 @@ export default function AssignmentPage() {
 								onChange={(e) =>
 									setEditForm((prev) => ({ ...prev, title: e.target.value }))
 								}
-								className="col-span-3"
+								className="w-full"
 							/>
 						</div>
-						<div className="items-center gap-4 grid grid-cols-4">
-							<label htmlFor="body" className="text-right">
+						<div className="space-y-2">
+							<label htmlFor="body" className="font-medium text-sm">
 								Deskripsi
 							</label>
 							<Input
@@ -434,42 +490,38 @@ export default function AssignmentPage() {
 								onChange={(e) =>
 									setEditForm((prev) => ({ ...prev, body: e.target.value }))
 								}
-								className="col-span-3"
+								className="w-full"
 							/>
 						</div>
-						<div className="items-center gap-4 grid grid-cols-4">
-							<label htmlFor="date" className="text-right">
+						<div className="space-y-2">
+							<label htmlFor="date" className="font-medium text-sm">
 								Tanggal Mulai
 							</label>
-							<div className="col-span-3">
-								<DatePicker
-									selectedDate={editForm.date || undefined}
-									onSelect={(date) => {
-										const formattedDate = date.toISOString().split("T")[0];
-										setEditForm((prev) => ({ ...prev, date: formattedDate }));
-									}}
-								/>
-							</div>
+							<DatePicker
+								selectedDate={editForm.date || undefined}
+								onSelect={(date) => {
+									const formattedDate = date.toISOString().split("T")[0];
+									setEditForm((prev) => ({ ...prev, date: formattedDate }));
+								}}
+							/>
 						</div>
-						<div className="items-center gap-4 grid grid-cols-4">
-							<label htmlFor="due_date" className="text-right">
+						<div className="space-y-2">
+							<label htmlFor="due_date" className="font-medium text-sm">
 								Tanggal Selesai
 							</label>
-							<div className="col-span-3">
-								<DatePicker
-									selectedDate={editForm.due_date || undefined}
-									onSelect={(date) => {
-										const formattedDate = date.toISOString().split("T")[0];
-										setEditForm((prev) => ({
-											...prev,
-											due_date: formattedDate,
-										}));
-									}}
-								/>
-							</div>
+							<DatePicker
+								selectedDate={editForm.due_date || undefined}
+								onSelect={(date) => {
+									const formattedDate = date.toISOString().split("T")[0];
+									setEditForm((prev) => ({
+										...prev,
+										due_date: formattedDate,
+									}));
+								}}
+							/>
 						</div>
-						<div className="items-center gap-4 grid grid-cols-4">
-							<label htmlFor="kkm" className="text-right">
+						<div className="space-y-2">
+							<label htmlFor="kkm" className="font-medium text-sm">
 								KKM
 							</label>
 							<Input
@@ -482,19 +534,24 @@ export default function AssignmentPage() {
 										kkm_value: e.target.value,
 									}))
 								}
-								className="col-span-3"
+								className="w-full"
 							/>
 						</div>
 					</div>
-					<div className="flex justify-end gap-2">
+					<div className="flex sm:flex-row flex-col justify-end gap-2">
 						<Button
 							variant="outline"
 							onClick={() => setIsEditDialogOpen(false)}
 							disabled={updateAssignment.isPending}
+							className="w-full sm:w-auto"
 						>
 							Batal
 						</Button>
-						<Button onClick={handleSave} disabled={updateAssignment.isPending}>
+						<Button
+							onClick={handleSave}
+							disabled={updateAssignment.isPending}
+							className="w-full sm:w-auto"
+						>
 							{updateAssignment.isPending ? (
 								<>
 									<Loader2 className="mr-2 w-4 h-4 animate-spin" />
@@ -566,7 +623,7 @@ function GradeAction({
 			disabled={loading}
 			min={0}
 			max={100}
-			className={`${colorClass} w-24`}
+			className={`${colorClass} w-20 sm:w-24`}
 			onChange={(e) => {
 				const nextVal = e.currentTarget.value;
 				setGrade(nextVal);
@@ -632,7 +689,7 @@ function NotesAction({
 			value={notes}
 			placeholder="Catatan (opsional)"
 			disabled={loading}
-			className="min-w-[150px]"
+			className="w-full min-w-[120px] sm:min-w-[150px]"
 			onChange={(e) => {
 				const nextVal = e.currentTarget.value;
 				setNotes(nextVal);
