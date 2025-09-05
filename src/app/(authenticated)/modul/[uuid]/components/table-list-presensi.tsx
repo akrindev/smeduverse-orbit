@@ -1,10 +1,5 @@
 "use client";
 
-import { format } from "date-fns";
-import { id } from "date-fns/locale";
-import { Calendar, Clock } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
 	Card,
@@ -28,8 +23,13 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import ViewSwitcher from "@/components/ui/view-switcher";
-import { usePresence } from "@/store/usePresence";
+import { usePresencesQuery } from "@/queries/usePresenceQuery";
 import type { Presence } from "@/types/presence";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
+import { Calendar, Clock } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const colors = {
 	H: "bg-green-500",
@@ -44,14 +44,12 @@ export default function TableListPresensi({
 }: {
 	modulUuid: string;
 }) {
-	const [presences, fetchPresences] = usePresence<
-		[Presence[], (modulUuid: string) => void]
-	>((state) => [state.presences, state.fetchPresences]);
+	const {
+		data: presences = [],
+		isLoading,
+		error,
+	} = usePresencesQuery(modulUuid);
 	const [view, setView] = useState<"table" | "grid">("table");
-
-	useEffect(() => {
-		fetchPresences(modulUuid);
-	}, [modulUuid, fetchPresences]);
 
 	return (
 		<Card>
@@ -65,7 +63,17 @@ export default function TableListPresensi({
 				<ViewSwitcher onViewChange={setView} />
 			</CardHeader>
 			<CardContent>
-				{presences.length === 0 ? (
+				{isLoading ? (
+					<div className="flex justify-center items-center py-8">
+						<div className="text-muted-foreground">Memuat data presensi...</div>
+					</div>
+				) : error ? (
+					<div className="flex justify-center items-center py-8">
+						<div className="text-red-500">
+							Terjadi kesalahan saat memuat data
+						</div>
+					</div>
+				) : presences.length === 0 ? (
 					<div className="flex flex-col justify-center items-center space-y-2 py-8">
 						<p>Belum ada data presensi untuk ditampilkan</p>
 					</div>
@@ -112,7 +120,7 @@ function PresensiTable({
 						<TableCell className="p-2 max-w-[420px] text-left truncate whitespace-pre-line">
 							<TooltipText text={presence.title} />
 							{presence.description && (
-								<div className="mt-1 line-clamp-2 text-muted-foreground text-xs">
+								<div className="mt-1 text-muted-foreground text-xs line-clamp-2">
 									{presence.description}
 								</div>
 							)}

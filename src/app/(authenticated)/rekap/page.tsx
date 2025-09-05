@@ -1,13 +1,5 @@
 "use client";
 
-import { IconDownload, IconExternalLink } from "@tabler/icons-react";
-import { format, subDays } from "date-fns";
-import { id } from "date-fns/locale";
-import { Calendar, Loader2 } from "lucide-react";
-import { nanoid } from "nanoid";
-import Link from "next/link";
-import { Fragment, useEffect, useState } from "react";
-import type { DateRange } from "react-day-picker";
 import BaseLoading from "@/components/base-loading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,9 +20,11 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import ViewSwitcher from "@/components/ui/view-switcher";
-import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
-import { useAttendance } from "@/store/useAttendance";
+import {
+	useAttendanceExportByDateRangeMutation,
+	useAttendanceRecapByDateRangeQuery,
+} from "@/queries/useAttendanceQuery";
 import { useRombel } from "@/store/useRombel";
 import { useView } from "@/store/useView";
 import type {
@@ -38,6 +32,14 @@ import type {
 	AttendancePagination,
 	IAttendance,
 } from "@/types/attendance";
+import { IconDownload, IconExternalLink } from "@tabler/icons-react";
+import { format, subDays } from "date-fns";
+import { id } from "date-fns/locale";
+import { Calendar, Loader2 } from "lucide-react";
+import { nanoid } from "nanoid";
+import Link from "next/link";
+import { Fragment, useEffect, useState } from "react";
+import type { DateRange } from "react-day-picker";
 import { DateRangeSelector } from "./components/date-range-selector";
 import SelectAttendanceStatus from "./components/select-attendance-status";
 import SelectRombel from "./components/select-rombel";
@@ -54,20 +56,23 @@ export default function RekapPage() {
 	const { selectedView: view } = useView();
 	const rombelId = useRombel((state) => state.selectedRombelId);
 
-	const recapByDateRange = useAttendance((state) => state.getRecapByDateRange);
+	const recapByDateRangeMutation = useAttendanceRecapByDateRangeQuery();
+	const exportByDateRangeMutation = useAttendanceExportByDateRangeMutation();
 
 	useEffect(() => {
 		setIsLoading(true);
-		recapByDateRange({
-			status,
-			from: date?.from ? date.from : new Date(),
-			to: date?.to,
-			rombel_id: rombelId,
-		})
-			// @ts-ignore
-			.then((res) => setData(res.data))
+		const fromDate = date?.from ?? new Date();
+		const toDate = date?.to ?? undefined;
+		recapByDateRangeMutation
+			.mutateAsync({
+				status,
+				from: format(fromDate, "yyyy-MM-dd"),
+				to: toDate ? format(toDate, "yyyy-MM-dd") : undefined,
+				rombel_id: rombelId ? String(rombelId) : undefined,
+			})
+			.then((res) => setData(res as AttendancePagination))
 			.finally(() => setIsLoading(false));
-	}, [status, date, rombelId, recapByDateRange]);
+	}, [status, date, rombelId, recapByDateRangeMutation.mutateAsync]);
 
 	const handleExport = async () => {
 		try {
@@ -77,18 +82,14 @@ export default function RekapPage() {
 			const formattedFrom = format(fromDate, "yyyy-MM-dd");
 			const formattedTo = toDate ? format(toDate, "yyyy-MM-dd") : "";
 
-			const response = await api.post(
-				"/modul/presence/recap/export/date-range",
-				{
-					status,
-					from: formattedFrom,
-					to: formattedTo,
-					rombel_id: rombelId ? String(rombelId) : "",
-				},
-				{ responseType: "blob" },
-			);
+			const blob = await exportByDateRangeMutation.mutateAsync({
+				status,
+				from: formattedFrom,
+				to: formattedTo || undefined,
+				rombel_id: rombelId ? String(rombelId) : undefined,
+			});
 
-			const url = window.URL.createObjectURL(new Blob([response.data]));
+			const url = window.URL.createObjectURL(new Blob([blob]));
 			const link = document.createElement("a");
 			link.href = url;
 			const filename = `rekap-presensi-${status}-${formattedFrom}${formattedTo ? `-${formattedTo}` : ""}.xlsx`;
@@ -217,23 +218,23 @@ function AttendanceTable({ data }: AttendanceTableProps) {
 				<TableHeader>
 					<TableRow>
 						<TableHead className="whitespace-nowrap">Nama Siswa</TableHead>
-						<TableHead className="hidden whitespace-nowrap md:table-cell">
+						<TableHead className="hidden md:table-cell whitespace-nowrap">
 							Kelas
 						</TableHead>
-						<TableHead className="hidden whitespace-nowrap md:table-cell">
+						<TableHead className="hidden md:table-cell whitespace-nowrap">
 							Mata Pelajaran
 						</TableHead>
 						<TableHead className="whitespace-nowrap">Status</TableHead>
-						<TableHead className="hidden whitespace-nowrap md:table-cell">
+						<TableHead className="hidden md:table-cell whitespace-nowrap">
 							Pertemuan
 						</TableHead>
-						<TableHead className="hidden whitespace-nowrap md:table-cell">
+						<TableHead className="hidden md:table-cell whitespace-nowrap">
 							Waktu Mulai
 						</TableHead>
-						<TableHead className="hidden whitespace-nowrap md:table-cell">
+						<TableHead className="hidden md:table-cell whitespace-nowrap">
 							Waktu Selesai
 						</TableHead>
-						<TableHead className="hidden whitespace-nowrap md:table-cell">
+						<TableHead className="hidden md:table-cell whitespace-nowrap">
 							Pada
 						</TableHead>
 					</TableRow>
@@ -250,7 +251,7 @@ function AttendanceTable({ data }: AttendanceTableProps) {
 												<div className="text-muted-foreground text-xs">
 													{attendance.nipd}
 												</div>
-												<div className="space-y-0.5 md:hidden mt-1">
+												<div className="md:hidden space-y-0.5 mt-1">
 													<div className="text-muted-foreground text-xs">
 														{item.modul?.mapel?.kode || "-"} -{" "}
 														{item.modul?.rombel?.nama || "-"}
@@ -287,7 +288,7 @@ function AttendanceTable({ data }: AttendanceTableProps) {
 												{statusMap[attendance.presence?.status || "no"]}
 											</Badge>
 										</TableCell>
-										<TableCell className="hidden max-w-[180px] truncate md:table-cell">
+										<TableCell className="hidden md:table-cell max-w-[180px] truncate">
 											<Link
 												href={`/modul/${item.modul?.uuid}`}
 												className="hover:underline"
