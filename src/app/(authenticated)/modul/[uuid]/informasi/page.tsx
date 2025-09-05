@@ -1,21 +1,13 @@
 "use client";
 
-import type { AxiosPromise, AxiosResponse } from "axios";
 import { useParams } from "next/navigation";
-import { useEffect } from "react";
 import { Separator } from "@/components/ui/separator";
-import { useModul } from "@/store/useModul";
-import type { Modul } from "@/types/modul";
+import { useModulQuery } from "@/queries/useModulQuery";
 
 export default function PreseniPage() {
 	const { uuid } = useParams<{ uuid: string }>();
-	const [modul, fetchByUuid] = useModul<
-		[Modul | null, (uuid: string) => AxiosPromise<AxiosResponse>]
-	>((state) => [state.modul, state.fetchByUuid]);
-
-	useEffect(() => {
-		fetchByUuid(uuid);
-	}, [uuid, fetchByUuid]);
+	const { modulInfoQuery } = useModulQuery(uuid);
+	const modul = modulInfoQuery.data as any;
 
 	return (
 		<div className="space-y-6">
@@ -48,7 +40,7 @@ export default function PreseniPage() {
 					<div className="col-span-12">
 						<h3 className="font-medium text-md">Semester</h3>
 						<p className="text-muted-foreground text-sm">
-							{modul.semester.name}
+							{modul.semester?.name}
 						</p>
 					</div>
 
