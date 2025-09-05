@@ -3,6 +3,7 @@ export * from "./useAnalyticsQuery";
 export * from "./useAssignmentQuery";
 export * from "./useAttendanceQuery";
 export * from "./useAuthQuery";
+export * from "./useClassJournalQuery";
 export * from "./useExportQuery";
 export * from "./useMapelQuery";
 export * from "./useModulQuery";
