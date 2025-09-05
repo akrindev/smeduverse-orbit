@@ -162,8 +162,16 @@ export default function DialogPresensi({
 			const isEdit = Boolean(data);
 			if (isEdit) {
 				await updatePresenceMutation.mutateAsync(body);
+				toast({
+					title: "Berhasil mengupdate presensi",
+					description: "Presensi berhasil diperbarui",
+				});
 			} else {
 				await createPresenceMutation.mutateAsync(body);
+				toast({
+					title: "Berhasil membuat presensi",
+					description: "Presensi baru berhasil dibuat",
+				});
 			}
 			// reset input
 			setTitle("");
