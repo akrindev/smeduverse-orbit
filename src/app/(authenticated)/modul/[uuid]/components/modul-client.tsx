@@ -1,14 +1,14 @@
 "use client";
 
-import { BookOpen, FileText, Info, Loader2 } from "lucide-react";
-import Link from "next/link";
-import { notFound, useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useModulQuery } from "@/queries/useModulQuery";
 import { useAuth } from "@/store/useAuth";
+import { FileText, Info, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { notFound, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import DialogPresensi from "./dialog-presensi";
 import TableListPresensi from "./table-list-presensi";
 
@@ -69,8 +69,6 @@ export default function ModulClient({ modulUuid }: { modulUuid: string }) {
 					</Link>
 				</div>
 			</div>
-			<Separator />
-
 			<Separator />
 			<Alert>
 				<Info className="w-4 h-4" />
