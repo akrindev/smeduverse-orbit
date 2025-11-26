@@ -22,6 +22,11 @@ export function NavMain() {
 	// change variant to default when the page is active
 	// this will highlight the menu item
 	function isActive(path: string) {
+		// For exact match routes (like /rekap), only match exactly
+		// to avoid highlighting both /rekap and /rekap/bulanan
+		if (path === "/rekap") {
+			return pathname === path;
+		}
 		return pathname.startsWith(path);
 	}
 

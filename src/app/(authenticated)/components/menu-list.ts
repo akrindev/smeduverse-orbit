@@ -86,8 +86,8 @@ export const menuList: MenuItem[] = [
 		path: "/rekap",
 	},
 	{
-		name: "Rekap Bulanan",
-		title: "Rekap Bulanan",
+		name: "Rekap Kehadiran Bulanan",
+		title: "Rekap Kehadiran Bulanan",
 		icon: IconCalendarMonth,
 		path: "/rekap/bulanan",
 	},
