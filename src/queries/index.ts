@@ -12,6 +12,7 @@ export * from "./useMonitorPresenceQuery";
 export * from "./usePresenceQuery";
 export * from "./useRombelQuery";
 export * from "./useSemesterQuery";
+export * from "./useStudentJournalQuery";
 export * from "./useSubjectScheduleQuery";
 export * from "./useTeacherJournalQuery";
 export * from "./useUserQuery";

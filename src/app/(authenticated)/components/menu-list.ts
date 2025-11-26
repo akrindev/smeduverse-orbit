@@ -67,6 +67,12 @@ export const menuList: MenuItem[] = [
 		path: "/jurnal-guru",
 	},
 	{
+		name: "Jurnal Siswa",
+		title: "Jurnal Siswa",
+		icon: IconNotebook,
+		path: "/jurnal-siswa",
+	},
+	{
 		name: "Jurnal Kelas",
 		title: "Jurnal Kelas",
 		icon: IconNotebook,
