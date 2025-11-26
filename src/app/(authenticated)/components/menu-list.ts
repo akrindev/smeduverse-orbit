@@ -1,6 +1,7 @@
 import {
 	IconBooks,
 	IconCalendar,
+	IconCalendarMonth,
 	IconGridPattern,
 	IconListDetails,
 	IconNotebook,
@@ -66,12 +67,12 @@ export const menuList: MenuItem[] = [
 		icon: IconNotes,
 		path: "/jurnal-guru",
 	},
-	{
-		name: "Jurnal Siswa",
-		title: "Jurnal Siswa",
-		icon: IconNotebook,
-		path: "/jurnal-siswa",
-	},
+	// {
+	// 	name: "Jurnal Siswa",
+	// 	title: "Jurnal Siswa",
+	// 	icon: IconNotebook,
+	// 	path: "/jurnal-siswa",
+	// },
 	{
 		name: "Jurnal Kelas",
 		title: "Jurnal Kelas",
@@ -83,6 +84,12 @@ export const menuList: MenuItem[] = [
 		title: "Rekap Laporan",
 		icon: IconReportAnalytics,
 		path: "/rekap",
+	},
+	{
+		name: "Rekap Bulanan",
+		title: "Rekap Bulanan",
+		icon: IconCalendarMonth,
+		path: "/rekap/bulanan",
 	},
 
 	{
