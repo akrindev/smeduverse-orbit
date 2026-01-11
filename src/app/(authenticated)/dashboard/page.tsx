@@ -80,7 +80,7 @@ export default function Page() {
 		<div className="flex flex-col space-y-5 h-full">
 			<div className="flex flex-col h-full">
 				{/* Welcome Section */}
-				<div className="relative bg-gradient-to-r from-blue-100 dark:from-blue-950/20 to-indigo-100 dark:to-indigo-950/20 mb-6 p-4 border border-blue-100 dark:border-blue-900/30 rounded-lg overflow-hidden">
+				<div className="relative bg-linear-to-r from-blue-100 dark:from-blue-950/20 to-indigo-100 dark:to-indigo-950/20 mb-6 p-4 border border-blue-100 dark:border-blue-900/30 rounded-lg overflow-hidden">
 					{/* Confetti Icons */}
 					<div className="top-2 right-2 absolute flex space-x-1">
 						<PartyPopper className="w-5 h-5 text-yellow-500 animate-bounce" />
@@ -92,7 +92,7 @@ export default function Page() {
 					</div>
 
 					<div className="flex items-center space-x-4">
-						<div className="flex-shrink-0">
+						<div className="shrink-0">
 							<div className="relative">
 								<Avatar className="border-2 border-blue-200 dark:border-blue-800 w-12 h-12">
 									<AvatarImage

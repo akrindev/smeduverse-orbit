@@ -161,7 +161,7 @@ function NoteAction({
 	const presensiUuid = params?.presensiUuid as string | undefined;
 
 	const [notes, setNotes] = useState(attendance.presence?.notes ?? "");
-	const debounceRef = useRef<NodeJS.Timeout>();
+	const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
 	const updateNotesMutation = useUpdateAttendanceNotesMutation(
 		presensiUuid || "",
@@ -197,7 +197,9 @@ function NoteAction({
 				);
 			}
 		}, 2000);
-		return () => clearTimeout(debounceRef.current);
+		return () => {
+			if (debounceRef.current) clearTimeout(debounceRef.current);
+		};
 	}, [notes, attendance, updateNotesMutation, onUpdateAction]);
 
 	return (

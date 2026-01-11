@@ -183,7 +183,7 @@ function RombelCard({ rombel }: { rombel: RombelWithPresence }) {
 							<div className="gap-1 grid grid-cols-5">
 								<Badge
 									variant="outline"
-									className="flex flex-col items-center hover:bg-green-50 dark:hover:bg-green-900/20 hover:shadow p-1 hover:border-green-300 dark:hover:border-green-700 hover:scale-105 transition-transform duration-200 cursor-pointer"
+									className="flex flex-col items-center hover:bg-green-50 dark:hover:bg-green-900/20 hover:shadow-sm p-1 hover:border-green-300 dark:hover:border-green-700 hover:scale-105 transition-transform duration-200 cursor-pointer"
 									onClick={() => {
 										setSelectedStatus("h");
 										setIsDialogOpen(true);
@@ -196,7 +196,7 @@ function RombelCard({ rombel }: { rombel: RombelWithPresence }) {
 								</Badge>
 								<Badge
 									variant="outline"
-									className="flex flex-col items-center hover:bg-yellow-50 dark:hover:bg-yellow-900/20 hover:shadow p-1 hover:border-yellow-300 dark:hover:border-yellow-700 hover:scale-105 transition-transform duration-200 cursor-pointer"
+									className="flex flex-col items-center hover:bg-yellow-50 dark:hover:bg-yellow-900/20 hover:shadow-sm p-1 hover:border-yellow-300 dark:hover:border-yellow-700 hover:scale-105 transition-transform duration-200 cursor-pointer"
 									onClick={() => {
 										setSelectedStatus("s");
 										setIsDialogOpen(true);
@@ -209,7 +209,7 @@ function RombelCard({ rombel }: { rombel: RombelWithPresence }) {
 								</Badge>
 								<Badge
 									variant="outline"
-									className="flex flex-col items-center hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:shadow p-1 hover:border-blue-300 dark:hover:border-blue-700 hover:scale-105 transition-transform duration-200 cursor-pointer"
+									className="flex flex-col items-center hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:shadow-sm p-1 hover:border-blue-300 dark:hover:border-blue-700 hover:scale-105 transition-transform duration-200 cursor-pointer"
 									onClick={() => {
 										setSelectedStatus("i");
 										setIsDialogOpen(true);
@@ -222,7 +222,7 @@ function RombelCard({ rombel }: { rombel: RombelWithPresence }) {
 								</Badge>
 								<Badge
 									variant="outline"
-									className="flex flex-col items-center hover:bg-red-50 dark:hover:bg-red-900/20 hover:shadow p-1 hover:border-red-300 dark:hover:border-red-700 hover:scale-105 transition-transform duration-200 cursor-pointer"
+									className="flex flex-col items-center hover:bg-red-50 dark:hover:bg-red-900/20 hover:shadow-sm p-1 hover:border-red-300 dark:hover:border-red-700 hover:scale-105 transition-transform duration-200 cursor-pointer"
 									onClick={() => {
 										setSelectedStatus("a");
 										setIsDialogOpen(true);
@@ -235,7 +235,7 @@ function RombelCard({ rombel }: { rombel: RombelWithPresence }) {
 								</Badge>
 								<Badge
 									variant="outline"
-									className="flex flex-col items-center hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:shadow p-1 hover:border-purple-300 dark:hover:border-purple-700 hover:scale-105 transition-transform duration-200 cursor-pointer"
+									className="flex flex-col items-center hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:shadow-sm p-1 hover:border-purple-300 dark:hover:border-purple-700 hover:scale-105 transition-transform duration-200 cursor-pointer"
 									onClick={() => {
 										setSelectedStatus("b");
 										setIsDialogOpen(true);

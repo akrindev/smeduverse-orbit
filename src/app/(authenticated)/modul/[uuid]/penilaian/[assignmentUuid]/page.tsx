@@ -588,7 +588,7 @@ function GradeAction({
 		initial === null || initial === undefined ? "" : String(initial),
 	);
 	const [loading, setLoading] = useState(false);
-	const debounceRef = useRef<NodeJS.Timeout>();
+	const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
 	// Update local state when initial prop changes, but only if we haven't made local changes
 	const [hasLocalChanges, setHasLocalChanges] = useState(false);
@@ -673,7 +673,7 @@ function NotesAction({
 }) {
 	const [notes, setNotes] = useState<string>(initial ?? "");
 	const [loading, setLoading] = useState(false);
-	const debounceRef = useRef<NodeJS.Timeout>();
+	const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
 	// Update local state when initial prop changes, but only if we haven't made local changes
 	const [hasLocalChanges, setHasLocalChanges] = useState(false);

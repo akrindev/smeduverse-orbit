@@ -168,7 +168,7 @@ export default function RekapBulananDetailPage() {
 					<Button
 						onClick={handleExport}
 						disabled={exportMonthlyRecapMutation.isPending}
-						className="mt-2 bg-green-600 hover:bg-green-700 text-white shadow-sm transition-all flex items-center gap-2"
+						className="mt-2 bg-green-600 hover:bg-green-700 text-white shadow-xs transition-all flex items-center gap-2"
 					>
 						{exportMonthlyRecapMutation.isPending ? (
 							<div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -191,7 +191,7 @@ export default function RekapBulananDetailPage() {
 				</div>
 
 				{/* Students Table */}
-				<Card className="border-none shadow-md overflow-hidden bg-card/50 backdrop-blur-sm">
+				<Card className="border-none shadow-md overflow-hidden bg-card/50 backdrop-blur-xs">
 					<CardHeader className="bg-muted/30">
 						<CardTitle className="text-xl">Daftar Siswa</CardTitle>
 						<CardDescription>
@@ -240,7 +240,7 @@ export default function RekapBulananDetailPage() {
 														href={`/rekap/bulanan/${rombelId}/siswa/${student.student_id}?month=${month}&year=${year}`}
 														className="flex items-center gap-3"
 													>
-														<Avatar className="w-9 h-9 border-2 border-background shadow-sm">
+														<Avatar className="w-9 h-9 border-2 border-background shadow-xs">
 															<AvatarImage
 																src={student.photo}
 																alt={student.fullname}
@@ -260,27 +260,27 @@ export default function RekapBulananDetailPage() {
 													{student.nipd}
 												</TableCell>
 												<TableCell className="text-center">
-													<Badge className="bg-emerald-500 hover:bg-emerald-600 shadow-sm border-none">
+													<Badge className="bg-emerald-500 hover:bg-emerald-600 shadow-xs border-none">
 														{student.count_h}
 													</Badge>
 												</TableCell>
 												<TableCell className="text-center">
-													<Badge className="bg-sky-500 hover:bg-sky-600 shadow-sm border-none">
+													<Badge className="bg-sky-500 hover:bg-sky-600 shadow-xs border-none">
 														{student.count_s}
 													</Badge>
 												</TableCell>
 												<TableCell className="text-center">
-													<Badge className="bg-indigo-500 hover:bg-indigo-600 shadow-sm border-none">
+													<Badge className="bg-indigo-500 hover:bg-indigo-600 shadow-xs border-none">
 														{student.count_i}
 													</Badge>
 												</TableCell>
 												<TableCell className="text-center">
-													<Badge className="bg-amber-500 hover:bg-amber-600 shadow-sm border-none">
+													<Badge className="bg-amber-500 hover:bg-amber-600 shadow-xs border-none">
 														{student.count_a}
 													</Badge>
 												</TableCell>
 												<TableCell className="text-center">
-													<Badge className="bg-rose-500 hover:bg-rose-600 shadow-sm border-none">
+													<Badge className="bg-rose-500 hover:bg-rose-600 shadow-xs border-none">
 														{student.count_b}
 													</Badge>
 												</TableCell>

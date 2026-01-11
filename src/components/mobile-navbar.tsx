@@ -57,7 +57,7 @@ export function MobileNavbar() {
 							className={cn(
 								"flex flex-col items-center justify-center p-2 px-3 rounded-2xl transition-all duration-300 relative min-w-[68px]",
 								active 
-									? "bg-primary/10 text-primary shadow-sm" 
+									? "bg-primary/10 text-primary shadow-xs" 
 									: "text-muted-foreground hover:text-foreground"
 							)}
 						>
