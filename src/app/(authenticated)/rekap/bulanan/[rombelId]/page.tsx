@@ -5,27 +5,35 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
 } from "@/components/ui/table";
-import { useMonthlyRecapMutation } from "@/queries/useExportQuery";
+import {
+    useExportMonthlyRecapMutation,
+    useMonthlyRecapMutation,
+} from "@/queries/useExportQuery";
 import type { MonthlyRecapResponse } from "@/types/monthly-recap";
-import { IconArrowLeft, IconChevronRight } from "@tabler/icons-react";
+import {
+    IconArrowLeft,
+    IconChevronRight,
+    IconDownload,
+} from "@tabler/icons-react";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 export default function RekapBulananDetailPage() {
 	const params = useParams<{ rombelId: string }>();
@@ -38,6 +46,7 @@ export default function RekapBulananDetailPage() {
 	const [data, setData] = useState<MonthlyRecapResponse | null>(null);
 
 	const monthlyRecapMutation = useMonthlyRecapMutation();
+	const exportMonthlyRecapMutation = useExportMonthlyRecapMutation();
 
 	useEffect(() => {
 		if (!rombelId) return;
@@ -55,6 +64,30 @@ export default function RekapBulananDetailPage() {
 			})
 			.finally(() => setIsLoading(false));
 	}, [rombelId, month, year, monthlyRecapMutation.mutateAsync]);
+
+	const handleExport = async () => {
+		try {
+			const blob = await exportMonthlyRecapMutation.mutateAsync({
+				rombel_id: rombelId,
+				month,
+				year,
+			});
+
+			const url = window.URL.createObjectURL(blob);
+			const a = document.createElement("a");
+			a.href = url;
+			a.download = `rekap-bulanan-${data?.meta.rombel_nama}-${month}-${year}.xlsx`;
+			document.body.appendChild(a);
+			a.click();
+			window.URL.revokeObjectURL(url);
+			document.body.removeChild(a);
+
+			toast.success("Berhasil mengunduh rekap bulanan");
+		} catch (error) {
+			console.error("Error exporting monthly recap:", error);
+			toast.error("Gagal mengunduh rekap bulanan");
+		}
+	};
 
 	const getAttendanceRateBadge = (rate: number) => {
 		if (rate >= 90) {
@@ -123,15 +156,27 @@ export default function RekapBulananDetailPage() {
 					</Link>
 				</Button>
 
-				<div className="flex md:flex-row flex-col justify-between">
+				<div className="flex flex-row justify-between items-start gap-4">
 					<div className="space-y-1 mt-2">
-						<h2 className="font-semibold text-2xl tracking-tight">
+						<h2 className="font-semibold text-2xl tracking-tight text-primary">
 							{data.meta.rombel_nama}
 						</h2>
-						<p className="text-muted-foreground text-sm">
+						<p className="text-muted-foreground text-sm font-medium">
 							{data.meta.jurusan} | {data.meta.period}
 						</p>
 					</div>
+					<Button
+						onClick={handleExport}
+						disabled={exportMonthlyRecapMutation.isPending}
+						className="mt-2 bg-green-600 hover:bg-green-700 text-white shadow-xs transition-all flex items-center gap-2"
+					>
+						{exportMonthlyRecapMutation.isPending ? (
+							<div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+						) : (
+							<IconDownload className="w-4 h-4" />
+						)}
+						Unduh Excel
+					</Button>
 				</div>
 				<Separator className="my-4" />
 
@@ -146,112 +191,118 @@ export default function RekapBulananDetailPage() {
 				</div>
 
 				{/* Students Table */}
-				<Card>
-					<CardHeader>
-						<CardTitle>Daftar Siswa</CardTitle>
+				<Card className="border-none shadow-md overflow-hidden bg-card/50 backdrop-blur-xs">
+					<CardHeader className="bg-muted/30">
+						<CardTitle className="text-xl">Daftar Siswa</CardTitle>
 						<CardDescription>
 							Klik pada siswa untuk melihat detail kehadiran
 						</CardDescription>
 					</CardHeader>
-					<CardContent>
-						<Table>
-							<TableHeader>
-								<TableRow>
-									<TableHead className="w-12">No</TableHead>
-									<TableHead>Siswa</TableHead>
-									<TableHead className="text-center">NIS</TableHead>
-									<TableHead className="text-center">H</TableHead>
-									<TableHead className="text-center">S</TableHead>
-									<TableHead className="text-center">I</TableHead>
-									<TableHead className="text-center">A</TableHead>
-									<TableHead className="text-center">B</TableHead>
-									<TableHead className="text-center">Total</TableHead>
-									<TableHead className="text-center">%</TableHead>
-									<TableHead className="w-12"></TableHead>
-								</TableRow>
-							</TableHeader>
-							<TableBody>
-								{data.students.length === 0 ? (
-									<TableRow>
-										<TableCell
-											colSpan={11}
-											className="py-8 text-muted-foreground text-center"
-										>
-											Tidak ada data siswa
-										</TableCell>
+					<CardContent className="p-0">
+						<div className="overflow-x-auto">
+							<Table>
+								<TableHeader>
+									<TableRow className="hover:bg-transparent border-b">
+										<TableHead className="w-12 font-bold px-4">No</TableHead>
+										<TableHead className="font-bold">Siswa</TableHead>
+										<TableHead className="text-center font-bold">NIS</TableHead>
+										<TableHead className="text-center font-bold">H</TableHead>
+										<TableHead className="text-center font-bold">S</TableHead>
+										<TableHead className="text-center font-bold">I</TableHead>
+										<TableHead className="text-center font-bold">A</TableHead>
+										<TableHead className="text-center font-bold">B</TableHead>
+										<TableHead className="text-center font-bold">
+											Total
+										</TableHead>
+										<TableHead className="text-center font-bold">%</TableHead>
+										<TableHead className="w-12"></TableHead>
 									</TableRow>
-								) : (
-									data.students.map((student, index) => (
-										<TableRow
-											key={student.student_id}
-											className="hover:bg-muted/50 cursor-pointer"
-										>
-											<TableCell>{index + 1}</TableCell>
-											<TableCell>
-												<Link
-													href={`/rekap/bulanan/${rombelId}/siswa/${student.student_id}?month=${month}&year=${year}`}
-													className="flex items-center gap-3"
-												>
-													<Avatar className="w-8 h-8">
-														<AvatarImage
-															src={student.photo}
-															alt={student.fullname}
-														/>
-														<AvatarFallback>
-															{student.fullname.charAt(0).toUpperCase()}
-														</AvatarFallback>
-													</Avatar>
-													<span className="font-medium hover:underline">
-														{student.fullname}
-													</span>
-												</Link>
-											</TableCell>
-											<TableCell className="text-center">
-												{student.nipd}
-											</TableCell>
-											<TableCell className="text-center">
-												<Badge className="bg-green-500 hover:bg-green-600">
-													{student.count_h}
-												</Badge>
-											</TableCell>
-											<TableCell className="text-center">
-												<Badge className="bg-blue-500 hover:bg-blue-600">
-													{student.count_s}
-												</Badge>
-											</TableCell>
-											<TableCell className="text-center">
-												<Badge className="bg-purple-500 hover:bg-purple-600">
-													{student.count_i}
-												</Badge>
-											</TableCell>
-											<TableCell className="text-center">
-												<Badge className="bg-orange-500 hover:bg-orange-600">
-													{student.count_a}
-												</Badge>
-											</TableCell>
-											<TableCell className="text-center">
-												<Badge className="bg-red-500 hover:bg-red-600">
-													{student.count_b}
-												</Badge>
-											</TableCell>
-											<TableCell className="font-medium text-center">
-												{student.total_days}
-											</TableCell>
-											<TableCell className="text-center">
-												{getAttendanceRateBadge(student.attendance_rate)}
-											</TableCell>
-											<TableCell>
-												<Link
-													href={`/rekap/bulanan/${rombelId}/siswa/${student.student_id}?month=${month}&year=${year}`}
-												>
-													<IconChevronRight className="w-4 h-4 text-muted-foreground" />
-												</Link>
+								</TableHeader>
+								<TableBody>
+									{data.students.length === 0 ? (
+										<TableRow>
+											<TableCell
+												colSpan={11}
+												className="py-12 text-muted-foreground text-center italic"
+											>
+												Tidak ada data siswa
 											</TableCell>
 										</TableRow>
-									))
-								)}
-							</TableBody>
-						</Table>
+									) : (
+										data.students.map((student, index) => (
+											<TableRow
+												key={student.student_id}
+												className="hover:bg-muted/80 cursor-pointer group transition-colors"
+											>
+												<TableCell className="px-4">{index + 1}</TableCell>
+												<TableCell>
+													<Link
+														href={`/rekap/bulanan/${rombelId}/siswa/${student.student_id}?month=${month}&year=${year}`}
+														className="flex items-center gap-3"
+													>
+														<Avatar className="w-9 h-9 border-2 border-background shadow-xs">
+															<AvatarImage
+																src={student.photo}
+																alt={student.fullname}
+															/>
+															<AvatarFallback className="bg-primary/10 text-primary font-bold">
+																{student.fullname.charAt(0).toUpperCase()}
+															</AvatarFallback>
+														</Avatar>
+														<div className="flex flex-col">
+															<span className="font-semibold group-hover:text-primary transition-colors">
+																{student.fullname}
+															</span>
+														</div>
+													</Link>
+												</TableCell>
+												<TableCell className="text-center font-mono text-xs">
+													{student.nipd}
+												</TableCell>
+												<TableCell className="text-center">
+													<Badge className="bg-emerald-500 hover:bg-emerald-600 shadow-xs border-none">
+														{student.count_h}
+													</Badge>
+												</TableCell>
+												<TableCell className="text-center">
+													<Badge className="bg-sky-500 hover:bg-sky-600 shadow-xs border-none">
+														{student.count_s}
+													</Badge>
+												</TableCell>
+												<TableCell className="text-center">
+													<Badge className="bg-indigo-500 hover:bg-indigo-600 shadow-xs border-none">
+														{student.count_i}
+													</Badge>
+												</TableCell>
+												<TableCell className="text-center">
+													<Badge className="bg-amber-500 hover:bg-amber-600 shadow-xs border-none">
+														{student.count_a}
+													</Badge>
+												</TableCell>
+												<TableCell className="text-center">
+													<Badge className="bg-rose-500 hover:bg-rose-600 shadow-xs border-none">
+														{student.count_b}
+													</Badge>
+												</TableCell>
+												<TableCell className="font-bold text-center">
+													{student.total_days}
+												</TableCell>
+												<TableCell className="text-center">
+													{getAttendanceRateBadge(student.attendance_rate)}
+												</TableCell>
+												<TableCell>
+													<Link
+														href={`/rekap/bulanan/${rombelId}/siswa/${student.student_id}?month=${month}&year=${year}`}
+													>
+														<IconChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+													</Link>
+												</TableCell>
+											</TableRow>
+										))
+									)}
+								</TableBody>
+							</Table>
+						</div>
 					</CardContent>
 				</Card>
 			</div>
