@@ -15,9 +15,9 @@ import {
 	type ModulListItem,
 	type ModulListQuery,
 	useModulsQuery,
-	useOwnedModulsQuery,
 } from "@/queries/useModulQuery";
 import { useAuth } from "@/store/useAuth";
+import { useSemester } from "@/store/useSemester";
 import type { Modul } from "@/types/modul";
 import { IconFilter, IconX } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
@@ -63,12 +63,35 @@ function useMediaQuery(query: string): boolean {
 export default function ModulList({ owned }: { owned?: boolean }) {
 	const [query, setQuery] = useState<ModulListQuery>(null);
 	const [open, setOpen] = useState(false);
+	const [semesterId, setSemesterId] = useState<string | null>(null);
 	const isDesktop = useMediaQuery("(min-width: 768px)");
 
 	const { user } = useAuth();
+	const { semesters } = useSemester();
+
+	// Set default semester to active semester
+	useEffect(() => {
+		if (semesters.length > 0 && !semesterId) {
+			const activeSemester = semesters.find(
+				(s) => s.is_active === 1 || s.is_active === true,
+			);
+			if (activeSemester) {
+				setSemesterId(activeSemester.id.toString());
+			}
+		}
+	}, [semesters, semesterId]);
 
 	const ownedTeacherId = user?.id;
-	const ownedQuery = useOwnedModulsQuery(ownedTeacherId);
+
+	// If owned, we construct the query manually to include semester_id
+	const ownedQueryFilter: ModulListQuery = owned
+		? {
+				teacher_id: ownedTeacherId,
+				semester_id: semesterId,
+			}
+		: undefined;
+
+	const ownedQuery = useModulsQuery(ownedQueryFilter);
 	const allQuery = useModulsQuery(query || undefined);
 	const listQuery = owned ? ownedQuery : allQuery;
 
@@ -89,6 +112,17 @@ export default function ModulList({ owned }: { owned?: boolean }) {
 
 	return (
 		<div className="relative">
+			{owned && (
+				<div className="flex justify-end my-3">
+					<div className="w-[200px]">
+						<SearchableSemesterSelect
+							onSelected={(value) => setSemesterId(value)}
+							defaultValue={semesterId || ""}
+							className="w-full"
+						/>
+					</div>
+				</div>
+			)}
 			{!owned && (
 				<div className="flex justify-start my-3">
 					<Sheet open={open} onOpenChange={setOpen}>
