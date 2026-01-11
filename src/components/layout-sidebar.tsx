@@ -1,16 +1,17 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import {
-	Breadcrumb,
-	BreadcrumbItem,
-	BreadcrumbLink,
-	BreadcrumbList,
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import {
-	SidebarInset,
-	SidebarProvider,
-	SidebarTrigger,
+    SidebarInset,
+    SidebarProvider,
+    SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { MobileNavbar } from "./mobile-navbar";
 import { ReactQueryProvider } from "./react-query-provider";
 
 export function LayoutSidebar({ children }: { children: React.ReactNode }) {
@@ -40,8 +41,11 @@ export function LayoutSidebar({ children }: { children: React.ReactNode }) {
 							</BreadcrumbList>
 						</Breadcrumb>
 					</header>
-					<main className="flex-1 overflow-y-auto">{children}</main>
+					<main className="flex-1 overflow-y-auto pb-20 md:pb-0">
+						{children}
+					</main>
 				</SidebarInset>
+				<MobileNavbar />
 			</SidebarProvider>
 		</ReactQueryProvider>
 	);
