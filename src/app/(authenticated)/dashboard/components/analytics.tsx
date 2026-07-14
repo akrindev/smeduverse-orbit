@@ -41,7 +41,7 @@ export default function AnalyticsCard() {
 					<div>
 						{/* Display your analytics data here */}
 						<p>Total Users: {analytics[0]?.totalUsers}</p>
-						<p>Total Modules: {analytics[0]?.totalModules}</p>
+						<p>Total Kelas Ajar: {analytics[0]?.totalModules}</p>
 					</div>
 				) : (
 					<p>No analytics data available.</p>

@@ -290,7 +290,7 @@ function AttendanceTable({ data }: AttendanceTableProps) {
 										</TableCell>
 										<TableCell className="hidden md:table-cell max-w-[180px] truncate">
 											<Link
-												href={`/modul/${item.modul?.uuid}`}
+												href={`/kelas-ajar/${item.modul?.uuid}`}
 												className="hover:underline"
 											>
 												<div className="flex items-center">
@@ -438,7 +438,7 @@ function AttendanceGrid({ data }: AttendanceTableProps) {
 									</span>
 								</div>
 								<Link
-									href={`/modul/${item.modul?.uuid}`}
+									href={`/kelas-ajar/${item.modul?.uuid}`}
 									className="inline-flex items-center gap-1 text-blue-700 text-sm hover:underline"
 								>
 									<span>Lihat detail</span>

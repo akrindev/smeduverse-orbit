@@ -1,4 +1,4 @@
-export interface Modul {
+export interface KelasAjar {
   uuid: string;
   teacher_id: string;
   rombongan_belajar_id: string;
@@ -59,7 +59,7 @@ export interface Semester {
   updated_at: Date | string;
 }
 
-// Minimal shape returned by backend for latest presence attached to a Modul
+// Minimal shape returned by backend for latest presence attached to a KelasAjar
 export interface LatestPresence {
   uuid: string;
   orbit_modul_uuid: string;

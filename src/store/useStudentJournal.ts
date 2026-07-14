@@ -4,7 +4,7 @@ export interface Attendance {
 	notes: string | null;
 }
 
-export interface Module {
+export interface KelasAjarRef {
 	uuid: string;
 	mapel: {
 		id: number;
@@ -26,7 +26,7 @@ export interface Journal {
 	created_at: string;
 	start_time: string;
 	end_time: string;
-	modul: Module;
+	modul: KelasAjarRef;
 	attendance: Attendance;
 	is_present: boolean;
 }

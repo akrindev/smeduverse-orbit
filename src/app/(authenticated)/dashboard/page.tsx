@@ -11,7 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthQuery } from "@/hooks/useAuthQuery";
 import { menuList } from "../components/menu-list";
-import ModulList from "../modul/components/modul-list";
+import KelasAjarList from "../kelas-ajar/components/kelas-ajar-list";
 
 // revalidate every 5 seconds
 // export const revalidate = 5;
@@ -163,13 +163,13 @@ export default function Page() {
 
 				<div className="mt-5">
 					<div className="space-y-1 mt-6">
-						<h2 className="font-semibold text-2xl tracking-tight">Modul</h2>
+						<h2 className="font-semibold text-2xl tracking-tight">Kelas Ajar</h2>
 						<p className="text-muted-foreground text-sm">
-							Modul yang Anda kelola
+							Kelas ajar yang Anda kelola
 						</p>
 					</div>
 					<Separator className="my-4" />
-					<ModulList owned />
+					<KelasAjarList owned />
 				</div>
 			</div>
 		</div>
