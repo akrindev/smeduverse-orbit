@@ -16,6 +16,7 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { useMonitorPresenceQuery } from "@/queries/useMonitorPresenceQuery";
+import { Skeleton } from "@/components/ui/skeleton";
 import type {
 	ActivePresence,
 	AttendanceRecord,
@@ -55,7 +56,7 @@ export default function MonitoringPresenceClient() {
 		.sort((a, b) => a - b);
 
 	if (isLoading) {
-		return <div className="py-8 text-center">Memuat data pemantauan...</div>;
+		return <MonitoringPresenceSkeleton />;
 	}
 
 	if (error) {
@@ -93,6 +94,43 @@ export default function MonitoringPresenceClient() {
 					<div className="gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
 						{groupedRombels[grade].map((rombel) => (
 							<RombelCard key={rombel.id} rombel={rombel} />
+						))}
+					</div>
+				</div>
+			))}
+		</div>
+	);
+}
+
+// Skeleton untuk kondisi pemuatan data pemantauan
+function MonitoringPresenceSkeleton() {
+	const grades = [7, 8, 9];
+	return (
+		<div className="space-y-6">
+			<div className="flex justify-between items-center bg-muted p-4 rounded-lg">
+				<Skeleton className="w-48 h-5" />
+				<div className="flex gap-4">
+					<Skeleton className="w-24 h-6" />
+					<Skeleton className="w-24 h-6" />
+				</div>
+			</div>
+			{grades.map((grade) => (
+				<div key={grade} className="space-y-4">
+					<Skeleton className="w-24 h-7" />
+					<div className="gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+						{Array.from({ length: 3 }).map((_, i) => (
+							<Card key={i}>
+								<CardHeader className="pb-2">
+									<Skeleton className="w-32 h-5" />
+									<Skeleton className="mt-1 w-24 h-4" />
+								</CardHeader>
+								<CardContent className="space-y-2">
+									<Skeleton className="w-full h-4" />
+									<Skeleton className="w-2/3 h-4" />
+									<Skeleton className="w-1/2 h-4" />
+									<Skeleton className="mt-2 w-full h-10" />
+								</CardContent>
+							</Card>
 						))}
 					</div>
 				</div>
@@ -155,12 +193,12 @@ function RombelCard({ rombel }: { rombel: RombelWithPresence }) {
 						<div className="flex items-center gap-2">
 							<BookOpen className="w-4 h-4 text-muted-foreground" />
 							<span className="font-medium">
-								{rombel.presence?.modul.mapel.nama}
+								{rombel.presence?.modul?.mapel.nama}
 							</span>
 						</div>
 						<div className="flex items-center gap-2">
 							<User className="w-4 h-4 text-muted-foreground" />
-							<span>{rombel.presence?.modul.teacher.fullname}</span>
+							<span>{rombel.presence?.modul?.teacher.fullname}</span>
 						</div>
 						<div className="flex items-center gap-2">
 							<CalendarClock className="w-4 h-4 text-muted-foreground" />

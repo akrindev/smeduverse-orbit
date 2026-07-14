@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/table";
 import ViewSwitcher from "@/components/ui/view-switcher";
 import { useMonitorJournalQuery } from "@/queries/useMonitorJournalQuery";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { Journal } from "@/types/monitor";
 
 export default function MonitoringJournalClient() {
@@ -29,7 +30,7 @@ export default function MonitoringJournalClient() {
 	const { data, isLoading, error } = todayJournalQuery;
 
 	if (isLoading) {
-		return <div className="py-8 text-center">Memuat data jurnal...</div>;
+		return <MonitoringJournalSkeleton view={view} />;
 	}
 
 	if (error) {
@@ -64,6 +65,46 @@ export default function MonitoringJournalClient() {
 	);
 }
 
+// Skeleton untuk kondisi pemuatan data jurnal
+function MonitoringJournalSkeleton({ view }: { view: "table" | "grid" }) {
+	return (
+		<Card>
+			<CardHeader className="flex flex-row justify-between items-center">
+				<div className="space-y-2">
+					<Skeleton className="w-48 h-6" />
+					<Skeleton className="w-64 h-4" />
+				</div>
+				<Skeleton className="w-24 h-8" />
+			</CardHeader>
+			<CardContent>
+				{view === "table" ? (
+					<div className="space-y-2">
+						<Skeleton className="w-full h-10" />
+						{Array.from({ length: 6 }).map((_, i) => (
+							<Skeleton key={i} className="w-full h-12" />
+						))}
+					</div>
+				) : (
+					<div className="gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+						{Array.from({ length: 6 }).map((_, i) => (
+							<Card key={i}>
+								<CardHeader>
+									<Skeleton className="w-32 h-5" />
+									<Skeleton className="mt-1 w-24 h-4" />
+								</CardHeader>
+								<CardContent className="space-y-2">
+									<Skeleton className="w-2/3 h-4" />
+									<Skeleton className="w-1/2 h-4" />
+								</CardContent>
+							</Card>
+						))}
+					</div>
+				)}
+			</CardContent>
+		</Card>
+	);
+}
+
 function JournalTable({ data }: { data: Journal[] }) {
 	return (
 		<Table>
@@ -95,19 +136,19 @@ function JournalRow({ journal }: { journal: Journal }) {
 	return (
 		<TableRow>
 			<TableCell>
-				<div className="font-medium">{journal.modul.teacher.fullname}</div>
+				<div className="font-medium">{journal.modul?.teacher.fullname}</div>
 				<div className="text-muted-foreground text-sm">
-					{journal.modul.teacher.niy}
+					{journal.modul?.teacher.niy}
 				</div>
 			</TableCell>
 			<TableCell
 				className="hover:underline cursor-pointer"
 				onClick={handleNavigate}
 			>
-				{journal.modul.mapel.nama}
+				{journal.modul?.mapel.nama}
 				<ExternalLink className="inline-block ml-2 w-3 h-3 text-blue-700" />
 			</TableCell>
-			<TableCell>{journal.modul.rombel.nama}</TableCell>
+			<TableCell>{journal.modul?.rombel.nama}</TableCell>
 			<TableCell>
 				{journal.start_time} - {journal.end_time}
 			</TableCell>
@@ -146,14 +187,14 @@ function JournalGrid({ data }: { data: Journal[] }) {
 					onClick={() => router.push(`/rekap/presensi/${journal.uuid}`)}
 				>
 					<CardHeader>
-						<CardTitle>{journal.modul.mapel.nama}</CardTitle>
-						<CardDescription>{journal.modul.rombel.nama}</CardDescription>
+						<CardTitle>{journal.modul?.mapel.nama}</CardTitle>
+						<CardDescription>{journal.modul?.rombel.nama}</CardDescription>
 					</CardHeader>
 					<CardContent className="space-y-2">
 						<div>
-							<p className="font-medium">{journal.modul.teacher.fullname}</p>
+							<p className="font-medium">{journal.modul?.teacher.fullname}</p>
 							<p className="text-muted-foreground text-sm">
-								{journal.modul.teacher.niy}
+								{journal.modul?.teacher.niy}
 							</p>
 						</div>
 						<p>
