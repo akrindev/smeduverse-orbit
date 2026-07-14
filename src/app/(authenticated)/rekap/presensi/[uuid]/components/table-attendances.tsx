@@ -74,8 +74,8 @@ export default function TableAttendances({ modulUuid }: TableAttendancesProps) {
 							p.uuid === presence.uuid ||
 							p.presence?.orbit_presence_uuid ===
 								presence.presence?.orbit_presence_uuid;
-						const sameModule = p.orbit_modul_uuid === presence.orbit_modul_uuid;
-						return sameSession && sameModule;
+						const sameKelasAjar = p.orbit_modul_uuid === presence.orbit_modul_uuid;
+						return sameSession && sameKelasAjar;
 					});
 
 					const status = (

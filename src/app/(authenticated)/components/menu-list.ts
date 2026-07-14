@@ -50,10 +50,10 @@ export const menuList: MenuItem[] = [
 		path: "/dashboard",
 	},
 	{
-		name: "Modul",
-		title: "Modul",
+		name: "Kelas Ajar",
+		title: "Kelas Ajar",
 		icon: IconGridPattern,
-		path: "/modul",
+		path: "/kelas-ajar",
 	},
 	{
 		name: "Monitoring",

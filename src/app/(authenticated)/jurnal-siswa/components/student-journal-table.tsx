@@ -144,7 +144,7 @@ function StudentJournalSubTable({
 				cell: ({ row }) => (
 					<div className="flex flex-col">
 						<Link
-							href={`/modul/${row.original.modul.uuid}/presensi/${row.original.presence_uuid}`}
+							href={`/kelas-ajar/${row.original.modul.uuid}/presensi/${row.original.presence_uuid}`}
 							className="hover:underline"
 						>
 							<div className="flex items-center gap-1 font-medium">
@@ -183,7 +183,7 @@ function StudentJournalSubTable({
 				),
 			},
 			{
-				header: "Modul",
+				header: "Kelas Ajar",
 				accessorKey: "modul",
 				cell: ({ row }) => (
 					<div className="flex flex-col">
@@ -359,7 +359,7 @@ function GroupedJournalGrid({ students }: { students: Student[] }) {
 								}
 								return (
 									<Link
-										href={`/modul/${journal.modul.uuid}/presensi/${journal.presence_uuid}`}
+										href={`/kelas-ajar/${journal.modul.uuid}/presensi/${journal.presence_uuid}`}
 										key={journal.presence_uuid}
 									>
 										<Card className="cursor-pointer">

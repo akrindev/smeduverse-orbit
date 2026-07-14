@@ -74,7 +74,7 @@ function PresenceJournalTable({ data }: { data: IAttendance[] }) {
 			<TableHeader>
 				<TableRow>
 					<TableHead>Judul</TableHead>
-					<TableHead>Modul</TableHead>
+					<TableHead>Kelas Ajar</TableHead>
 					<TableHead>Tanggal</TableHead>
 					<TableHead>Kehadiran</TableHead>
 				</TableRow>

@@ -98,7 +98,7 @@ export default function SheetDetailAttendance({
 														)}
 													</span>
 													<Link
-														href={`/modul/${presence.orbit_modul_uuid}/presensi/${presence.presence.orbit_presence_uuid}`}
+														href={`/kelas-ajar/${presence.orbit_modul_uuid}/presensi/${presence.presence.orbit_presence_uuid}`}
 													>
 														<span className="hover:underline">
 															{presence.title}

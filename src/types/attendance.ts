@@ -1,4 +1,4 @@
-import type { Modul } from "./modul";
+import type { KelasAjar } from "./modul";
 
 export interface IAttendance {
 	uuid: string;
@@ -11,7 +11,7 @@ export interface IAttendance {
 	created_at: string;
 	updated_at: string;
 	attendances: Attendance[];
-	modul?: Modul;
+	modul?: KelasAjar;
 	count_h?: number;
 	count_s?: number;
 	count_i?: number;

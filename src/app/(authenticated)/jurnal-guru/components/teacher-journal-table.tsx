@@ -74,7 +74,7 @@ function JournalTable({ journals }: { journals: TeacherJournalEntry[] }) {
 	const columns: ColumnDef<TeacherJournalEntry>[] = useMemo(
 		() => [
 			{
-				header: "Modul",
+				header: "Kelas Ajar",
 				accessorKey: "modul",
 				cell: ({ row }) => (
 					<div className="flex flex-col w-">
@@ -93,7 +93,7 @@ function JournalTable({ journals }: { journals: TeacherJournalEntry[] }) {
 				accessorKey: "title",
 				cell: ({ row }) => (
 					<Link
-						href={`/modul/${row.original.orbit_modul_uuid}/presensi/${row.original.uuid}`}
+						href={`/kelas-ajar/${row.original.orbit_modul_uuid}/presensi/${row.original.uuid}`}
 						className="hover:underline"
 					>
 						<div className="flex flex-col">

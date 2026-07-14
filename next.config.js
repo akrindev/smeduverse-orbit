@@ -34,6 +34,16 @@ const nextConfig = {
 				destination: "/login",
 				permanent: true,
 			},
+			{
+				source: "/modul",
+				destination: "/kelas-ajar",
+				permanent: true,
+			},
+			{
+				source: "/modul/:path*",
+				destination: "/kelas-ajar/:path*",
+				permanent: true,
+			},
 		];
 	},
 };

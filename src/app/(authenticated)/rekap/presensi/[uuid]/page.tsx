@@ -4,7 +4,7 @@ import { IconDownload } from "@tabler/icons-react";
 import type { AxiosPromise, AxiosResponse } from "axios";
 import { ArrowLeft, Loader } from "lucide-react";
 import Link from "next/link";
-// import ModuleAttendanceAnalytics from "./components/module-attendance-analytics";
+// import KelasAjarAttendanceAnalytics from "./components/kelas-ajar-attendance-analytics";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import BaseLoading from "@/components/base-loading";
@@ -13,20 +13,20 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/lib/api";
 import { useAuth } from "@/store/useAuth";
-import { useModul } from "@/store/useModul";
-import type { Modul } from "@/types/modul";
+import { useKelasAjar } from "@/store/useKelasAjar";
+import type { KelasAjar } from "@/types/modul";
 import TableAttendances from "./components/table-attendances";
 import TablePresences from "./components/table-presence";
 
 export default function RekapPage() {
 	const { uuid } = useParams<{ uuid: string }>();
 	const [loading, setLoading] = useState(false);
-	const [modul, fetchModul] = useModul<
+	const [kelasAjar, fetchKelasAjar] = useKelasAjar<
 		[
-			modul: Modul | null,
+			kelasAjar: KelasAjar | null,
 			fetchByUuid: (uuid: string) => AxiosPromise<AxiosResponse>,
 		]
-	>((state) => [state.modul, state.fetchByUuid]);
+	>((state) => [state.kelasAjar, state.fetchByUuid]);
 
 	const router = useRouter();
 
@@ -34,12 +34,12 @@ export default function RekapPage() {
 	const { user, isLoading } = useAuth();
 
 	useEffect(() => {
-		fetchModul(uuid).catch(() => {
-			router.push("/modul");
+		fetchKelasAjar(uuid).catch(() => {
+			router.push("/kelas-ajar");
 		});
-	}, [uuid, fetchModul, router]);
+	}, [uuid, fetchKelasAjar, router]);
 
-	if (!user || isLoading || !modul) {
+	if (!user || isLoading || !kelasAjar) {
 		return <BaseLoading />;
 	}
 
@@ -57,7 +57,7 @@ export default function RekapPage() {
 				link.href = url;
 				link.setAttribute(
 					"download",
-					`rekap presensi ${modul?.mapel.kode}-${modul?.rombel.nama}.xlsx`,
+					`rekap presensi ${kelasAjar?.mapel.kode}-${kelasAjar?.rombel.nama}.xlsx`,
 				);
 				document.body.appendChild(link);
 				link.click();
@@ -74,8 +74,8 @@ export default function RekapPage() {
 							Rekap Presensi
 						</h2>
 						<p className="text-muted-foreground text-sm">
-							Rekap presensi pada modul {modul?.mapel.nama} <br />
-							{modul?.rombel.nama} - {modul?.teacher.fullname}
+							Rekap presensi pada kelas ajar {kelasAjar?.mapel.nama} <br />
+							{kelasAjar?.rombel.nama} - {kelasAjar?.teacher.fullname}
 						</p>
 					</div>
 					<div className="flex gap-3 mt-5 md:mt-0">
@@ -90,7 +90,7 @@ export default function RekapPage() {
 							)}
 						</Button>
 						<div className="flex mb-2">
-							<Link href={`/modul/${uuid}`}>
+							<Link href={`/kelas-ajar/${uuid}`}>
 								<Button
 									variant="outline"
 									className="flex items-center gap-2 w-fit"
@@ -100,8 +100,8 @@ export default function RekapPage() {
 								</Button>
 							</Link>
 						</div>
-						{/* {isUser(user, modul?.teacher_id!) && (
-              <Link href={`/modul/${params.uuid}`}>
+						{/* {isUser(user, kelasAjar?.teacher_id!) && (
+              <Link href={`/kelas-ajar/${params.uuid}`}>
                 <Button variant='default'>
                   Lihat
                   <IconLink className='ml-1 w-4 h-4' />

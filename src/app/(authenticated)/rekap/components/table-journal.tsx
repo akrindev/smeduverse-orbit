@@ -69,7 +69,7 @@ function JournalTable({ data }: { data: IAttendance[] }) {
 		<Table>
 			<TableHeader>
 				<TableRow>
-					<TableHead>Modul</TableHead>
+					<TableHead>Kelas Ajar</TableHead>
 					<TableHead>Judul</TableHead>
 					<TableHead>Deskripsi</TableHead>
 				</TableRow>

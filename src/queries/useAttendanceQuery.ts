@@ -94,7 +94,7 @@ export function useAttendanceRecapQuery(modulUuid: string) {
 				return list;
 			} catch (error: any) {
 				if (error.response?.status === 404) {
-					throw new Error("Module not found");
+					throw new Error("Kelas ajar tidak ditemukan");
 				}
 				throw error;
 			}
