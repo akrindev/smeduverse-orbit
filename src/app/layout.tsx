@@ -2,11 +2,11 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
-const inter = Inter({ subsets: ["latin"] });
+const plusJakartaSans = Plus_Jakarta_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
 	title: {
@@ -44,7 +44,7 @@ export default function RootLayout({
 			<body
 				className={cn(
 					"bg-background min-h-screen font-sans antialiased",
-					inter.className,
+					plusJakartaSans.className,
 				)}
 				suppressHydrationWarning
 			>

@@ -1,25 +1,29 @@
 "use client";
 
-import { Calendar, Clock, PartyPopper, Sparkles } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import SplitText from "@/components/ui/SplitText/SplitText";
+import { useAuthQuery } from "@/hooks/useAuthQuery";
+import { Calendar, PartyPopper, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import SplitText from "@/components/ui/SplitText/SplitText";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useAuthQuery } from "@/hooks/useAuthQuery";
 import { menuList } from "../components/menu-list";
 import KelasAjarList from "../kelas-ajar/components/kelas-ajar-list";
 
-// revalidate every 5 seconds
-// export const revalidate = 5;
-
-// export const metadata: Metadata = {
-//   title: "Dashboard",
-//   description: "Halaman utama",
-// };
+const iconColors: Record<string, string> = {
+	"Kelas Ajar": "text-blue-500",
+	"Monitoring": "text-emerald-500",
+	"Presensi Siswa Apel": "text-amber-500",
+	"Jurnal Guru": "text-violet-500",
+	"Jurnal Kelas": "text-indigo-500",
+	"Rekap Laporan": "text-rose-500",
+	"Rekap Kehadiran Bulanan": "text-teal-500",
+	"Semester": "text-cyan-500",
+	"Jadwal Jam Pelajaran": "text-orange-500",
+	"Mata Pelajaran": "text-purple-500",
+};
 
 export default function Page() {
 	const router = useRouter();
@@ -39,7 +43,6 @@ export default function Page() {
 
 	// Ensure user is authenticated
 	useEffect(() => {
-		// If authentication is already determined and user is not authenticated, redirect to login
 		if (!authLoading && !isAuthenticated) {
 			router.push("/login");
 			return;
@@ -48,17 +51,11 @@ export default function Page() {
 		if (!authLoading && isAuthenticated) {
 			setIsLoading(false);
 		}
-
-		// No need to call requireAuth() here as it can cause redirect loops
-		// Just check the authenticated state from the store
 	}, [isAuthenticated, authLoading, router]);
 
-	// console.log(analyticsData);
 	const filteredMenu = menuList.filter((item) => {
 		if (item.name === "Dashboard") return false;
-		// check if item.roles has user roles
 		if (!item.roles) return true;
-
 		if (item.separator) return false;
 
 		return item.roles?.some((role) =>
@@ -103,7 +100,6 @@ export default function Page() {
 										{user?.teacher?.fullname?.charAt(0) || "U"}
 									</AvatarFallback>
 								</Avatar>
-								{/* Small confetti near avatar */}
 								<Sparkles className="-top-1 -right-1 absolute w-3 h-3 text-yellow-400 animate-pulse" />
 							</div>
 						</div>
@@ -132,7 +128,8 @@ export default function Page() {
 					</div>
 				</div>
 
-				<div className="flex justify-between items-center">
+				{/* Quick Menu Header */}
+				<div className="flex justify-between items-center mb-1">
 					<div className="space-y-1">
 						<h2 className="font-semibold text-2xl tracking-tight">
 							Quick Menu
@@ -143,26 +140,29 @@ export default function Page() {
 					</div>
 				</div>
 
-				<div className="gap-4 grid grid-cols-2 lg:grid-cols-4 mt-5">
-					{filteredMenu.map((item) => (
-						<Link href={item.path} key={item.name}>
-							<Card className="shadow-md h-full duration-500 cursor-pointer hover:scale-105">
-								<CardHeader className="flex flex-row justify-between items-center space-y-0 pb-2">
-									{/* <CardTitle className="font-medium text-sm">
-                    {item.name}
-                  </CardTitle> */}
-									<item.icon className="w-4 h-4 text-muted-foreground" />
-								</CardHeader>
-								<CardContent>
-									<div className="font-bold text-md">{item.name}</div>
-								</CardContent>
-							</Card>
-						</Link>
-					))}
+				{/* Pure Icon Grid (No Card, No Icon Background Wrapper) */}
+				<div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-4 sm:gap-6 py-3">
+					{filteredMenu.map((item) => {
+						const textColor = iconColors[item.name] || "text-primary";
+						const IconComponent = item.icon;
+
+						return (
+							<Link
+								href={item.path}
+								key={item.name}
+								className="group flex flex-col items-center text-center cursor-pointer p-1 transition-transform duration-200 hover:scale-105"
+							>
+								<IconComponent className={`w-8 h-8 sm:w-9 sm:h-9 ${textColor} mb-2 group-hover:scale-110 transition-transform duration-200 stroke-[1.8]`} />
+								<span className="text-xs font-medium text-foreground/85 group-hover:text-primary transition-colors leading-tight text-center line-clamp-2">
+									{item.name}
+								</span>
+							</Link>
+						);
+					})}
 				</div>
 
-				<div className="mt-5">
-					<div className="space-y-1 mt-6">
+				<div className="mt-6">
+					<div className="space-y-1 mt-4">
 						<h2 className="font-semibold text-2xl tracking-tight">Kelas Ajar</h2>
 						<p className="text-muted-foreground text-sm">
 							Kelas ajar yang Anda kelola

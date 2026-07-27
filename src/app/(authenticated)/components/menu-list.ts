@@ -7,6 +7,7 @@ import {
 	IconNotebook,
 	IconNotes,
 	IconPlayerPlay,
+	IconQrcode,
 	IconReportAnalytics,
 	IconUserCheck,
 } from "@tabler/icons-react";
@@ -60,6 +61,13 @@ export const menuList: MenuItem[] = [
 		title: "Monitoring",
 		icon: IconUserCheck,
 		path: "/monitoring",
+	},
+	{
+		name: "Presensi Siswa Apel",
+		title: "Presensi Siswa Apel",
+		icon: IconQrcode,
+		path: "/presensi-siswa",
+		roles: ["guru", "admin"],
 	},
 	{
 		name: "Jurnal Guru",
