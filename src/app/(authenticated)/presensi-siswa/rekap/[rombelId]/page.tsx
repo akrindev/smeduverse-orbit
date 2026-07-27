@@ -135,8 +135,8 @@ export default function PresensiSiswaRekapRombelPage() {
 				else if (status === "a") countA++;
 			});
 
-			const totalDays = effectiveSessionDays;
-			const rate = totalDays > 0 ? Math.min(100, Math.round((countH / totalDays) * 100)) : 0;
+			const totalDays = countH + countS + countI + countA;
+			const rate = totalDays > 0 ? Math.round((countH / totalDays) * 100) : 0;
 
 			return {
 				stId,
