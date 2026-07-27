@@ -1,13 +1,5 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useAuthQuery } from "@/hooks/useAuthQuery";
-import { useLatestApelAttendanceQuery, useStoreApelAttendanceMutation } from "@/queries/useApelAttendanceQuery";
-import type { ApelStudent } from "@/types/apel-attendance";
 import { Scanner, useDevices } from "@yudiel/react-qr-scanner";
 import {
 	AlertCircle,
@@ -27,14 +19,29 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAuthQuery } from "@/hooks/useAuthQuery";
+import {
+	useLatestApelAttendanceQuery,
+	useOrbitSettingQuery,
+	useStoreApelAttendanceMutation,
+} from "@/queries/useApelAttendanceQuery";
+import type { ApelStudent } from "@/types/apel-attendance";
 
 interface ScanLog {
 	id: string;
 	nis: string;
 	timestamp: string;
 	student?: ApelStudent;
+	rombelName?: string;
 	status: "success" | "error";
 	message: string;
+	createdAt?: string;
 }
 
 export default function PresensiSiswaScanPage() {
@@ -52,17 +59,20 @@ export default function PresensiSiswaScanPage() {
 	const [scanLogs, setScanLogs] = useState<ScanLog[]>([]);
 	const [lastScannedResult, setLastScannedResult] = useState<{
 		student?: ApelStudent;
+		rombelName?: string;
 		message: string;
 		status: "success" | "error";
 		timestamp: string;
+		createdAt?: string;
 	} | null>(null);
 
 	const lastQrScanRef = useRef<{ code: string; time: number }>({ code: "", time: 0 });
 	const storeMutation = useStoreApelAttendanceMutation();
 
-	// Today's summary data
+	// Today's summary data & settings
 	const todayDate = new Date().toISOString().split("T")[0];
 	const { data: latestAttendanceData, refetch: refetchLatest } = useLatestApelAttendanceQuery({ date: todayDate });
+	const { data: settingData } = useOrbitSettingQuery("apel_time_start");
 
 	// Authentication Gate
 	useEffect(() => {
@@ -78,6 +88,82 @@ export default function PresensiSiswaScanPage() {
 		return () => clearInterval(timer);
 	}, []);
 
+	// Auto-hydrate scanLogs and lastScannedResult from latestAttendanceData when visiting/re-visiting page
+	useEffect(() => {
+		if (latestAttendanceData?.attendances?.data?.length) {
+			const items = latestAttendanceData.attendances.data;
+
+			if (scanLogs.length === 0) {
+				const initialLogs: ScanLog[] = items.map((item) => {
+					const timeStr = item.created_at
+						? new Date(item.created_at).toLocaleTimeString("id-ID", {
+								hour: "2-digit",
+								minute: "2-digit",
+								second: "2-digit",
+							})
+						: "--:--";
+
+					return {
+						id: String(item.id),
+						nis: item.student?.nipd || item.student_id,
+						timestamp: timeStr,
+						student: item.student,
+						rombelName: item.rombel?.nama || (item.student as any)?.rombongan_belajar?.nama,
+						status: "success",
+						message: "Presensi Apel",
+						createdAt: item.created_at,
+					};
+				});
+				setScanLogs(initialLogs);
+			}
+
+			if (!lastScannedResult && items[0]) {
+				const top = items[0];
+				const timeStr = top.created_at
+					? new Date(top.created_at).toLocaleTimeString("id-ID", {
+							hour: "2-digit",
+							minute: "2-digit",
+							second: "2-digit",
+						})
+					: "--:--";
+
+				setLastScannedResult({
+					student: top.student,
+					rombelName: top.rombel?.nama || (top.student as any)?.rombongan_belajar?.nama,
+					message: "Presensi Apel",
+					status: "success",
+					timestamp: timeStr,
+					createdAt: top.created_at,
+				});
+			}
+		}
+	}, [latestAttendanceData]);
+
+	// Check if attendance is Terlambat (Late) based on apel_time_start setting
+	const checkIsLate = (timeOrDateString: string) => {
+		if (!timeOrDateString) return false;
+
+		let timeStr = timeOrDateString;
+		if (timeOrDateString.includes("T") || timeOrDateString.includes("-")) {
+			const dateObj = new Date(timeOrDateString);
+			timeStr = dateObj.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", hour12: false });
+		}
+
+		const cleanTime = timeStr.replace(".", ":");
+		const [h, m] = cleanTime.split(":").map(Number);
+
+		const cutoffStr = (settingData?.value as string) || "07:00";
+		const cleanCutoff = cutoffStr.replace(".", ":");
+		const [cutH, cutM] = cleanCutoff.split(":").map(Number);
+
+		if (isNaN(h) || isNaN(m) || isNaN(cutH) || isNaN(cutM)) return false;
+
+		const scanMinutes = h * 60 + m;
+		const cutoffMinutes = cutH * 60 + cutM;
+
+		return scanMinutes > cutoffMinutes;
+	};
+
 	// Audio Player for Success and Failed Notifications from /sounds/
 	const playSound = (type: "success" | "error") => {
 		if (!soundEnabled) return;
@@ -90,7 +176,6 @@ export default function PresensiSiswaScanPage() {
 			const audio = new Audio(soundFile);
 			audio.currentTime = 0;
 			audio.play().catch(() => {
-				// Fallback to Web Audio Synth if autoplay is restricted
 				playSynthSound(type);
 			});
 		} catch (e) {
@@ -152,15 +237,19 @@ export default function PresensiSiswaScanPage() {
 				nis: cleanNis,
 				timestamp: timeStr,
 				student: result.student,
+				rombelName: (result.student as any)?.rombongan_belajar?.nama,
 				status: "success",
 				message: result.message,
+				createdAt: new Date().toISOString(),
 			};
 
 			setLastScannedResult({
 				student: result.student,
+				rombelName: (result.student as any)?.rombongan_belajar?.nama,
 				message: result.message,
 				status: "success",
 				timestamp: timeStr,
+				createdAt: new Date().toISOString(),
 			});
 			setScanLogs((prev) => [newLog, ...prev]);
 			refetchLatest();
@@ -209,12 +298,10 @@ export default function PresensiSiswaScanPage() {
 		detectedCodes.forEach((code) => {
 			const { boundingBox, rawValue } = code;
 			if (boundingBox) {
-				// 1. Draw Emerald Green Bounding Box
 				ctx.strokeStyle = "#10b981";
 				ctx.lineWidth = 3;
 				ctx.strokeRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
 
-				// 2. Draw Text Overlay Badge above the detected bounding box
 				if (rawValue) {
 					const text = `${rawValue}`;
 					ctx.font = "bold 13px sans-serif";
@@ -225,7 +312,6 @@ export default function PresensiSiswaScanPage() {
 					const badgeX = boundingBox.x + (boundingBox.width - badgeWidth) / 2;
 					const badgeY = Math.max(8, boundingBox.y - badgeHeight - 6);
 
-					// Draw rounded background pill
 					ctx.fillStyle = "rgba(16, 185, 129, 0.95)";
 					if (typeof ctx.roundRect === "function") {
 						ctx.beginPath();
@@ -235,7 +321,6 @@ export default function PresensiSiswaScanPage() {
 						ctx.fillRect(badgeX, badgeY, badgeWidth, badgeHeight);
 					}
 
-					// Draw White Text inside badge
 					ctx.fillStyle = "#ffffff";
 					ctx.textAlign = "center";
 					ctx.textBaseline = "middle";
@@ -432,7 +517,7 @@ export default function PresensiSiswaScanPage() {
 
 					{/* Outer Padded Card Container for Margin & Spacing */}
 					<div className="p-4 sm:p-5 bg-card border rounded-2xl shadow-md">
-						{/* 1:1 Aspect Ratio Scanner Container (Clean background, NO static box line, ONLY animated laser beam line) */}
+						{/* 1:1 Aspect Ratio Scanner Container */}
 						<div className="w-full aspect-square max-h-[480px] bg-black rounded-xl overflow-hidden shadow-inner border-2 border-emerald-500/30 relative flex items-center justify-center mx-auto">
 							{isCameraActive ? (
 								<>
@@ -442,7 +527,7 @@ export default function PresensiSiswaScanPage() {
 										scanDelay={2000}
 										allowMultiple={false}
 										components={{
-											finder: false, // Static box line removed!
+											finder: false,
 											torch: true,
 											zoom: true,
 											tracker: customGreenTracker,
@@ -462,7 +547,7 @@ export default function PresensiSiswaScanPage() {
 
 									<div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-xs text-white text-[11px] px-2.5 py-1 rounded-md flex items-center gap-1.5 z-10 border border-white/10">
 										<span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-										<span>Scanner Laser Line Active</span>
+										<span>Scanner Active</span>
 									</div>
 								</>
 							) : (
@@ -507,50 +592,72 @@ export default function PresensiSiswaScanPage() {
 						<CardContent className="pt-4">
 							{lastScannedResult ? (
 								<div
-									className={`p-4 rounded-lg border ${
+									className={`p-4 rounded-xl border shadow-xs ${
 										lastScannedResult.status === "success"
-											? "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800"
-											: "bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800"
+											? "bg-emerald-50/70 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800"
+											: "bg-red-50/70 dark:bg-red-950/40 border-red-200 dark:border-red-800"
 									}`}
 								>
-									<div className="flex items-start gap-3">
-										{lastScannedResult.status === "success" ? (
-											<CheckCircle2 className="w-8 h-8 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-										) : (
-											<AlertCircle className="w-8 h-8 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-										)}
-										<div className="flex-1">
-											<h3
-												className={`font-bold text-base ${
-													lastScannedResult.status === "success"
-														? "text-emerald-900 dark:text-emerald-100"
-														: "text-red-900 dark:text-red-100"
-												}`}
-											>
-												{lastScannedResult.message}
-											</h3>
-											{lastScannedResult.student && (
-												<div className="mt-2 text-xs space-y-1 text-muted-foreground border-t pt-2">
-													<p>
-														<span className="font-semibold text-foreground">Siswa:</span>{" "}
-														{lastScannedResult.student.fullname}
-													</p>
-													<p>
-														<span className="font-semibold text-foreground">NIPD / NIS:</span>{" "}
-														{lastScannedResult.student.nipd}
-													</p>
-													<p>
-														<span className="font-semibold text-foreground">ID Siswa:</span>{" "}
-														{lastScannedResult.student.student_id}
-													</p>
-												</div>
-											)}
+									<div className="flex items-start gap-4">
+										<Avatar className="w-14 h-14 border-2 border-emerald-500/50 shadow-xs shrink-0">
+											<AvatarImage
+												src={(lastScannedResult.student as any)?.avatar}
+												alt={lastScannedResult.student?.fullname}
+											/>
+											<AvatarFallback className="bg-emerald-600 text-white font-bold text-lg">
+												{lastScannedResult.student?.fullname?.substring(0, 2).toUpperCase() || "SW"}
+											</AvatarFallback>
+										</Avatar>
+
+										<div className="flex-1 min-w-0">
+											<div className="flex items-center justify-between gap-2">
+												<h3 className="font-bold text-base truncate leading-tight">
+													{lastScannedResult.student?.fullname || "Presensi Apel"}
+												</h3>
+
+												{/* Status badge: Terlambat vs Hadir vs Gagal */}
+												{lastScannedResult.status === "success" ? (
+													checkIsLate(lastScannedResult.timestamp || lastScannedResult.createdAt || "") ? (
+														<Badge className="bg-amber-500 hover:bg-amber-600 text-white font-semibold text-[11px] shrink-0">
+															Terlambat
+														</Badge>
+													) : (
+														<Badge className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-[11px] shrink-0">
+															Hadir
+														</Badge>
+													)
+												) : (
+													<Badge variant="destructive" className="text-[11px] shrink-0">
+														Gagal
+													</Badge>
+												)}
+											</div>
+
+											<div className="mt-2 space-y-1 text-xs text-muted-foreground border-t pt-2">
+												<p className="flex items-center gap-1.5">
+													<span className="font-medium text-foreground">NIS / NIPD:</span>{" "}
+													<span className="font-mono">
+														{lastScannedResult.student?.nipd ||
+															(lastScannedResult.student as any)?.nisn ||
+															(lastScannedResult as any).nis ||
+															"-"}
+													</span>
+												</p>
+												<p className="flex items-center gap-1.5">
+													<span className="font-medium text-foreground">Kelas:</span>{" "}
+													<span>
+														{lastScannedResult.rombelName ||
+															(lastScannedResult.student as any)?.rombongan_belajar?.nama ||
+															"-"}
+													</span>
+												</p>
+											</div>
 										</div>
 									</div>
 								</div>
 							) : (
 								<div className="py-10 text-center text-muted-foreground text-sm border border-dashed rounded-md">
-									Belum ada data scan pada sesi pemindaian ini
+									Belum ada data presensi apel hari ini
 								</div>
 							)}
 						</CardContent>
@@ -575,29 +682,62 @@ export default function PresensiSiswaScanPage() {
 									Belum ada aktivitas scan.
 								</div>
 							) : (
-								<div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
-									{scanLogs.map((log) => (
-										<div
-											key={log.id}
-											className="p-3 border rounded-lg text-xs flex items-center justify-between bg-card"
-										>
-											<div>
-												<p className="font-bold border-b-0">
-													{log.student?.fullname || `NIS: ${log.nis}`}
-												</p>
-												<p className="text-muted-foreground text-[11px]">{log.message}</p>
+								<div className="space-y-2.5 max-h-[320px] overflow-y-auto pr-1">
+									{scanLogs.map((log) => {
+										const isLate = checkIsLate(log.timestamp || log.createdAt || "");
+										const nipdText = log.student?.nipd || (log.student as any)?.nisn || log.nis || "-";
+										const kelasText =
+											log.rombelName || (log.student as any)?.rombongan_belajar?.nama || "-";
+
+										return (
+											<div
+												key={log.id}
+												className="p-3 border rounded-xl text-xs flex items-center justify-between bg-card hover:bg-muted/40 transition-colors gap-3"
+											>
+												<div className="flex items-center gap-3 min-w-0">
+													<Avatar className="w-10 h-10 border shrink-0">
+														<AvatarImage
+															src={(log.student as any)?.avatar}
+															alt={log.student?.fullname}
+														/>
+														<AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
+															{log.student?.fullname?.substring(0, 2).toUpperCase() || "SW"}
+														</AvatarFallback>
+													</Avatar>
+													<div className="min-w-0">
+														<p className="font-bold truncate text-sm">
+															{log.student?.fullname || `NIS: ${log.nis}`}
+														</p>
+														<p className="text-muted-foreground text-[11px] truncate">
+															NIS: <span className="font-mono font-medium">{nipdText}</span> • Kelas:{" "}
+															<span className="font-medium">{kelasText}</span>
+														</p>
+													</div>
+												</div>
+
+												<div className="text-right shrink-0">
+													{log.status === "success" ? (
+														isLate ? (
+															<Badge className="bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-semibold">
+																Terlambat
+															</Badge>
+														) : (
+															<Badge className="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-semibold">
+																Hadir
+															</Badge>
+														)
+													) : (
+														<Badge variant="destructive" className="text-[10px]">
+															Gagal
+														</Badge>
+													)}
+													<p className="text-muted-foreground text-[10px] mt-1 font-mono">
+														{log.timestamp}
+													</p>
+												</div>
 											</div>
-											<div className="text-right shrink-0 ml-2">
-												<Badge
-													variant={log.status === "success" ? "default" : "destructive"}
-													className="text-[10px]"
-												>
-													{log.status === "success" ? "Hadir" : "Gagal"}
-												</Badge>
-												<p className="text-muted-foreground text-[10px] mt-1">{log.timestamp}</p>
-											</div>
-										</div>
-									))}
+										);
+									})}
 								</div>
 							)}
 						</CardContent>
