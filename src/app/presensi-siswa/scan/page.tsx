@@ -1,22 +1,35 @@
 "use client";
 
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { Scanner, useDevices } from "@yudiel/react-qr-scanner";
 import {
+	Activity,
 	AlertCircle,
+	BadgeCheck,
+	Calendar,
 	Camera,
 	CheckCircle2,
 	Clock,
+	Flame,
+	GraduationCap,
 	Maximize,
 	Minimize,
+	Moon,
 	QrCode,
+	ShieldCheck,
+	Sparkles,
+	Sun,
+	User,
 	Volume2,
 	VolumeX,
 	Wifi,
+	XCircle,
 	Zap,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -24,6 +37,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthQuery } from "@/hooks/useAuthQuery";
 import {
@@ -47,6 +61,7 @@ interface ScanLog {
 export default function PresensiSiswaScanPage() {
 	const router = useRouter();
 	const { isAuthenticated, isLoading: authLoading } = useAuthQuery();
+	const { theme, setTheme } = useTheme();
 	const devices = useDevices();
 
 	const [isMounted, setIsMounted] = useState<boolean>(false);
@@ -99,9 +114,8 @@ export default function PresensiSiswaScanPage() {
 						? new Date(item.created_at).toLocaleTimeString("id-ID", {
 								hour: "2-digit",
 								minute: "2-digit",
-								second: "2-digit",
-							})
-						: "--:--";
+							}) + " WIB"
+						: "--:-- WIB";
 
 					return {
 						id: String(item.id),
@@ -123,9 +137,8 @@ export default function PresensiSiswaScanPage() {
 					? new Date(top.created_at).toLocaleTimeString("id-ID", {
 							hour: "2-digit",
 							minute: "2-digit",
-							second: "2-digit",
-						})
-					: "--:--";
+						}) + " WIB"
+					: "--:-- WIB";
 
 				setLastScannedResult({
 					student: top.student,
@@ -149,7 +162,7 @@ export default function PresensiSiswaScanPage() {
 			timeStr = dateObj.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", hour12: false });
 		}
 
-		const cleanTime = timeStr.replace(".", ":");
+		const cleanTime = timeStr.replace(" WIB", "").replace(".", ":");
 		const [h, m] = cleanTime.split(":").map(Number);
 
 		const cutoffStr = (settingData?.value as string) || "07:00";
@@ -221,11 +234,11 @@ export default function PresensiSiswaScanPage() {
 		const cleanNis = nisCode.trim();
 		if (!cleanNis || storeMutation.isPending) return;
 
-		const timeStr = new Date().toLocaleTimeString("id-ID", {
-			hour: "2-digit",
-			minute: "2-digit",
-			second: "2-digit",
-		});
+		const timeStr =
+			new Date().toLocaleTimeString("id-ID", {
+				hour: "2-digit",
+				minute: "2-digit",
+			}) + " WIB";
 
 		try {
 			const result = await storeMutation.mutateAsync({ nis: cleanNis });
@@ -401,7 +414,9 @@ export default function PresensiSiswaScanPage() {
 					<Link href="/presensi-siswa" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
 						<Image src="/orbit.png" width={32} height={32} alt="Orbit Logo" />
 						<div>
-							<h1 className="font-bold text-base leading-tight tracking-tight">Presensi Apel Siswa</h1>
+							<h1 className="font-bold text-base leading-tight tracking-tight flex items-center gap-1.5">
+								Presensi Apel Siswa <BadgeCheck className="w-4 h-4 text-primary" />
+							</h1>
 							<p className="text-[11px] text-muted-foreground">Smeduverse Orbit Station</p>
 						</div>
 					</Link>
@@ -429,7 +444,7 @@ export default function PresensiSiswaScanPage() {
 					)}
 				</div>
 
-				{/* Right: Date, Live Clock & Actions */}
+				{/* Right: Date, Live Clock, Theme Switcher & Actions */}
 				<div className="flex items-center gap-2">
 					<div className="hidden md:flex items-center gap-2 bg-muted/60 px-3 py-1.5 rounded-md text-xs font-mono">
 						<Clock className="w-3.5 h-3.5 text-primary" />
@@ -448,15 +463,29 @@ export default function PresensiSiswaScanPage() {
 										{currentTime.toLocaleTimeString("id-ID", {
 											hour: "2-digit",
 											minute: "2-digit",
-											second: "2-digit",
-										})}
+										})}{" "}
+										WIB
 									</span>
 								</>
 							) : (
-								"--:--:--"
+								"--:-- WIB"
 							)}
 						</span>
 					</div>
+
+					{/* Theme Switcher Button */}
+					<Button
+						variant="outline"
+						size="sm"
+						title="Toggle Theme"
+						onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+					>
+						{theme === "dark" ? (
+							<Sun className="w-4 h-4 text-amber-400" />
+						) : (
+							<Moon className="w-4 h-4 text-slate-700" />
+						)}
+					</Button>
 
 					<Button variant="outline" size="sm" onClick={() => setSoundEnabled(!soundEnabled)}>
 						{soundEnabled ? (
@@ -479,7 +508,9 @@ export default function PresensiSiswaScanPage() {
 					<div className="flex flex-wrap items-center justify-between gap-2 p-3 bg-card border rounded-xl shadow-xs">
 						<div className="flex items-center gap-2">
 							<QrCode className="w-4 h-4 text-primary" />
-							<span className="text-xs font-bold">Pemindai QR Code</span>
+							<span className="text-xs font-bold flex items-center gap-1">
+								Pemindai QR Code <Sparkles className="w-3 h-3 text-amber-500" />
+							</span>
 						</div>
 
 						<div className="flex items-center gap-2">
@@ -547,7 +578,9 @@ export default function PresensiSiswaScanPage() {
 
 									<div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-xs text-white text-[11px] px-2.5 py-1 rounded-md flex items-center gap-1.5 z-10 border border-white/10">
 										<span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-										<span>Scanner Active</span>
+										<span className="flex items-center gap-1">
+											Scanner Active <ShieldCheck className="w-3 h-3 text-emerald-400" />
+										</span>
 									</div>
 								</>
 							) : (
@@ -579,25 +612,50 @@ export default function PresensiSiswaScanPage() {
 
 				{/* Right Section: Student Scan Result Banner & Session Activity */}
 				<div className="lg:col-span-5 flex flex-col space-y-6">
-					{/* Result Banner Card */}
-					<Card className="shadow-md">
+					{/* Result Banner Card with DotLottie Player */}
+					<Card className="shadow-md relative overflow-hidden">
 						<CardHeader className="pb-3 border-b flex flex-row items-center justify-between">
-							<CardTitle className="text-base">Hasil Scan Terakhir</CardTitle>
+							<CardTitle className="text-base flex items-center gap-1.5">
+								<Flame className="w-4 h-4 text-amber-500" /> Hasil Scan Terakhir
+							</CardTitle>
 							{lastScannedResult && (
-								<span className="text-xs font-mono text-muted-foreground">
-									{lastScannedResult.timestamp}
+								<span className="text-xs font-mono text-muted-foreground flex items-center gap-1">
+									<Clock className="w-3 h-3" /> {lastScannedResult.timestamp}
 								</span>
 							)}
 						</CardHeader>
 						<CardContent className="pt-4">
 							{lastScannedResult ? (
 								<div
-									className={`p-4 rounded-xl border shadow-xs ${
+									className={`p-4 rounded-xl border shadow-xs relative ${
 										lastScannedResult.status === "success"
 											? "bg-emerald-50/70 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800"
 											: "bg-red-50/70 dark:bg-red-950/40 border-red-200 dark:border-red-800"
 									}`}
 								>
+									{/* DotLottie Animation overlay for success / error */}
+									<div className="absolute right-2 top-2 pointer-events-none opacity-85">
+										{lastScannedResult.status === "success" ? (
+											isMounted && (
+												<DotLottieReact
+													src="/lotties/success-confetti.lottie"
+													autoplay
+													loop
+													style={{ height: "65px", width: "65px" }}
+												/>
+											)
+										) : (
+											isMounted && (
+												<DotLottieReact
+													src="/lotties/error.lottie"
+													autoplay
+													loop
+													style={{ height: "55px", width: "55px" }}
+												/>
+											)
+										)}
+									</div>
+
 									<div className="flex items-start gap-4">
 										<Avatar className="w-14 h-14 border-2 border-emerald-500/50 shadow-xs shrink-0">
 											<AvatarImage
@@ -609,9 +667,9 @@ export default function PresensiSiswaScanPage() {
 											</AvatarFallback>
 										</Avatar>
 
-										<div className="flex-1 min-w-0">
+										<div className="flex-1 min-w-0 pr-8">
 											<div className="flex items-center justify-between gap-2">
-												<h3 className="font-bold text-base truncate leading-tight">
+												<h3 className="font-bold text-base truncate leading-tight flex items-center gap-1">
 													{lastScannedResult.student?.fullname || "Presensi Apel"}
 												</h3>
 
@@ -633,8 +691,9 @@ export default function PresensiSiswaScanPage() {
 												)}
 											</div>
 
-											<div className="mt-2 space-y-1 text-xs text-muted-foreground border-t pt-2">
+											<div className="mt-2.5 space-y-1 text-xs text-muted-foreground border-t pt-2">
 												<p className="flex items-center gap-1.5">
+													<User className="w-3.5 h-3.5 text-muted-foreground" />
 													<span className="font-medium text-foreground">NIS / NIPD:</span>{" "}
 													<span className="font-mono">
 														{lastScannedResult.student?.nipd ||
@@ -644,6 +703,7 @@ export default function PresensiSiswaScanPage() {
 													</span>
 												</p>
 												<p className="flex items-center gap-1.5">
+													<GraduationCap className="w-3.5 h-3.5 text-muted-foreground" />
 													<span className="font-medium text-foreground">Kelas:</span>{" "}
 													<span>
 														{lastScannedResult.rombelName ||
@@ -656,84 +716,97 @@ export default function PresensiSiswaScanPage() {
 									</div>
 								</div>
 							) : (
-								<div className="py-10 text-center text-muted-foreground text-sm border border-dashed rounded-md">
-									Belum ada data presensi apel hari ini
+								<div className="py-8 text-center text-muted-foreground text-xs flex flex-col items-center justify-center">
+									<DotLottieReact
+										src="/lotties/empty.lottie"
+										autoplay
+										loop
+										style={{ height: "90px", width: "90px" }}
+									/>
+									<p className="mt-2 text-xs">Belum ada data presensi apel hari ini</p>
 								</div>
 							)}
 						</CardContent>
 					</Card>
 
-					{/* Live Session Log List */}
+					{/* Live Session Log List (Clean Divided List with Separator, Top 10 items) */}
 					<Card className="shadow-xs flex-1">
 						<CardHeader className="pb-3 border-b flex flex-row items-center justify-between">
 							<div>
-								<CardTitle className="text-base">Aktivitas Sesi Presensi</CardTitle>
+								<CardTitle className="text-base flex items-center gap-1.5">
+									<Activity className="w-4 h-4 text-primary" /> Aktivitas Sesi Presensi
+								</CardTitle>
 								<CardDescription className="text-xs">
 									Total Terdaftar Hari Ini: {latestAttendanceData?.attendances?.total ?? 0} Siswa
 								</CardDescription>
 							</div>
 							<Badge variant="outline" className="text-xs">
-								{scanLogs.length} Scan
+								{scanLogs.slice(0, 10).length} Terakhir
 							</Badge>
 						</CardHeader>
-						<CardContent className="pt-4">
+						<CardContent className="pt-2">
 							{scanLogs.length === 0 ? (
-								<div className="py-8 text-center text-muted-foreground text-xs">
-									Belum ada aktivitas scan.
+								<div className="py-8 text-center text-muted-foreground text-xs flex flex-col items-center justify-center">
+									<DotLottieReact
+										src="/lotties/empty.lottie"
+										autoplay
+										loop
+										style={{ height: "80px", width: "80px" }}
+									/>
+									<p className="mt-2">Belum ada aktivitas scan.</p>
 								</div>
 							) : (
-								<div className="space-y-2.5 max-h-[320px] overflow-y-auto pr-1">
-									{scanLogs.map((log) => {
+								<div className="divide-y divide-border max-h-[340px] overflow-y-auto pr-1">
+									{scanLogs.slice(0, 10).map((log, index) => {
 										const isLate = checkIsLate(log.timestamp || log.createdAt || "");
 										const nipdText = log.student?.nipd || (log.student as any)?.nisn || log.nis || "-";
 										const kelasText =
 											log.rombelName || (log.student as any)?.rombongan_belajar?.nama || "-";
 
 										return (
-											<div
-												key={log.id}
-												className="p-3 border rounded-xl text-xs flex items-center justify-between bg-card hover:bg-muted/40 transition-colors gap-3"
-											>
-												<div className="flex items-center gap-3 min-w-0">
-													<Avatar className="w-10 h-10 border shrink-0">
-														<AvatarImage
-															src={(log.student as any)?.avatar}
-															alt={log.student?.fullname}
-														/>
-														<AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
-															{log.student?.fullname?.substring(0, 2).toUpperCase() || "SW"}
-														</AvatarFallback>
-													</Avatar>
-													<div className="min-w-0">
-														<p className="font-bold truncate text-sm">
-															{log.student?.fullname || `NIS: ${log.nis}`}
-														</p>
-														<p className="text-muted-foreground text-[11px] truncate">
-															NIS: <span className="font-mono font-medium">{nipdText}</span> • Kelas:{" "}
-															<span className="font-medium">{kelasText}</span>
+											<div key={log.id} className="py-3 first:pt-1 last:pb-1">
+												<div className="flex items-center justify-between gap-3">
+													<div className="flex items-center gap-3 min-w-0">
+														<Avatar className="w-9 h-9 border shrink-0">
+															<AvatarImage
+																src={(log.student as any)?.avatar}
+																alt={log.student?.fullname}
+															/>
+															<AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
+																{log.student?.fullname?.substring(0, 2).toUpperCase() || "SW"}
+															</AvatarFallback>
+														</Avatar>
+														<div className="min-w-0">
+															<p className="font-bold truncate text-xs flex items-center gap-1">
+																{log.student?.fullname || `NIS: ${log.nis}`}
+															</p>
+															<p className="text-muted-foreground text-[11px] truncate mt-0.5">
+																NIS: <span className="font-mono font-medium">{nipdText}</span> • Kelas:{" "}
+																<span className="font-medium">{kelasText}</span>
+															</p>
+														</div>
+													</div>
+
+													<div className="text-right shrink-0">
+														{log.status === "success" ? (
+															isLate ? (
+																<Badge className="bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-semibold px-2 py-0.5">
+																	Terlambat
+																</Badge>
+															) : (
+																<Badge className="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-semibold px-2 py-0.5">
+																	Hadir
+																</Badge>
+															)
+														) : (
+															<Badge variant="destructive" className="text-[10px] px-2 py-0.5">
+																Gagal
+															</Badge>
+														)}
+														<p className="text-muted-foreground text-[10px] mt-1 font-mono">
+															{log.timestamp}
 														</p>
 													</div>
-												</div>
-
-												<div className="text-right shrink-0">
-													{log.status === "success" ? (
-														isLate ? (
-															<Badge className="bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-semibold">
-																Terlambat
-															</Badge>
-														) : (
-															<Badge className="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-semibold">
-																Hadir
-															</Badge>
-														)
-													) : (
-														<Badge variant="destructive" className="text-[10px]">
-															Gagal
-														</Badge>
-													)}
-													<p className="text-muted-foreground text-[10px] mt-1 font-mono">
-														{log.timestamp}
-													</p>
 												</div>
 											</div>
 										);
