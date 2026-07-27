@@ -137,9 +137,9 @@ export default function PresensiSiswaRekapPage() {
 				</CardContent>
 			</Card>
 
-			{/* Matrix Table with Single Rock-Solid Sticky Left Column (No & Name Combined) */}
+			{/* Clean, Non-Overlapping Matrix Table (matching /rekap/bulanan pattern) */}
 			<Card className="shadow-xs overflow-hidden">
-				<CardHeader className="pb-3 flex flex-row items-center justify-between flex-wrap gap-2">
+				<CardHeader className="pb-3 flex flex-row items-center justify-between flex-wrap gap-2 border-b bg-muted/20">
 					<div>
 						<CardTitle className="text-base flex items-center gap-2">
 							Matriks Rekap ({viewMode === "bulanan" ? "Bulanan" : "Mingguan"}): {monthlyData?.rombel || "Rombel"}
@@ -154,7 +154,7 @@ export default function PresensiSiswaRekapPage() {
 						</Badge>
 					)}
 				</CardHeader>
-				<CardContent className="p-0 sm:p-6 sm:pt-0">
+				<CardContent className="p-0">
 					{!selectedRombel ? (
 						<div className="m-4 py-12 text-center text-muted-foreground text-sm border border-dashed rounded-md">
 							Silakan pilih Rombongan Belajar terlebih dahulu untuk menampilkan rekap.
@@ -170,24 +170,23 @@ export default function PresensiSiswaRekapPage() {
 							Belum ada data presensi untuk Rombel terpilih pada periode ini.
 						</div>
 					) : (
-						/* Single inner scrollable container */
-						<div className="w-full max-w-full overflow-x-auto border-y sm:border sm:rounded-lg">
+						/* Clean, non-overlapping overflow scroll area matching /rekap/bulanan */
+						<div className="overflow-x-auto w-full">
 							<Table className="min-w-max border-collapse">
 								<TableHeader>
-									<TableRow className="bg-muted/60">
-										{/* Single Unified Sticky Column for No + Nama Siswa */}
-										<TableHead className="w-[230px] min-w-[230px] max-w-[230px] sticky left-0 bg-muted dark:bg-slate-900 z-30 border-r text-xs font-semibold">
-											Nama Siswa
-										</TableHead>
+									<TableRow className="bg-muted/50 border-b">
+										<TableHead className="w-12 text-center font-bold text-xs px-2">No</TableHead>
+										<TableHead className="min-w-48 font-bold text-xs px-3">Nama Siswa</TableHead>
+										<TableHead className="text-center font-bold text-xs px-2">NIS</TableHead>
 										{daysArray.map((day) => (
 											<TableHead key={day} className="text-center w-9 min-w-9 px-1 text-xs font-semibold">
 												{day}
 											</TableHead>
 										))}
-										<TableHead className="text-center w-10 px-1 font-semibold text-emerald-600 text-xs bg-muted">H</TableHead>
-										<TableHead className="text-center w-10 px-1 font-semibold text-amber-600 text-xs bg-muted">S</TableHead>
-										<TableHead className="text-center w-10 px-1 font-semibold text-blue-600 text-xs bg-muted">I</TableHead>
-										<TableHead className="text-center w-10 px-1 font-semibold text-red-600 text-xs bg-muted">A</TableHead>
+										<TableHead className="text-center w-10 px-1 font-bold text-emerald-600 text-xs">H</TableHead>
+										<TableHead className="text-center w-10 px-1 font-bold text-amber-600 text-xs">S</TableHead>
+										<TableHead className="text-center w-10 px-1 font-bold text-blue-600 text-xs">I</TableHead>
+										<TableHead className="text-center w-10 px-1 font-bold text-red-600 text-xs">A</TableHead>
 									</TableRow>
 								</TableHeader>
 								<TableBody>
@@ -216,29 +215,24 @@ export default function PresensiSiswaRekapPage() {
 										});
 
 										return (
-											<TableRow key={stId} className="hover:bg-muted/40 transition-colors">
-												{/* Single Sticky Left Cell (No + Student Name combined cleanly) */}
-												<TableCell className="font-medium text-xs sticky left-0 bg-card dark:bg-slate-950 z-20 border-r w-[230px] min-w-[230px] max-w-[230px]">
-													<div className="flex items-center gap-2">
-														<span className="text-[11px] text-muted-foreground font-mono w-5 shrink-0 text-right">
-															{idx + 1}.
-														</span>
-														<div className="min-w-0 flex-1">
-															<span className="block truncate font-semibold text-foreground">{studentName}</span>
-															<span className="text-[10px] text-muted-foreground font-mono block truncate">
-																NIS: {firstStudent?.nipd || "-"}
-															</span>
-														</div>
-													</div>
+											<TableRow key={stId} className="hover:bg-muted/40 transition-colors border-b">
+												<TableCell className="text-center font-medium text-xs text-muted-foreground w-12 px-2">
+													{idx + 1}
+												</TableCell>
+												<TableCell className="font-semibold text-xs min-w-48 px-3">
+													{studentName}
+												</TableCell>
+												<TableCell className="text-center text-xs font-mono text-muted-foreground px-2">
+													{firstStudent?.nipd || "-"}
 												</TableCell>
 												{daysArray.map((day) => {
 													const status = dayStatusMap[day];
-													let badgeColor = "bg-muted text-muted-foreground/40";
+													let badgeColor = "bg-muted text-muted-foreground/30";
 
-													if (status === "h") badgeColor = "bg-emerald-500 text-white font-bold shadow-2xs";
-													else if (status === "s") badgeColor = "bg-amber-500 text-white font-bold shadow-2xs";
-													else if (status === "i") badgeColor = "bg-blue-500 text-white font-bold shadow-2xs";
-													else if (status === "a") badgeColor = "bg-red-500 text-white font-bold shadow-2xs";
+													if (status === "h") badgeColor = "bg-emerald-500 text-white font-bold";
+													else if (status === "s") badgeColor = "bg-amber-500 text-white font-bold";
+													else if (status === "i") badgeColor = "bg-blue-500 text-white font-bold";
+													else if (status === "a") badgeColor = "bg-red-500 text-white font-bold";
 
 													return (
 														<TableCell key={day} className="text-center p-1 text-xs">
