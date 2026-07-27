@@ -75,9 +75,10 @@ export default function PresensiSiswaRekapRombelPage() {
 			const dayStatusMap: Record<number, string> = {};
 
 			records.forEach((rec) => {
+				if (!rec.attendance_date || !rec.attendance_status) return;
 				const dateObj = new Date(rec.attendance_date);
 				const dayNum = dateObj.getDate();
-				const status = (rec.attendance_status || "h").toLowerCase();
+				const status = rec.attendance_status.toLowerCase();
 				dayStatusMap[dayNum] = status;
 
 				if (status === "h") countH++;
