@@ -250,37 +250,15 @@ export default function PresensiSiswaScanPage() {
 
 	return (
 		<div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
-			{/* CSS override for @yudiel/react-qr-scanner finder colors and animated laser beam */}
+			{/* CSS Keyframe for Smooth Continuous Laser Scan Beam */}
 			<style>{`
-				@keyframes greenLaserMove {
-					0% { top: 5%; opacity: 0.8; }
-					50% { top: 92%; opacity: 1; }
-					100% { top: 5%; opacity: 0.8; }
+				@keyframes laserSweep {
+					0% { top: 3%; opacity: 0.6; }
+					50% { top: 94%; opacity: 1; }
+					100% { top: 3%; opacity: 0.6; }
 				}
-
-				.green-qr-scanner-wrap div {
-					border-color: #10b981 !important;
-				}
-
-				/* Animate laser beam inside finder box */
-				.green-qr-scanner-wrap div[style*="width: 70%"],
-				.green-qr-scanner-wrap div[style*="width:70%"] {
-					position: relative !important;
-				}
-
-				.green-qr-scanner-wrap div[style*="width: 70%"]::after,
-				.green-qr-scanner-wrap div[style*="width:70%"]::after {
-					content: '';
-					position: absolute;
-					left: 4%;
-					right: 4%;
-					height: 3px;
-					background: linear-gradient(90deg, transparent, #10b981, #34d399, #10b981, transparent);
-					box-shadow: 0 0 15px #10b981, 0 0 6px #34d399;
-					border-radius: 9999px;
-					animation: greenLaserMove 2.2s ease-in-out infinite;
-					z-index: 25;
-					pointer-events: none;
+				.animate-laser-sweep {
+					animation: laserSweep 2.2s ease-in-out infinite;
 				}
 			`}</style>
 
@@ -362,7 +340,7 @@ export default function PresensiSiswaScanPage() {
 
 			{/* Main Layout Body */}
 			<main className="flex-1 p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-7xl w-full mx-auto items-start">
-				{/* Left / Primary QR Scanner Section (With Margins & Animated Green Laser Finder) */}
+				{/* Left / Primary QR Scanner Section */}
 				<div className="lg:col-span-7 flex flex-col space-y-4">
 					{/* Toolbar: Camera Selection & Toggle */}
 					<div className="flex flex-wrap items-center justify-between gap-2 p-3 bg-card border rounded-xl shadow-xs">
@@ -406,8 +384,8 @@ export default function PresensiSiswaScanPage() {
 
 					{/* Outer Padded Card Container for Margin & Spacing */}
 					<div className="p-4 sm:p-5 bg-card border rounded-2xl shadow-md">
-						{/* 1:1 Aspect Ratio Scanner Container */}
-						<div className="green-qr-scanner-wrap w-full aspect-square max-h-[480px] bg-black rounded-xl overflow-hidden shadow-inner border-2 border-emerald-500/30 relative flex items-center justify-center mx-auto">
+						{/* 1:1 Aspect Ratio Scanner Container (Clean background, NO static box line, ONLY animated laser beam line) */}
+						<div className="w-full aspect-square max-h-[480px] bg-black rounded-xl overflow-hidden shadow-inner border-2 border-emerald-500/30 relative flex items-center justify-center mx-auto">
 							{isCameraActive ? (
 								<>
 									<Scanner
@@ -416,7 +394,7 @@ export default function PresensiSiswaScanPage() {
 										scanDelay={2000}
 										allowMultiple={false}
 										components={{
-											finder: true,
+											finder: false, // Static box line removed!
 											torch: true,
 											zoom: true,
 											tracker: customGreenTracker,
@@ -431,9 +409,12 @@ export default function PresensiSiswaScanPage() {
 										}}
 									/>
 
+									{/* Smooth Animated Green Laser Scan Line */}
+									<div className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_18px_#10b981,0_0_8px_#34d399] pointer-events-none z-20 animate-laser-sweep" />
+
 									<div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-xs text-white text-[11px] px-2.5 py-1 rounded-md flex items-center gap-1.5 z-10 border border-white/10">
 										<span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-										<span>Scanner Animated Green</span>
+										<span>Scanner Laser Line Active</span>
 									</div>
 								</>
 							) : (
