@@ -1,5 +1,6 @@
 "use client";
 
+import { Scanner } from "@yudiel/react-qr-scanner";
 import {
 	AlertCircle,
 	ArrowLeft,
@@ -9,7 +10,6 @@ import {
 	Maximize,
 	Minimize,
 	QrCode,
-	RefreshCw,
 	Volume2,
 	VolumeX,
 	Wifi,
@@ -20,7 +20,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -56,8 +55,7 @@ export default function PresensiSiswaScanPage() {
 		timestamp: string;
 	} | null>(null);
 
-	const videoRef = useRef<HTMLVideoElement | null>(null);
-	const mediaStreamRef = useRef<MediaStream | null>(null);
+	const lastQrScanRef = useRef<{ code: string; time: number }>({ code: "", time: 0 });
 	const storeMutation = useStoreApelAttendanceMutation();
 
 	// Today's summary data
@@ -167,6 +165,25 @@ export default function PresensiSiswaScanPage() {
 		}
 	};
 
+	// QR Code Handler from @yudiel/react-qr-scanner
+	const handleQrScan = (result: Array<{ rawValue: string }>) => {
+		if (result && result.length > 0) {
+			const scannedText = result[0].rawValue;
+			const now = Date.now();
+
+			// Cooldown of 2 seconds for identical QR code scan
+			if (
+				scannedText === lastQrScanRef.current.code &&
+				now - lastQrScanRef.current.time < 2000
+			) {
+				return;
+			}
+
+			lastQrScanRef.current = { code: scannedText, time: now };
+			handleScanSubmit(scannedText);
+		}
+	};
+
 	// RFID USB Reader Listener (Continuous background keystrokes)
 	useEffect(() => {
 		let buffer = "";
@@ -201,41 +218,6 @@ export default function PresensiSiswaScanPage() {
 			clearTimeout(timeoutId);
 		};
 	}, [storeMutation.isPending]);
-
-	// Camera Management
-	const startCamera = async () => {
-		try {
-			const stream = await navigator.mediaDevices.getUserMedia({
-				video: { facingMode: "environment" },
-			});
-			mediaStreamRef.current = stream;
-			if (videoRef.current) {
-				videoRef.current.srcObject = stream;
-			}
-			setIsCameraActive(true);
-		} catch (_err) {
-			toast.error("Tidak dapat mengakses kamera. Pastikan izin kamera telah diberikan.");
-			setIsCameraActive(false);
-		}
-	};
-
-	const stopCamera = () => {
-		if (mediaStreamRef.current) {
-			mediaStreamRef.current.getTracks().forEach((t) => t.stop());
-			mediaStreamRef.current = null;
-		}
-		if (videoRef.current) {
-			videoRef.current.srcObject = null;
-		}
-		setIsCameraActive(false);
-	};
-
-	useEffect(() => {
-		startCamera();
-		return () => {
-			stopCamera();
-		};
-	}, []);
 
 	const toggleFullscreen = () => {
 		if (!document.fullscreenElement) {
@@ -280,7 +262,10 @@ export default function PresensiSiswaScanPage() {
 
 					{/* Live RFID Buffer Pill */}
 					{rfidBuffer && (
-						<Badge variant="outline" className="bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 text-xs animate-pulse">
+						<Badge
+							variant="outline"
+							className="bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 text-xs animate-pulse"
+						>
 							<Wifi className="w-3 h-3 mr-1" /> Tap: {rfidBuffer}
 						</Badge>
 					)}
@@ -292,13 +277,21 @@ export default function PresensiSiswaScanPage() {
 						<Clock className="w-3.5 h-3.5 text-primary" />
 						<span>
 							{isMounted
-								? currentTime.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+								? currentTime.toLocaleTimeString("id-ID", {
+										hour: "2-digit",
+										minute: "2-digit",
+										second: "2-digit",
+									})
 								: "--:--:--"}
 						</span>
 					</div>
 
 					<Button variant="outline" size="sm" onClick={() => setSoundEnabled(!soundEnabled)}>
-						{soundEnabled ? <Volume2 className="w-4 h-4 text-emerald-600" /> : <VolumeX className="w-4 h-4 text-muted-foreground" />}
+						{soundEnabled ? (
+							<Volume2 className="w-4 h-4 text-emerald-600" />
+						) : (
+							<VolumeX className="w-4 h-4 text-muted-foreground" />
+						)}
 					</Button>
 					<Button variant="outline" size="sm" onClick={toggleFullscreen}>
 						{isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
@@ -323,9 +316,9 @@ export default function PresensiSiswaScanPage() {
 										<QrCode className="w-5 h-5" />
 									</div>
 									<div>
-										<CardTitle className="text-lg">Pemindai QR Code Utama</CardTitle>
+										<CardTitle className="text-lg">Pemindai QR Code (@yudiel)</CardTitle>
 										<CardDescription className="text-xs">
-											Arahkan QR Code Kartu Siswa ke kotak pemindai kamera
+											Arahkan QR Code Kartu Siswa ke pemindai kamera di bawah ini
 										</CardDescription>
 									</div>
 								</div>
@@ -333,10 +326,10 @@ export default function PresensiSiswaScanPage() {
 									<Button
 										variant={isCameraActive ? "outline" : "default"}
 										size="sm"
-										onClick={isCameraActive ? stopCamera : startCamera}
+										onClick={() => setIsCameraActive(!isCameraActive)}
 									>
 										<Camera className="w-4 h-4 mr-1.5" />
-										{isCameraActive ? "Nonaktifkan Camera" : "Aktifkan Camera"}
+										{isCameraActive ? "Nonaktifkan Kamera" : "Aktifkan Kamera"}
 									</Button>
 								</div>
 							</div>
@@ -344,14 +337,26 @@ export default function PresensiSiswaScanPage() {
 						<CardContent className="pt-4 flex-1 flex flex-col items-center justify-center">
 							{isCameraActive ? (
 								<div className="relative w-full aspect-video max-h-[400px] bg-black rounded-xl overflow-hidden shadow-inner border flex items-center justify-center">
-									<video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover" />
-									{/* Scanning Frame Overlay */}
-									<div className="absolute inset-0 border-2 border-primary/80 border-dashed m-8 sm:m-12 rounded-xl pointer-events-none flex items-center justify-center">
-										<div className="w-full h-0.5 bg-red-500/80 animate-pulse shadow-sm" />
-									</div>
-									<div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-xs text-white text-[11px] px-2.5 py-1 rounded-md flex items-center gap-1.5">
+									<Scanner
+										onScan={handleQrScan}
+										onError={(err) => console.log("QR Scanner info:", err)}
+										scanDelay={2000}
+										allowMultiple={false}
+										components={{
+											finder: true,
+											torch: true,
+										}}
+										constraints={{
+											facingMode: "environment",
+										}}
+										styles={{
+											container: { width: "100%", height: "100%" },
+											video: { width: "100%", height: "100%", objectFit: "cover" },
+										}}
+									/>
+									<div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-xs text-white text-[11px] px-2.5 py-1 rounded-md flex items-center gap-1.5 z-10">
 										<span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-										<span>Kamera Memindai...</span>
+										<span>Kamera QR Ready</span>
 									</div>
 								</div>
 							) : (
@@ -359,9 +364,9 @@ export default function PresensiSiswaScanPage() {
 									<Camera className="w-12 h-12 text-muted-foreground/40 mb-3" />
 									<p className="font-semibold text-sm">Kamera QR Nonaktif</p>
 									<p className="text-xs text-muted-foreground mt-1 max-w-xs">
-										Klik tombol &quot;Aktifkan Camera&quot; untuk menyalakan kamera QR Code.
+										Klik tombol &quot;Aktifkan Kamera&quot; untuk menyalakan kamera QR Code.
 									</p>
-									<Button size="sm" className="mt-4" onClick={startCamera}>
+									<Button size="sm" className="mt-4" onClick={() => setIsCameraActive(true)}>
 										Nyalakan Kamera
 									</Button>
 								</div>
@@ -373,7 +378,9 @@ export default function PresensiSiswaScanPage() {
 									<Zap className="w-4 h-4 text-emerald-600" />
 									<span>Pembaca RFID USB aktif di latar belakang (tanpa perlu dipindah)</span>
 								</div>
-								<Badge variant="secondary" className="text-[10px]">Auto Tap</Badge>
+								<Badge variant="secondary" className="text-[10px]">
+									Auto Tap
+								</Badge>
 							</div>
 						</CardContent>
 					</Card>
@@ -386,7 +393,9 @@ export default function PresensiSiswaScanPage() {
 						<CardHeader className="pb-3 border-b flex flex-row items-center justify-between">
 							<CardTitle className="text-base">Hasil Scan Terakhir</CardTitle>
 							{lastScannedResult && (
-								<span className="text-xs font-mono text-muted-foreground">{lastScannedResult.timestamp}</span>
+								<span className="text-xs font-mono text-muted-foreground">
+									{lastScannedResult.timestamp}
+								</span>
 							)}
 						</CardHeader>
 						<CardContent className="pt-4">
@@ -416,9 +425,18 @@ export default function PresensiSiswaScanPage() {
 											</h3>
 											{lastScannedResult.student && (
 												<div className="mt-2 text-xs space-y-1 text-muted-foreground border-t pt-2">
-													<p><span className="font-semibold text-foreground">Siswa:</span> {lastScannedResult.student.fullname}</p>
-													<p><span className="font-semibold text-foreground">NIPD / NIS:</span> {lastScannedResult.student.nipd}</p>
-													<p><span className="font-semibold text-foreground">ID Siswa:</span> {lastScannedResult.student.student_id}</p>
+													<p>
+														<span className="font-semibold text-foreground">Siswa:</span>{" "}
+														{lastScannedResult.student.fullname}
+													</p>
+													<p>
+														<span className="font-semibold text-foreground">NIPD / NIS:</span>{" "}
+														{lastScannedResult.student.nipd}
+													</p>
+													<p>
+														<span className="font-semibold text-foreground">ID Siswa:</span>{" "}
+														{lastScannedResult.student.student_id}
+													</p>
 												</div>
 											)}
 										</div>
@@ -447,7 +465,9 @@ export default function PresensiSiswaScanPage() {
 						</CardHeader>
 						<CardContent className="pt-4">
 							{scanLogs.length === 0 ? (
-								<div className="py-8 text-center text-muted-foreground text-xs">Belum ada aktivitas scan.</div>
+								<div className="py-8 text-center text-muted-foreground text-xs">
+									Belum ada aktivitas scan.
+								</div>
 							) : (
 								<div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
 									{scanLogs.map((log) => (
@@ -456,7 +476,9 @@ export default function PresensiSiswaScanPage() {
 											className="p-3 border rounded-lg text-xs flex items-center justify-between bg-card"
 										>
 											<div>
-												<p className="font-bold">{log.student?.fullname || `NIS: ${log.nis}`}</p>
+												<p className="font-bold border-b-0">
+													{log.student?.fullname || `NIS: ${log.nis}`}
+												</p>
 												<p className="text-muted-foreground text-[11px]">{log.message}</p>
 											</div>
 											<div className="text-right shrink-0 ml-2">
