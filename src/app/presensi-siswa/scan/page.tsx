@@ -185,6 +185,18 @@ export default function PresensiSiswaScanPage() {
 		}
 	};
 
+	// Custom Green Canvas Tracker for detected barcode box
+	const customGreenTracker = (detectedCodes: any[], ctx: CanvasRenderingContext2D) => {
+		detectedCodes.forEach((code) => {
+			const { boundingBox } = code;
+			if (boundingBox) {
+				ctx.strokeStyle = "#10b981"; // Emerald green
+				ctx.lineWidth = 4;
+				ctx.strokeRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
+			}
+		});
+	};
+
 	// RFID USB Reader Listener (Continuous background keystrokes)
 	useEffect(() => {
 		let buffer = "";
@@ -238,6 +250,19 @@ export default function PresensiSiswaScanPage() {
 
 	return (
 		<div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
+			{/* CSS override to force scanner finder lines to emerald green */}
+			<style>{`
+				.green-qr-scanner-wrap svg path,
+				.green-qr-scanner-wrap svg line,
+				.green-qr-scanner-wrap svg rect,
+				.green-qr-scanner-wrap [class*="finder"],
+				.green-qr-scanner-wrap [data-qrcode-finder] {
+					stroke: #10b981 !important;
+					border-color: #10b981 !important;
+					color: #10b981 !important;
+				}
+			`}</style>
+
 			{/* Top Header Bar */}
 			<header className="px-6 py-3.5 border-b bg-card shadow-xs flex items-center justify-between sticky top-0 z-50">
 				<div className="flex items-center gap-3">
@@ -316,10 +341,10 @@ export default function PresensiSiswaScanPage() {
 
 			{/* Main Layout Body */}
 			<main className="flex-1 p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-7xl w-full mx-auto items-start">
-				{/* Left / Primary QR Scanner Container (No Card wrapper, 1:1 Aspect Ratio) */}
-				<div className="lg:col-span-7 flex flex-col space-y-3">
+				{/* Left / Primary QR Scanner Section (With Margins & Green Finder Lines) */}
+				<div className="lg:col-span-7 flex flex-col space-y-4">
 					{/* Toolbar: Camera Selection & Toggle */}
-					<div className="flex flex-wrap items-center justify-between gap-2 p-2 bg-card border rounded-lg">
+					<div className="flex flex-wrap items-center justify-between gap-2 p-3 bg-card border rounded-xl shadow-xs">
 						<div className="flex items-center gap-2">
 							<QrCode className="w-4 h-4 text-primary" />
 							<span className="text-xs font-bold">Pemindai QR Code</span>
@@ -358,56 +383,74 @@ export default function PresensiSiswaScanPage() {
 						</div>
 					</div>
 
-					{/* 1:1 Aspect Ratio Scanner Box Container (NO CARD) */}
-					<div className="w-full aspect-square max-h-[500px] bg-black rounded-2xl overflow-hidden shadow-lg border-2 border-primary/30 relative flex items-center justify-center mx-auto">
-						{isCameraActive ? (
-							<Scanner
-								onScan={handleQrScan}
-								onError={(err) => console.log("QR Scanner info:", err)}
-								scanDelay={2000}
-								allowMultiple={false}
-								components={{
-									finder: true,
-									torch: true,
-									zoom: true,
-								}}
-								constraints={{
-									deviceId: selectedDeviceId,
-									facingMode: selectedDeviceId ? undefined : "environment",
-								}}
-								styles={{
-									container: { width: "100%", height: "100%", aspectRatio: "1 / 1" },
-									video: { width: "100%", height: "100%", objectFit: "cover" },
-								}}
-							/>
-						) : (
-							<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-slate-400 bg-slate-950">
-								<Camera className="w-12 h-12 mb-3 text-slate-600" />
-								<p className="font-semibold text-sm text-slate-200">Kamera Nonaktif</p>
-								<p className="text-xs text-slate-500 mt-1 max-w-xs">
-									Klik tombol &quot;Aktifkan&quot; di atas untuk menyalakan kamera.
-								</p>
-								<Button size="sm" className="mt-4" onClick={() => setIsCameraActive(true)}>
-									Nyalakan Kamera
-								</Button>
+					{/* Outer Padded Card Container for Margin & Clean Spacing */}
+					<div className="p-4 sm:p-5 bg-card border rounded-2xl shadow-md">
+						{/* 1:1 Aspect Ratio Scanner Container */}
+						<div className="green-qr-scanner-wrap w-full aspect-square max-h-[480px] bg-black rounded-xl overflow-hidden shadow-inner border-2 border-emerald-500/30 relative flex items-center justify-center mx-auto">
+							{isCameraActive ? (
+								<>
+									<Scanner
+										onScan={handleQrScan}
+										onError={(err) => console.log("QR Scanner info:", err)}
+										scanDelay={2000}
+										allowMultiple={false}
+										components={{
+											finder: false,
+											torch: true,
+											zoom: true,
+											tracker: customGreenTracker,
+										}}
+										constraints={{
+											deviceId: selectedDeviceId,
+											facingMode: selectedDeviceId ? undefined : "environment",
+										}}
+										styles={{
+											container: { width: "100%", height: "100%", aspectRatio: "1 / 1" },
+											video: { width: "100%", height: "100%", objectFit: "cover" },
+										}}
+									/>
+
+									{/* Custom Emerald Green Finder Corner Lines Overlay */}
+									<div className="absolute inset-10 sm:inset-14 border-2 border-emerald-500/60 rounded-xl pointer-events-none flex items-center justify-center">
+										{/* Emerald Corner Brackets */}
+										<div className="absolute -top-1 -left-1 w-6 h-6 border-t-4 border-l-4 border-emerald-400 rounded-tl-lg shadow-[0_0_8px_#10b981]" />
+										<div className="absolute -top-1 -right-1 w-6 h-6 border-t-4 border-r-4 border-emerald-400 rounded-tr-lg shadow-[0_0_8px_#10b981]" />
+										<div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-4 border-l-4 border-emerald-400 rounded-bl-lg shadow-[0_0_8px_#10b981]" />
+										<div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-4 border-r-4 border-emerald-400 rounded-br-lg shadow-[0_0_8px_#10b981]" />
+
+										{/* Emerald Scanning Beam */}
+										<div className="w-full h-0.5 bg-emerald-400/90 shadow-[0_0_12px_#10b981] animate-pulse" />
+									</div>
+
+									<div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-xs text-white text-[11px] px-2.5 py-1 rounded-md flex items-center gap-1.5 z-10 border border-white/10">
+										<span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+										<span>Scanner 1:1 Green Lines</span>
+									</div>
+								</>
+							) : (
+								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-slate-400 bg-slate-950">
+									<Camera className="w-12 h-12 mb-3 text-slate-600" />
+									<p className="font-semibold text-sm text-slate-200">Kamera Nonaktif</p>
+									<p className="text-xs text-slate-500 mt-1 max-w-xs">
+										Klik tombol &quot;Aktifkan&quot; di atas untuk menyalakan kamera.
+									</p>
+									<Button size="sm" className="mt-4" onClick={() => setIsCameraActive(true)}>
+										Nyalakan Kamera
+									</Button>
+								</div>
+							)}
+						</div>
+
+						{/* Footnote info for RFID */}
+						<div className="mt-4 p-3 bg-muted/40 rounded-lg border text-xs flex items-center justify-between text-muted-foreground">
+							<div className="flex items-center gap-2">
+								<Zap className="w-4 h-4 text-emerald-600 shrink-0" />
+								<span>Sensor RFID USB aktif di latar belakang (otomatis deteksi kartu tap)</span>
 							</div>
-						)}
-
-						<div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-xs text-white text-[11px] px-2.5 py-1 rounded-md flex items-center gap-1.5 z-10 border border-white/10">
-							<span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-							<span>Scanner 1:1 Ready</span>
+							<Badge variant="secondary" className="text-[10px]">
+								Auto Tap
+							</Badge>
 						</div>
-					</div>
-
-					{/* Footnote info for RFID */}
-					<div className="p-3 bg-muted/40 rounded-lg border text-xs flex items-center justify-between text-muted-foreground">
-						<div className="flex items-center gap-2">
-							<Zap className="w-4 h-4 text-emerald-600 shrink-0" />
-							<span>Sensor RFID USB aktif di latar belakang (otomatis deteksi kartu tap)</span>
-						</div>
-						<Badge variant="secondary" className="text-[10px]">
-							Auto Tap
-						</Badge>
 					</div>
 				</div>
 
