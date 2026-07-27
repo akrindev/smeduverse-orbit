@@ -42,6 +42,7 @@ export default function PresensiSiswaScanPage() {
 	const router = useRouter();
 	const { isAuthenticated, isLoading: authLoading } = useAuthQuery();
 
+	const [isMounted, setIsMounted] = useState<boolean>(false);
 	const [currentTime, setCurrentTime] = useState<Date>(new Date());
 	const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
 	const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
@@ -70,8 +71,9 @@ export default function PresensiSiswaScanPage() {
 		}
 	}, [isAuthenticated, authLoading, router]);
 
-	// Live Clock Timer
+	// Live Clock Timer & Mount Check
 	useEffect(() => {
+		setIsMounted(true);
 		const timer = setInterval(() => setCurrentTime(new Date()), 1000);
 		return () => clearInterval(timer);
 	}, []);
@@ -288,7 +290,11 @@ export default function PresensiSiswaScanPage() {
 				<div className="flex items-center gap-2">
 					<div className="hidden md:flex items-center gap-2 bg-muted/60 px-3 py-1.5 rounded-md text-xs font-mono">
 						<Clock className="w-3.5 h-3.5 text-primary" />
-						<span>{currentTime.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</span>
+						<span>
+							{isMounted
+								? currentTime.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+								: "--:--:--"}
+						</span>
 					</div>
 
 					<Button variant="outline" size="sm" onClick={() => setSoundEnabled(!soundEnabled)}>
