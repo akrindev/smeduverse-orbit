@@ -463,12 +463,13 @@ export default function PresensiSiswaScanPage() {
 										{currentTime.toLocaleTimeString("id-ID", {
 											hour: "2-digit",
 											minute: "2-digit",
+											second: "2-digit",
 										})}{" "}
 										WIB
 									</span>
 								</>
 							) : (
-								"--:-- WIB"
+								"--:--:-- WIB"
 							)}
 						</span>
 					</div>
