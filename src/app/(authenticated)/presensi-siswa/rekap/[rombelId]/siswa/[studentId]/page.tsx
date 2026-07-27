@@ -133,15 +133,15 @@ export default function PresensiSiswaRekapSiswaPage() {
 			else if (status === "a") a++;
 		});
 
-		const total = h + s + i + a;
-		const r = total > 0 ? Math.round((h / total) * 100) : 0;
+		const total = effectiveSessionDays;
+		const r = total > 0 ? Math.min(100, Math.round((h / total) * 100)) : 0;
 
 		return {
 			countH: h,
 			countS: s,
 			countI: i,
 			countA: a,
-			totalDays: total,
+			totalDays: `${h}/${effectiveSessionDays}`,
 			rate: r,
 			dayStatusMap: map,
 		};

@@ -135,8 +135,8 @@ export default function PresensiSiswaRekapRombelPage() {
 				else if (status === "a") countA++;
 			});
 
-			const totalDays = countH + countS + countI + countA;
-			const rate = totalDays > 0 ? Math.round((countH / totalDays) * 100) : 0;
+			const totalDisplay = `${countH}/${effectiveSessionDays}`;
+			const rate = effectiveSessionDays > 0 ? Math.min(100, Math.round((countH / effectiveSessionDays) * 100)) : 0;
 
 			return {
 				stId,
@@ -147,9 +147,9 @@ export default function PresensiSiswaRekapRombelPage() {
 				countS,
 				countI,
 				countA,
-				totalDays,
-				rate,
+				totalDisplay,
 				dayStatusMap,
+				rate,
 			};
 		});
 	}, [studentKeys, studentAttendanceMap, effectiveSessionDays]);
@@ -295,7 +295,7 @@ export default function PresensiSiswaRekapRombelPage() {
 														{st.countA}
 													</Badge>
 												</TableCell>
-												<TableCell className="font-bold text-center text-xs">{st.totalDays}</TableCell>
+												<TableCell className="font-bold text-center text-xs">{st.totalDisplay}</TableCell>
 												<TableCell className="text-center">{getAttendanceRateBadge(st.rate)}</TableCell>
 												<TableCell className="text-center">
 													<Link href={`/presensi-siswa/rekap/${rombelId}/siswa/${st.stId}?month=${month}&year=${year}`}>
