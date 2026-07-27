@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { useMonthlyApelAttendanceQuery, useStudentApelHistoryQuery } from "@/queries/useApelAttendanceQuery";
+import { useMonthlyApelAttendanceQuery, useOrbitSettingQuery, useStudentApelHistoryQuery } from "@/queries/useApelAttendanceQuery";
 import { useRombelsQuery } from "@/queries/useRombelQuery";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { Clock } from "lucide-react";
@@ -56,6 +56,54 @@ export default function PresensiSiswaRekapSiswaPage() {
 		year,
 	});
 
+	const { data: workdaysData } = useOrbitSettingQuery("apel_workdays_config");
+
+	const parsedWorkdays = useMemo(() => {
+		if (workdaysData?.value) {
+			try {
+				const parsed = JSON.parse(String(workdaysData.value));
+				if (Array.isArray(parsed)) return parsed;
+			} catch (_) {}
+		}
+		return null;
+	}, [workdaysData]);
+
+	// Calculate total effective working session days in month (excluding weekends/holidays set in settings)
+	const effectiveSessionDays = useMemo(() => {
+		const daysInMonth = new Date(year, month, 0).getDate();
+		let count = 0;
+
+		const holidayDaysOfWeek = new Set<number>();
+		if (parsedWorkdays && parsedWorkdays.length > 0) {
+			const keyToDayOfWeek: Record<string, number> = {
+				minggu: 0,
+				senin: 1,
+				selasa: 2,
+				rabu: 3,
+				kamis: 4,
+				jumat: 5,
+				sabtu: 6,
+			};
+			parsedWorkdays.forEach((item: any) => {
+				if (item.isHoliday && keyToDayOfWeek[item.key] !== undefined) {
+					holidayDaysOfWeek.add(keyToDayOfWeek[item.key]);
+				}
+			});
+		} else {
+			holidayDaysOfWeek.add(0);
+			holidayDaysOfWeek.add(6);
+		}
+
+		for (let d = 1; d <= daysInMonth; d++) {
+			const date = new Date(year, month - 1, d);
+			if (!holidayDaysOfWeek.has(date.getDay())) {
+				count++;
+			}
+		}
+
+		return count;
+	}, [month, year, parsedWorkdays]);
+
 	const studentAttendanceMap = monthlyData?.attendances ?? {};
 	const studentRecords = studentAttendanceMap[studentId] || studentHistoryData?.attendances || [];
 	const firstStudent = studentRecords[0]?.student;
@@ -73,9 +121,10 @@ export default function PresensiSiswaRekapSiswaPage() {
 		const map: Record<number, string> = {};
 
 		studentRecords.forEach((rec) => {
+			if (!rec.attendance_date || !rec.attendance_status) return;
 			const dateObj = new Date(rec.attendance_date);
 			const dayNum = dateObj.getDate();
-			const status = (rec.attendance_status || "h").toLowerCase();
+			const status = rec.attendance_status.toLowerCase();
 			map[dayNum] = status;
 
 			if (status === "h") h++;
@@ -84,8 +133,8 @@ export default function PresensiSiswaRekapSiswaPage() {
 			else if (status === "a") a++;
 		});
 
-		const total = h + s + i + a;
-		const r = total > 0 ? Math.round((h / total) * 100) : 0;
+		const total = effectiveSessionDays;
+		const r = total > 0 ? Math.min(100, Math.round((h / total) * 100)) : 0;
 
 		return {
 			countH: h,
@@ -96,7 +145,7 @@ export default function PresensiSiswaRekapSiswaPage() {
 			rate: r,
 			dayStatusMap: map,
 		};
-	}, [studentRecords]);
+	}, [studentRecords, effectiveSessionDays]);
 
 	const getAttendanceRateBadge = (rate: number) => {
 		if (rate >= 90) return <Badge className="bg-emerald-500 hover:bg-emerald-600 font-bold">{rate}%</Badge>;
@@ -171,7 +220,7 @@ export default function PresensiSiswaRekapSiswaPage() {
 					<Card className="shadow-2xs">
 						<CardContent className="p-4 text-center">
 							<div className="font-bold text-foreground text-2xl">{totalDays}</div>
-							<div className="text-muted-foreground text-xs mt-0.5">Total Sesi</div>
+							<div className="text-muted-foreground text-xs mt-0.5">Total Sesi (Kerja)</div>
 						</CardContent>
 					</Card>
 					<Card className="shadow-2xs">
@@ -226,6 +275,7 @@ export default function PresensiSiswaRekapSiswaPage() {
 									</TableHeader>
 									<TableBody>
 										{studentRecords.map((rec, idx) => {
+											if (!rec.attendance_date) return null;
 											const dateObj = new Date(rec.attendance_date);
 											const formattedDate = dateObj.toLocaleDateString("id-ID", {
 												weekday: "long",

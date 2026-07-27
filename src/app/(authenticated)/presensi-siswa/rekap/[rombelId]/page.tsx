@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useMonthlyApelAttendanceQuery } from "@/queries/useApelAttendanceQuery";
+import { useMonthlyApelAttendanceQuery, useOrbitSettingQuery } from "@/queries/useApelAttendanceQuery";
 import { useRombelsQuery } from "@/queries/useRombelQuery";
 import { IconArrowLeft, IconChevronRight } from "@tabler/icons-react";
 import { Layers } from "lucide-react";
@@ -51,6 +51,54 @@ export default function PresensiSiswaRekapRombelPage() {
 		year,
 	});
 
+	const { data: workdaysData } = useOrbitSettingQuery("apel_workdays_config");
+
+	const parsedWorkdays = useMemo(() => {
+		if (workdaysData?.value) {
+			try {
+				const parsed = JSON.parse(String(workdaysData.value));
+				if (Array.isArray(parsed)) return parsed;
+			} catch (_) {}
+		}
+		return null;
+	}, [workdaysData]);
+
+	// Calculate total effective working session days in month (excluding weekends/holidays set in settings)
+	const effectiveSessionDays = useMemo(() => {
+		const daysInMonth = new Date(year, month, 0).getDate();
+		let count = 0;
+
+		const holidayDaysOfWeek = new Set<number>();
+		if (parsedWorkdays && parsedWorkdays.length > 0) {
+			const keyToDayOfWeek: Record<string, number> = {
+				minggu: 0,
+				senin: 1,
+				selasa: 2,
+				rabu: 3,
+				kamis: 4,
+				jumat: 5,
+				sabtu: 6,
+			};
+			parsedWorkdays.forEach((item: any) => {
+				if (item.isHoliday && keyToDayOfWeek[item.key] !== undefined) {
+					holidayDaysOfWeek.add(keyToDayOfWeek[item.key]);
+				}
+			});
+		} else {
+			holidayDaysOfWeek.add(0);
+			holidayDaysOfWeek.add(6);
+		}
+
+		for (let d = 1; d <= daysInMonth; d++) {
+			const date = new Date(year, month - 1, d);
+			if (!holidayDaysOfWeek.has(date.getDay())) {
+				count++;
+			}
+		}
+
+		return count;
+	}, [month, year, parsedWorkdays]);
+
 	// Days calculation for matrix
 	const daysInMonth = new Date(year, month, 0).getDate();
 	const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
@@ -87,8 +135,8 @@ export default function PresensiSiswaRekapRombelPage() {
 				else if (status === "a") countA++;
 			});
 
-			const totalDays = countH + countS + countI + countA;
-			const rate = totalDays > 0 ? Math.round((countH / totalDays) * 100) : 0;
+			const totalDays = effectiveSessionDays;
+			const rate = totalDays > 0 ? Math.min(100, Math.round((countH / totalDays) * 100)) : 0;
 
 			return {
 				stId,
@@ -104,7 +152,7 @@ export default function PresensiSiswaRekapRombelPage() {
 				dayStatusMap,
 			};
 		});
-	}, [studentKeys, studentAttendanceMap]);
+	}, [studentKeys, studentAttendanceMap, effectiveSessionDays]);
 
 	const getAttendanceRateBadge = (rate: number) => {
 		if (rate >= 90) return <Badge className="bg-emerald-500 hover:bg-emerald-600 font-bold">{rate}%</Badge>;
@@ -165,7 +213,7 @@ export default function PresensiSiswaRekapRombelPage() {
 						Total Siswa: {studentKeys.length}
 					</Badge>
 					<Badge variant="outline" className="px-3 py-1 text-sm">
-						Total Hari Sesi: {daysInMonth} Hari
+						Total Hari Sesi (Hari Kerja): {effectiveSessionDays} Hari
 					</Badge>
 				</div>
 
