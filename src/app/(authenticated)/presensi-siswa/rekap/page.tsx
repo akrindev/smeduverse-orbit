@@ -137,7 +137,7 @@ export default function PresensiSiswaRekapPage() {
 				</CardContent>
 			</Card>
 
-			{/* Matrix Table with Non-Overlapping Sticky Positions & Contained Inner Scrollbar */}
+			{/* Matrix Table with Single Rock-Solid Sticky Left Column (No & Name Combined) */}
 			<Card className="shadow-xs overflow-hidden">
 				<CardHeader className="pb-3 flex flex-row items-center justify-between flex-wrap gap-2">
 					<div>
@@ -170,15 +170,13 @@ export default function PresensiSiswaRekapPage() {
 							Belum ada data presensi untuk Rombel terpilih pada periode ini.
 						</div>
 					) : (
-						/* Scrollbar contained strictly inside CardContent for mobile responsiveness */
+						/* Single inner scrollable container */
 						<div className="w-full max-w-full overflow-x-auto border-y sm:border sm:rounded-lg">
 							<Table className="min-w-max border-collapse">
 								<TableHeader>
 									<TableRow className="bg-muted/60">
-										<TableHead className="w-[48px] min-w-[48px] sticky left-0 bg-muted z-20 text-xs font-semibold text-center">
-											No
-										</TableHead>
-										<TableHead className="w-[200px] min-w-[200px] max-w-[200px] sticky left-[48px] bg-muted z-20 border-r text-xs font-semibold">
+										{/* Single Unified Sticky Column for No + Nama Siswa */}
+										<TableHead className="w-[230px] min-w-[230px] max-w-[230px] sticky left-0 bg-muted dark:bg-slate-900 z-30 border-r text-xs font-semibold">
 											Nama Siswa
 										</TableHead>
 										{daysArray.map((day) => (
@@ -219,15 +217,18 @@ export default function PresensiSiswaRekapPage() {
 
 										return (
 											<TableRow key={stId} className="hover:bg-muted/40 transition-colors">
-												<TableCell className="font-medium text-xs text-center sticky left-0 bg-background z-10 w-[48px] min-w-[48px]">
-													{idx + 1}
-												</TableCell>
-												<TableCell className="font-medium text-xs sticky left-[48px] bg-background z-10 border-r w-[200px] min-w-[200px] max-w-[200px] truncate">
-													<div>
-														<span className="block truncate font-semibold">{studentName}</span>
-														<span className="text-[10px] text-muted-foreground font-mono">
-															NIS: {firstStudent?.nipd || "-"}
+												{/* Single Sticky Left Cell (No + Student Name combined cleanly) */}
+												<TableCell className="font-medium text-xs sticky left-0 bg-card dark:bg-slate-950 z-20 border-r w-[230px] min-w-[230px] max-w-[230px]">
+													<div className="flex items-center gap-2">
+														<span className="text-[11px] text-muted-foreground font-mono w-5 shrink-0 text-right">
+															{idx + 1}.
 														</span>
+														<div className="min-w-0 flex-1">
+															<span className="block truncate font-semibold text-foreground">{studentName}</span>
+															<span className="text-[10px] text-muted-foreground font-mono block truncate">
+																NIS: {firstStudent?.nipd || "-"}
+															</span>
+														</div>
 													</div>
 												</TableCell>
 												{daysArray.map((day) => {
