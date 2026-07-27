@@ -9,10 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useMonthlyApelAttendanceQuery } from "@/queries/useApelAttendanceQuery";
+import { useMonthlyApelAttendanceQuery, useStudentApelHistoryQuery } from "@/queries/useApelAttendanceQuery";
 import { useRombelsQuery } from "@/queries/useRombelQuery";
 import { IconArrowLeft, IconChevronRight, IconUsers } from "@tabler/icons-react";
-import { Layers, User } from "lucide-react";
+import { Clock, Layers, User } from "lucide-react";
 import { useMemo, useState } from "react";
 import MonthYearSelector from "../../rekap/bulanan/components/month-year-selector";
 
@@ -36,12 +36,19 @@ export default function PresensiSiswaRekapPage() {
 	const [month, setMonth] = useState(currentDate.getMonth() + 1);
 	const [year, setYear] = useState(currentDate.getFullYear());
 	const [selectedRombel, setSelectedRombel] = useState<string>("");
+	const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
 	const [viewType, setViewType] = useState<"ringkasan" | "matriks">("ringkasan");
 
 	const { data: rombels, isLoading: isRombelsLoading } = useRombelsQuery();
 
 	const { data: monthlyData, isLoading: isMonthlyLoading } = useMonthlyApelAttendanceQuery({
 		rombel_id: selectedRombel,
+		month,
+		year,
+	});
+
+	const { data: studentHistoryData, isLoading: isStudentHistoryLoading } = useStudentApelHistoryQuery({
+		student_id: selectedStudentId || "",
 		month,
 		year,
 	});
@@ -118,15 +125,23 @@ export default function PresensiSiswaRekapPage() {
 				totalDays,
 				rate,
 				dayStatusMap,
+				records,
 			};
 		});
 	}, [studentKeys, studentAttendanceMap]);
+
+	const selectedStudentDetail = useMemo(() => {
+		if (!selectedStudentId) return null;
+		return studentStatsList.find((s) => s.stId === selectedStudentId) || null;
+	}, [selectedStudentId, studentStatsList]);
 
 	const getAttendanceRateBadge = (rate: number) => {
 		if (rate >= 90) return <Badge className="bg-emerald-500 hover:bg-emerald-600 font-bold">{rate}%</Badge>;
 		if (rate >= 75) return <Badge className="bg-amber-500 hover:bg-amber-600 font-bold">{rate}%</Badge>;
 		return <Badge variant="destructive" className="font-bold">{rate}%</Badge>;
 	};
+
+	const monthName = monthsList.find((m) => m.value === month)?.label;
 
 	return (
 		<div className="flex flex-col space-y-5 h-full">
@@ -142,7 +157,15 @@ export default function PresensiSiswaRekapPage() {
 						</p>
 					</div>
 
-					{selectedRombel && (
+					{selectedStudentId ? (
+						<Button
+							variant="outline"
+							onClick={() => setSelectedStudentId(null)}
+							className="mt-4 md:mt-0 font-medium"
+						>
+							<IconArrowLeft className="mr-2 w-4 h-4" /> Kembali ke {monthlyData?.rombel || selectedRombelObj?.nama || "Daftar Siswa"}
+						</Button>
+					) : selectedRombel ? (
 						<Button
 							variant="outline"
 							onClick={() => setSelectedRombel("")}
@@ -150,54 +173,210 @@ export default function PresensiSiswaRekapPage() {
 						>
 							<IconArrowLeft className="mr-2 w-4 h-4" /> Kembali ke Rekap Bulanan
 						</Button>
-					)}
+					) : null}
 				</div>
 
 				<Separator className="my-4" />
 
 				{/* Filter Row matching /rekap/bulanan */}
-				<div className="grid grid-cols-12 gap-4 items-center">
-					<div className="col-span-12 md:col-span-6">
-						<MonthYearSelector
-							month={month}
-							year={year}
-							onMonthChange={setMonth}
-							onYearChange={setYear}
-						/>
-					</div>
-
-					{selectedRombel && (
-						<div className="col-span-12 md:col-span-6 flex justify-end items-end gap-3">
-							<div className="w-56 space-y-1">
-								<label htmlFor="view-type-select" className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-									<Layers className="w-3.5 h-3.5" /> Tampilan Detail
-								</label>
-								<Select value={viewType} onValueChange={(val: "ringkasan" | "matriks") => setViewType(val)}>
-									<SelectTrigger id="view-type-select" className="h-9 text-xs">
-										<SelectValue placeholder="Pilih Tampilan" />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value="ringkasan">Daftar Ringkasan Siswa</SelectItem>
-										<SelectItem value="matriks">Matriks Presensi Harian (1-{daysInMonth})</SelectItem>
-									</SelectContent>
-								</Select>
+				{!selectedStudentId && (
+					<>
+						<div className="grid grid-cols-12 gap-4 items-center">
+							<div className="col-span-12 md:col-span-6">
+								<MonthYearSelector
+									month={month}
+									year={year}
+									onMonthChange={setMonth}
+									onYearChange={setYear}
+								/>
 							</div>
-						</div>
-					)}
-				</div>
 
-				<Separator className="my-4" />
+							{selectedRombel && (
+								<div className="col-span-12 md:col-span-6 flex justify-end items-end gap-3">
+									<div className="w-56 space-y-1">
+										<label htmlFor="view-type-select" className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+											<Layers className="w-3.5 h-3.5" /> Tampilan Detail
+										</label>
+										<Select value={viewType} onValueChange={(val: "ringkasan" | "matriks") => setViewType(val)}>
+											<SelectTrigger id="view-type-select" className="h-9 text-xs">
+												<SelectValue placeholder="Pilih Tampilan" />
+											</SelectTrigger>
+											<SelectContent>
+												<SelectItem value="ringkasan">Daftar Ringkasan Siswa</SelectItem>
+												<SelectItem value="matriks">Matriks Presensi Harian (1-{daysInMonth})</SelectItem>
+											</SelectContent>
+										</Select>
+									</div>
+								</div>
+							)}
+						</div>
+
+						<Separator className="my-4" />
+					</>
+				)}
 
 				{/* CONTENT AREA */}
 				{isRombelsLoading ? (
 					<BaseLoading />
+				) : selectedStudentId ? (
+					/* INDIVIDUAL STUDENT DETAIL VIEW (MATCHING /rekap/bulanan/[rombelId]/siswa/[studentId]) */
+					<div className="space-y-6">
+						{/* Header Banner */}
+						<div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-card p-6 rounded-xl border shadow-xs">
+							<div className="flex items-center gap-4">
+								<Avatar className="w-16 h-16 border-2 border-primary/20 shadow-xs">
+									<AvatarImage src={selectedStudentDetail?.photo} alt={selectedStudentDetail?.studentName || "Siswa"} />
+									<AvatarFallback className="text-2xl font-bold bg-primary/10 text-primary">
+										{(selectedStudentDetail?.studentName || "S").charAt(0).toUpperCase()}
+									</AvatarFallback>
+								</Avatar>
+								<div className="space-y-1">
+									<h2 className="font-bold text-2xl tracking-tight">
+										{selectedStudentDetail?.studentName || "Detail Siswa"}
+									</h2>
+									<p className="text-muted-foreground text-sm font-medium">
+										NIS: {selectedStudentDetail?.nipd || "-"} | {monthlyData?.rombel || selectedRombelObj?.nama}
+									</p>
+									<p className="text-muted-foreground text-xs">
+										Periode Presensi Apel: {monthName} {year}
+									</p>
+								</div>
+							</div>
+
+							<div className="flex items-center gap-2">
+								{getAttendanceRateBadge(selectedStudentDetail?.rate || 0)}
+							</div>
+						</div>
+
+						{/* 6 Metric Stat Cards */}
+						<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+							<Card className="shadow-2xs">
+								<CardContent className="p-4 text-center">
+									<div className="font-bold text-emerald-600 text-2xl">
+										{selectedStudentDetail?.countH || 0}
+									</div>
+									<div className="text-muted-foreground text-xs mt-0.5">Hadir</div>
+								</CardContent>
+							</Card>
+							<Card className="shadow-2xs">
+								<CardContent className="p-4 text-center">
+									<div className="font-bold text-sky-600 text-2xl">
+										{selectedStudentDetail?.countS || 0}
+									</div>
+									<div className="text-muted-foreground text-xs mt-0.5">Sakit</div>
+								</CardContent>
+							</Card>
+							<Card className="shadow-2xs">
+								<CardContent className="p-4 text-center">
+									<div className="font-bold text-indigo-600 text-2xl">
+										{selectedStudentDetail?.countI || 0}
+									</div>
+									<div className="text-muted-foreground text-xs mt-0.5">Izin</div>
+								</CardContent>
+							</Card>
+							<Card className="shadow-2xs">
+								<CardContent className="p-4 text-center">
+									<div className="font-bold text-amber-600 text-2xl">
+										{selectedStudentDetail?.countA || 0}
+									</div>
+									<div className="text-muted-foreground text-xs mt-0.5">Alpa</div>
+								</CardContent>
+							</Card>
+							<Card className="shadow-2xs">
+								<CardContent className="p-4 text-center">
+									<div className="font-bold text-foreground text-2xl">
+										{selectedStudentDetail?.totalDays || 0}
+									</div>
+									<div className="text-muted-foreground text-xs mt-0.5">Total Sesi</div>
+								</CardContent>
+							</Card>
+							<Card className="shadow-2xs">
+								<CardContent className="p-4 text-center">
+									<div className="font-bold text-emerald-600 text-2xl">
+										{selectedStudentDetail?.rate || 0}%
+									</div>
+									<div className="text-muted-foreground text-xs mt-0.5">Persentase</div>
+								</CardContent>
+							</Card>
+						</div>
+
+						{/* History Log Table */}
+						<Card className="shadow-xs overflow-hidden">
+							<CardHeader className="bg-muted/30 pb-3">
+								<CardTitle className="text-lg">Riwayat Presensi Apel Harian</CardTitle>
+								<CardDescription className="text-xs">
+									Log pemindaian dan kehadiran apel per tanggal di bulan {monthName} {year}
+								</CardDescription>
+							</CardHeader>
+							<CardContent className="p-0">
+								{isStudentHistoryLoading ? (
+									<div className="p-6 space-y-3">
+										<Skeleton className="w-full h-10" />
+										<Skeleton className="w-full h-10" />
+									</div>
+								) : !selectedStudentDetail?.records || selectedStudentDetail.records.length === 0 ? (
+									<div className="py-12 text-center text-muted-foreground text-sm italic">
+										Belum ada rincian presensi apel untuk siswa ini di bulan {monthName} {year}.
+									</div>
+								) : (
+									<div className="overflow-x-auto">
+										<Table>
+											<TableHeader>
+												<TableRow className="bg-muted/50 border-b">
+													<TableHead className="w-12 text-center font-bold px-3 text-xs">No</TableHead>
+													<TableHead className="font-bold text-xs px-4">Tanggal Presensi</TableHead>
+													<TableHead className="text-center font-bold text-xs px-3">Jam Masuk / Scan</TableHead>
+													<TableHead className="text-center font-bold text-xs px-3">Status</TableHead>
+												</TableRow>
+											</TableHeader>
+											<TableBody>
+												{selectedStudentDetail.records.map((rec, idx) => {
+													const dateObj = new Date(rec.attendance_date);
+													const formattedDate = dateObj.toLocaleDateString("id-ID", {
+														weekday: "long",
+														day: "numeric",
+														month: "long",
+														year: "numeric",
+													});
+													const formattedTime = dateObj.toLocaleTimeString("id-ID", {
+														hour: "2-digit",
+														minute: "2-digit",
+													});
+
+													const status = (rec.attendance_status || "h").toLowerCase();
+													let statusBadge = <Badge className="bg-emerald-500 text-white font-bold">Hadir</Badge>;
+
+													if (status === "s") statusBadge = <Badge className="bg-sky-500 text-white font-bold">Sakit</Badge>;
+													else if (status === "i") statusBadge = <Badge className="bg-indigo-500 text-white font-bold">Izin</Badge>;
+													else if (status === "a") statusBadge = <Badge className="bg-amber-500 text-white font-bold">Alpa</Badge>;
+
+													return (
+														<TableRow key={rec.id || idx} className="hover:bg-muted/40 transition-colors border-b">
+															<TableCell className="text-center text-xs text-muted-foreground px-3">{idx + 1}</TableCell>
+															<TableCell className="font-medium text-xs px-4">{formattedDate}</TableCell>
+															<TableCell className="text-center text-xs font-mono px-3">
+																<span className="inline-flex items-center gap-1">
+																	<Clock className="w-3.5 h-3.5 text-muted-foreground" /> {formattedTime} WIB
+																</span>
+															</TableCell>
+															<TableCell className="text-center px-3">{statusBadge}</TableCell>
+														</TableRow>
+													);
+												})}
+											</TableBody>
+										</Table>
+									</div>
+								)}
+							</CardContent>
+						</Card>
+					</div>
 				) : !selectedRombel ? (
 					/* MAIN VIEW: CLASS CARDS GRID (FULL MATCH TO /rekap/bulanan) */
 					<div className="space-y-6">
 						{/* Summary Banner */}
 						<div className="flex flex-wrap justify-between items-center gap-4 bg-muted p-4 rounded-lg">
 							<div className="flex items-center gap-2 font-medium text-sm">
-								<span>Periode: {monthsList.find((m) => m.value === month)?.label} {year}</span>
+								<span>Periode: {monthName} {year}</span>
 							</div>
 							<div className="flex flex-wrap gap-3">
 								<Badge variant="outline" className="text-sm">
@@ -218,6 +397,11 @@ export default function PresensiSiswaRekapPage() {
 													? rombel.wali_kelas
 													: "Wali Kelas";
 
+										const jurusanNama =
+											typeof rombel.jurusan === "object"
+												? rombel.jurusan?.nama || rombel.jurusan?.kode || "Presensi Apel Pagi"
+												: rombel.jurusan || "Presensi Apel Pagi";
+
 										return (
 											<Card
 												key={rombel.id}
@@ -231,11 +415,7 @@ export default function PresensiSiswaRekapPage() {
 															Tingkat {rombel.tingkat_kelas}
 														</Badge>
 													</CardTitle>
-													<CardDescription>
-														{typeof rombel.jurusan === "object"
-															? rombel.jurusan?.nama || rombel.jurusan?.kode || "Presensi Apel Pagi"
-															: rombel.jurusan || "Presensi Apel Pagi"}
-													</CardDescription>
+													<CardDescription>{jurusanNama}</CardDescription>
 												</CardHeader>
 												<CardContent>
 													<div className="space-y-2">
@@ -257,7 +437,7 @@ export default function PresensiSiswaRekapPage() {
 						))}
 					</div>
 				) : (
-					/* DETAIL VIEW (FULL MATCH TO /rekap/bulanan/[rombelId]) */
+					/* CLASS STUDENT TABLE VIEW (FULL MATCH TO /rekap/bulanan/[rombelId]) */
 					<div className="space-y-5">
 						<div className="flex flex-row justify-between items-start gap-4">
 							<div className="space-y-1">
@@ -268,7 +448,7 @@ export default function PresensiSiswaRekapPage() {
 									{(typeof selectedRombelObj?.jurusan === "object"
 										? selectedRombelObj?.jurusan?.nama || selectedRombelObj?.jurusan?.kode
 										: selectedRombelObj?.jurusan) || "Presensi Apel Pagi"}{" "}
-									| {monthsList.find((m) => m.value === month)?.label} {year}
+									| {monthName} {year}
 								</p>
 							</div>
 						</div>
@@ -288,7 +468,7 @@ export default function PresensiSiswaRekapPage() {
 							<CardHeader className="bg-muted/30">
 								<CardTitle className="text-xl">Daftar Siswa</CardTitle>
 								<CardDescription>
-									Detail statistik dan rekap kehadiran apel siswa per bulan
+									Klik pada nama siswa untuk melihat detail kehadiran individual
 								</CardDescription>
 							</CardHeader>
 							<CardContent className="p-0">
@@ -300,10 +480,10 @@ export default function PresensiSiswaRekapPage() {
 									</div>
 								) : studentStatsList.length === 0 ? (
 									<div className="py-12 text-center text-muted-foreground text-sm italic">
-										Tidak ada data presensi siswa untuk kelas ini pada bulan {monthsList.find((m) => m.value === month)?.label} {year}.
+										Tidak ada data presensi siswa untuk kelas ini pada bulan {monthName} {year}.
 									</div>
 								) : viewType === "ringkasan" ? (
-									/* SUMMARY STUDENT TABLE (EXACT MATCH TO /rekap/bulanan/[rombelId]) */
+									/* SUMMARY STUDENT TABLE (CLICKABLE ROWS) */
 									<div className="overflow-x-auto">
 										<Table>
 											<TableHeader>
@@ -317,11 +497,16 @@ export default function PresensiSiswaRekapPage() {
 													<TableHead className="text-center font-bold">A</TableHead>
 													<TableHead className="text-center font-bold">Total</TableHead>
 													<TableHead className="text-center font-bold">%</TableHead>
+													<TableHead className="w-12"></TableHead>
 												</TableRow>
 											</TableHeader>
 											<TableBody>
 												{studentStatsList.map((st, index) => (
-													<TableRow key={st.stId} className="hover:bg-muted/80 transition-colors">
+													<TableRow
+														key={st.stId}
+														onClick={() => setSelectedStudentId(st.stId)}
+														className="hover:bg-muted/80 cursor-pointer group transition-colors border-b"
+													>
 														<TableCell className="px-4 text-xs font-medium text-muted-foreground">{index + 1}</TableCell>
 														<TableCell>
 															<div className="flex items-center gap-3">
@@ -331,7 +516,9 @@ export default function PresensiSiswaRekapPage() {
 																		{st.studentName.charAt(0).toUpperCase()}
 																	</AvatarFallback>
 																</Avatar>
-																<span className="font-semibold text-sm">{st.studentName}</span>
+																<span className="font-semibold text-sm group-hover:text-primary transition-colors">
+																	{st.studentName}
+																</span>
 															</div>
 														</TableCell>
 														<TableCell className="text-center font-mono text-xs text-muted-foreground">{st.nipd}</TableCell>
@@ -357,6 +544,9 @@ export default function PresensiSiswaRekapPage() {
 														</TableCell>
 														<TableCell className="font-bold text-center text-xs">{st.totalDays}</TableCell>
 														<TableCell className="text-center">{getAttendanceRateBadge(st.rate)}</TableCell>
+														<TableCell className="text-center">
+															<IconChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+														</TableCell>
 													</TableRow>
 												))}
 											</TableBody>
@@ -384,7 +574,11 @@ export default function PresensiSiswaRekapPage() {
 											</TableHeader>
 											<TableBody>
 												{studentStatsList.map((st, idx) => (
-													<TableRow key={st.stId} className="border-b hover:bg-muted/40 transition-colors">
+													<TableRow
+														key={st.stId}
+														onClick={() => setSelectedStudentId(st.stId)}
+														className="border-b hover:bg-muted/40 cursor-pointer transition-colors"
+													>
 														<TableCell className="text-center font-medium text-xs text-muted-foreground w-12 px-3">
 															{idx + 1}
 														</TableCell>
