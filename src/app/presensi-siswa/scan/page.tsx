@@ -633,29 +633,6 @@ export default function PresensiSiswaScanPage() {
 											: "bg-red-50/70 dark:bg-red-950/40 border-red-200 dark:border-red-800"
 									}`}
 								>
-									{/* DotLottie Animation overlay for success / error */}
-									<div className="absolute right-2 top-2 pointer-events-none opacity-85">
-										{lastScannedResult.status === "success" ? (
-											isMounted && (
-												<DotLottieReact
-													src="/lotties/success-confetti.lottie"
-													autoplay
-													loop
-													style={{ height: "65px", width: "65px" }}
-												/>
-											)
-										) : (
-											isMounted && (
-												<DotLottieReact
-													src="/lotties/error.lottie"
-													autoplay
-													loop
-													style={{ height: "55px", width: "55px" }}
-												/>
-											)
-										)}
-									</div>
-
 									<div className="flex items-start gap-4">
 										<Avatar className="w-14 h-14 border-2 border-emerald-500/50 shadow-xs shrink-0">
 											<AvatarImage
@@ -667,11 +644,34 @@ export default function PresensiSiswaScanPage() {
 											</AvatarFallback>
 										</Avatar>
 
-										<div className="flex-1 min-w-0 pr-8">
+										<div className="flex-1 min-w-0">
 											<div className="flex items-center justify-between gap-2">
-												<h3 className="font-bold text-base truncate leading-tight flex items-center gap-1">
-													{lastScannedResult.student?.fullname || "Presensi Apel"}
-												</h3>
+												<div className="flex items-center gap-1.5 min-w-0">
+													<h3 className="font-bold text-base truncate leading-tight">
+														{lastScannedResult.student?.fullname || "Presensi Apel"}
+													</h3>
+
+													{/* DotLottie checkmark/error animation right beside student name */}
+													{isMounted && (
+														<div className="inline-flex items-center justify-center shrink-0">
+															{lastScannedResult.status === "success" ? (
+																<DotLottieReact
+																	src="/lotties/success-confetti.lottie"
+																	autoplay
+																	loop
+																	style={{ height: "40px", width: "40px" }}
+																/>
+															) : (
+																<DotLottieReact
+																	src="/lotties/error.lottie"
+																	autoplay
+																	loop
+																	style={{ height: "32px", width: "32px" }}
+																/>
+															)}
+														</div>
+													)}
+												</div>
 
 												{/* Status badge: Terlambat vs Hadir vs Gagal */}
 												{lastScannedResult.status === "success" ? (
