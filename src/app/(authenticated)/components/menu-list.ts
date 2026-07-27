@@ -63,8 +63,8 @@ export const menuList: MenuItem[] = [
 		path: "/monitoring",
 	},
 	{
-		name: "Presensi Siswa",
-		title: "Presensi Siswa",
+		name: "Presensi Siswa Apel",
+		title: "Presensi Siswa Apel",
 		icon: IconQrcode,
 		path: "/presensi-siswa",
 		roles: ["guru", "admin"],

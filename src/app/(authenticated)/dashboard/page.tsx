@@ -1,21 +1,21 @@
 "use client";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import SplitText from "@/components/ui/SplitText/SplitText";
+import { useAuthQuery } from "@/hooks/useAuthQuery";
 import { Calendar, PartyPopper, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import SplitText from "@/components/ui/SplitText/SplitText";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useAuthQuery } from "@/hooks/useAuthQuery";
 import { menuList } from "../components/menu-list";
 import KelasAjarList from "../kelas-ajar/components/kelas-ajar-list";
 
 const iconColors: Record<string, string> = {
 	"Kelas Ajar": "text-blue-500",
 	"Monitoring": "text-emerald-500",
-	"Presensi Siswa": "text-amber-500",
+	"Presensi Siswa Apel": "text-amber-500",
 	"Jurnal Guru": "text-violet-500",
 	"Jurnal Kelas": "text-indigo-500",
 	"Rekap Laporan": "text-rose-500",
