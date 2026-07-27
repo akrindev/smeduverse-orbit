@@ -8,7 +8,6 @@ import {
 	CheckCircle2,
 	Clock,
 	Flame,
-	GraduationCap,
 	History,
 	QrCode,
 	Settings,
@@ -37,16 +36,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useLatestApelAttendanceQuery, useOrbitSettingQuery } from "@/queries/useApelAttendanceQuery";
-
-// Dummy chart data for weekly attendance trend
-const weeklyTrendData = [
-	{ day: "Senin", hadir: 420, terlambat: 15 },
-	{ day: "Selasa", hadir: 435, terlambat: 8 },
-	{ day: "Rabu", hadir: 440, terlambat: 12 },
-	{ day: "Kamis", hadir: 428, terlambat: 18 },
-	{ day: "Jumat", hadir: 450, terlambat: 5 },
-];
+import {
+	useLatestApelAttendanceQuery,
+	useOrbitSettingQuery,
+	useWeeklyApelTrendQuery,
+} from "@/queries/useApelAttendanceQuery";
 
 const COLORS = ["#10b981", "#f59e0b", "#ef4444", "#3b82f6"];
 
@@ -55,6 +49,9 @@ export default function PresensiSiswaHubPage() {
 	const todayDate = new Date().toISOString().split("T")[0];
 	const { data: latestData, isLoading: isLatestLoading } = useLatestApelAttendanceQuery({ date: todayDate });
 	const { data: startTimeSetting } = useOrbitSettingQuery("apel_time_start");
+	const { data: weeklyTrendData, isLoading: isTrendLoading } = useWeeklyApelTrendQuery();
+
+	const chartTrendData = weeklyTrendData?.trend ?? [];
 
 	useEffect(() => {
 		setIsMounted(true);
@@ -101,15 +98,8 @@ export default function PresensiSiswaHubPage() {
 		{ name: "Terlambat", value: lateCount || 5 },
 	];
 
+	// Navigation feature cards (Scan is now a primary header button)
 	const quickCards = [
-		{
-			title: "Stasiun Scan & Tap RFID",
-			description: "Pemindai instan QR Code Kamera & Kartu RFID USB tanpa sidebar",
-			href: "/presensi-siswa/scan",
-			icon: QrCode,
-			color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800",
-			badge: "Live Scanner",
-		},
 		{
 			title: "Presensi Harian",
 			description: "Lihat dan kelola daftar presensi siswa hari ini atau tanggal terpilih",
@@ -146,10 +136,27 @@ export default function PresensiSiswaHubPage() {
 
 	return (
 		<div className="space-y-6">
-			{/* Metric Hero Bar */}
+			{/* Header Action Bar: Primary Action Button for Halaman Scan */}
+			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-muted/30 p-4 rounded-xl border">
+				<div>
+					<h1 className="text-xl font-bold flex items-center gap-2">
+						<Users className="w-5 h-5 text-emerald-600 dark:text-emerald-400" /> Presensi Apel Siswa
+					</h1>
+					<p className="text-xs text-muted-foreground mt-0.5">
+						Kelola presensi apel pagi, grafik kehadiran, rekap bulanan, dan pemindaian kartu RFID
+					</p>
+				</div>
+				<Link href="/presensi-siswa/scan" className="shrink-0">
+					<Button size="lg" className="w-full sm:w-auto font-semibold gap-2 shadow-sm">
+						<QrCode className="w-5 h-5" /> Buka Halaman Scan / Tap RFID
+					</Button>
+				</Link>
+			</div>
+
+			{/* Metric Summary Cards (Clean shadow-xs without colored side borders) */}
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 				{/* Card 1: Total Hadir */}
-				<Card className="shadow-xs border-l-4 border-l-emerald-500 bg-gradient-to-br from-card to-emerald-500/5">
+				<Card className="shadow-xs bg-card">
 					<CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
 						<CardTitle className="font-semibold text-xs text-muted-foreground uppercase tracking-wider">
 							Total Hadir Hari Ini
@@ -173,7 +180,7 @@ export default function PresensiSiswaHubPage() {
 				</Card>
 
 				{/* Card 2: Tepat Waktu vs Terlambat */}
-				<Card className="shadow-xs border-l-4 border-l-amber-500 bg-gradient-to-br from-card to-amber-500/5">
+				<Card className="shadow-xs bg-card">
 					<CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
 						<CardTitle className="font-semibold text-xs text-muted-foreground uppercase tracking-wider">
 							Tepat Waktu / Terlambat
@@ -199,7 +206,7 @@ export default function PresensiSiswaHubPage() {
 				</Card>
 
 				{/* Card 3: Jam Cutoff Apel */}
-				<Card className="shadow-xs border-l-4 border-l-blue-500 bg-gradient-to-br from-card to-blue-500/5">
+				<Card className="shadow-xs bg-card">
 					<CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
 						<CardTitle className="font-semibold text-xs text-muted-foreground uppercase tracking-wider">
 							Jam Mulai Apel
@@ -217,10 +224,10 @@ export default function PresensiSiswaHubPage() {
 				</Card>
 
 				{/* Card 4: Status Pemindai Scan */}
-				<Card className="shadow-xs border-l-4 border-l-primary bg-gradient-to-br from-card to-primary/5">
+				<Card className="shadow-xs bg-card">
 					<CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
 						<CardTitle className="font-semibold text-xs text-muted-foreground uppercase tracking-wider">
-							Stasiun Scan
+							Pemindai Scan
 						</CardTitle>
 						<div className="p-2 bg-primary/10 rounded-lg text-primary">
 							<QrCode className="w-4 h-4" />
@@ -241,7 +248,7 @@ export default function PresensiSiswaHubPage() {
 
 			{/* Main Tabbed Analytics & Content Interface */}
 			<Tabs defaultValue="analytics" className="w-full space-y-6">
-				<div className="flex items-center justify-between border-b pb-2 flex-wrap gap-2">
+				<div className="flex items-center justify-between border-b pb-2">
 					<TabsList className="bg-muted/60 p-1">
 						<TabsTrigger value="analytics" className="text-xs flex items-center gap-1.5">
 							<TrendingUp className="w-3.5 h-3.5" /> Grafik & Analytics
@@ -250,15 +257,9 @@ export default function PresensiSiswaHubPage() {
 							<Activity className="w-3.5 h-3.5" /> Presensi Terakhir ({attendancesList.length})
 						</TabsTrigger>
 						<TabsTrigger value="features" className="text-xs flex items-center gap-1.5">
-							<Sparkles className="w-3.5 h-3.5" /> Akses Cepat Fitur
+							<Sparkles className="w-3.5 h-3.5" /> Modul Presensi
 						</TabsTrigger>
 					</TabsList>
-
-					<Link href="/presensi-siswa/scan">
-						<Button size="sm" className="font-semibold gap-1.5">
-							<QrCode className="w-4 h-4" /> Buka Stasiun Scan
-						</Button>
-					</Link>
 				</div>
 
 				{/* TAB 1: Analytics & Charts */}
@@ -272,7 +273,7 @@ export default function PresensiSiswaHubPage() {
 										<TrendingUp className="w-4 h-4 text-emerald-500" /> Trend Kehadiran Apel Mingguan
 									</CardTitle>
 									<CardDescription className="text-xs">
-										Perbandingan jumlah siswa Hadir vs Terlambat minggu ini
+										Grafik proyeksi tren kehadiran apel siswa per hari minggu ini
 									</CardDescription>
 								</div>
 								<Badge variant="outline" className="text-xs font-normal">
@@ -280,10 +281,10 @@ export default function PresensiSiswaHubPage() {
 								</Badge>
 							</CardHeader>
 							<CardContent className="pt-4">
-								{isMounted ? (
-									<div className="h-[280px] w-full">
+								{isMounted && !isTrendLoading ? (
+									<div className="h-70 w-full">
 										<ResponsiveContainer width="100%" height="100%">
-											<AreaChart data={weeklyTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+											<AreaChart data={chartTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
 												<defs>
 													<linearGradient id="colorHadir" x1="0" y1="0" x2="0" y2="1">
 														<stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
@@ -327,7 +328,7 @@ export default function PresensiSiswaHubPage() {
 										</ResponsiveContainer>
 									</div>
 								) : (
-									<Skeleton className="w-full h-[280px]" />
+									<Skeleton className="w-full h-70" />
 								)}
 							</CardContent>
 						</Card>
@@ -344,7 +345,7 @@ export default function PresensiSiswaHubPage() {
 							</CardHeader>
 							<CardContent className="pt-2 flex-1 flex flex-col items-center justify-center">
 								{isMounted ? (
-									<div className="h-[200px] w-full relative flex items-center justify-center">
+									<div className="h-50 w-full relative flex items-center justify-center">
 										<ResponsiveContainer width="100%" height="100%">
 											<PieChart>
 												<Pie
@@ -376,7 +377,7 @@ export default function PresensiSiswaHubPage() {
 										</div>
 									</div>
 								) : (
-									<Skeleton className="w-full h-[200px]" />
+									<Skeleton className="w-full h-50" />
 								)}
 
 								<div className="w-full mt-2 grid grid-cols-2 gap-2 text-center text-xs">
@@ -393,12 +394,12 @@ export default function PresensiSiswaHubPage() {
 						</Card>
 					</div>
 
-					{/* Quick Feature Grid Cards */}
+					{/* Navigation Cards Grid */}
 					<div className="space-y-3 pt-2">
 						<h2 className="font-semibold text-base flex items-center gap-2">
-							<Sparkles className="w-4 h-4 text-primary" /> Modul & Layanan Presensi
+							<Sparkles className="w-4 h-4 text-primary" /> Modul Presensi Siswa
 						</h2>
-						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 							{quickCards.map((card) => {
 								const Icon = card.icon;
 								return (
@@ -501,7 +502,7 @@ export default function PresensiSiswaHubPage() {
 
 				{/* TAB 3: All Quick Action Features Grid */}
 				<TabsContent value="features" className="mt-0">
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 						{quickCards.map((card) => {
 							const Icon = card.icon;
 							return (

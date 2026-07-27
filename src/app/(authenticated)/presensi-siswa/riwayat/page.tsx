@@ -68,7 +68,7 @@ export default function PresensiSiswaRiwayatPage() {
 							<div className="flex gap-2">
 								<Input
 									id="student-id-input"
-									placeholder="Contoh: STU001..."
+									placeholder="Masukkan NIS / NIPD Siswa (misal: 324151)..."
 									value={studentInput}
 									onChange={(e) => setStudentInput(e.target.value)}
 								/>

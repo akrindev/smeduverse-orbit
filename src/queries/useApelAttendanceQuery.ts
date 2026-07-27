@@ -21,6 +21,7 @@ export const apelAttendanceQueryKeys = {
 	student: (studentId: string, month?: number, year?: number) =>
 		[...apelAttendanceQueryKeys.all, "student", studentId, month, year] as const,
 	setting: (key: string) => [...apelAttendanceQueryKeys.all, "setting", key] as const,
+	weeklyTrend: () => [...apelAttendanceQueryKeys.all, "weeklyTrend"] as const,
 };
 
 export function useStoreApelAttendanceMutation() {
@@ -162,5 +163,32 @@ export function useUpdateOrbitSettingMutation() {
 		onSuccess: (_, variables) => {
 			queryClient.invalidateQueries({ queryKey: apelAttendanceQueryKeys.setting(variables.key) });
 		},
+	});
+}
+
+export function useWeeklyApelTrendQuery() {
+	return useQuery({
+		queryKey: apelAttendanceQueryKeys.weeklyTrend(),
+		queryFn: async (): Promise<{ message: string; trend: { day: string; hadir: number; terlambat: number }[] }> => {
+			const response = await api.get("/attendance/apel/weekly-trend", {
+				validateStatus: (status) => status < 500,
+			});
+
+			if (response.status >= 400 || !response.data?.trend) {
+				return {
+					message: "Tren mingguan",
+					trend: [
+						{ day: "Senin", hadir: 0, terlambat: 0 },
+						{ day: "Selasa", hadir: 0, terlambat: 0 },
+						{ day: "Rabu", hadir: 0, terlambat: 0 },
+						{ day: "Kamis", hadir: 0, terlambat: 0 },
+						{ day: "Jumat", hadir: 0, terlambat: 0 },
+					],
+				};
+			}
+
+			return response.data;
+		},
+		retry: false,
 	});
 }
