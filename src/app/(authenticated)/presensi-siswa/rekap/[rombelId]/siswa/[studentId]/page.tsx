@@ -14,8 +14,9 @@ import { useRombelsQuery } from "@/queries/useRombelQuery";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { Clock } from "lucide-react";
 import Link from "next/link";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
+import MonthYearSelector from "@/app/(authenticated)/rekap/bulanan/components/month-year-selector";
 
 const monthsList = [
 	{ value: 1, label: "Januari" },
@@ -33,6 +34,7 @@ const monthsList = [
 ];
 
 export default function PresensiSiswaRekapSiswaPage() {
+	const router = useRouter();
 	const params = useParams<{ rombelId: string; studentId: string }>();
 	const rombelId = useMemo(() => params?.rombelId ?? "", [params]);
 	const studentId = useMemo(() => params?.studentId ?? "", [params]);
@@ -186,7 +188,17 @@ export default function PresensiSiswaRekapSiswaPage() {
 						</div>
 					</div>
 
-					<div className="flex items-center gap-2">{getAttendanceRateBadge(rate)}</div>
+					<div className="flex flex-col sm:flex-row items-center gap-4">
+						<div className="w-64">
+							<MonthYearSelector
+								month={month}
+								year={year}
+								onMonthChange={(m) => router.push(`/presensi-siswa/rekap/${rombelId}/siswa/${studentId}?month=${m}&year=${year}`)}
+								onYearChange={(y) => router.push(`/presensi-siswa/rekap/${rombelId}/siswa/${studentId}?month=${month}&year=${y}`)}
+							/>
+						</div>
+						{getAttendanceRateBadge(rate)}
+					</div>
 				</div>
 
 				<Separator className="my-4" />

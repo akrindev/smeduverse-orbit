@@ -14,8 +14,9 @@ import { useRombelsQuery } from "@/queries/useRombelQuery";
 import { IconArrowLeft, IconChevronRight } from "@tabler/icons-react";
 import { Layers } from "lucide-react";
 import Link from "next/link";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
+import MonthYearSelector from "@/app/(authenticated)/rekap/bulanan/components/month-year-selector";
 
 const monthsList = [
 	{ value: 1, label: "Januari" },
@@ -33,6 +34,7 @@ const monthsList = [
 ];
 
 export default function PresensiSiswaRekapRombelPage() {
+	const router = useRouter();
 	const params = useParams<{ rombelId: string }>();
 	const rombelId = useMemo(() => params?.rombelId ?? "", [params]);
 
@@ -189,19 +191,30 @@ export default function PresensiSiswaRekapRombelPage() {
 						</p>
 					</div>
 
-					<div className="w-56 space-y-1">
-						<label htmlFor="view-type-select" className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-							<Layers className="w-3.5 h-3.5" /> Tampilan Detail
-						</label>
-						<Select value={viewType} onValueChange={(val: "ringkasan" | "matriks") => setViewType(val)}>
-							<SelectTrigger id="view-type-select" className="h-9 text-xs">
-								<SelectValue placeholder="Pilih Tampilan" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="ringkasan">Daftar Ringkasan Siswa</SelectItem>
-								<SelectItem value="matriks">Matriks Presensi Harian (1-{daysInMonth})</SelectItem>
-							</SelectContent>
-						</Select>
+					<div className="flex flex-col sm:flex-row items-end gap-4 w-full md:w-auto">
+						<div className="w-full sm:w-64">
+							<MonthYearSelector
+								month={month}
+								year={year}
+								onMonthChange={(m) => router.push(`/presensi-siswa/rekap/${rombelId}?month=${m}&year=${year}`)}
+								onYearChange={(y) => router.push(`/presensi-siswa/rekap/${rombelId}?month=${month}&year=${y}`)}
+							/>
+						</div>
+
+						<div className="w-full sm:w-56 space-y-1">
+							<label htmlFor="view-type-select" className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+								<Layers className="w-3.5 h-3.5" /> Tampilan Detail
+							</label>
+							<Select value={viewType} onValueChange={(val: "ringkasan" | "matriks") => setViewType(val)}>
+								<SelectTrigger id="view-type-select" className="h-9 text-xs">
+									<SelectValue placeholder="Pilih Tampilan" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="ringkasan">Daftar Ringkasan Siswa</SelectItem>
+									<SelectItem value="matriks">Matriks Presensi Harian (1-{daysInMonth})</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
 					</div>
 				</div>
 

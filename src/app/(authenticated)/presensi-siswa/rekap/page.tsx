@@ -2,12 +2,10 @@
 
 import BaseLoading from "@/components/base-loading";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { useMonthlyApelAttendanceQuery } from "@/queries/useApelAttendanceQuery";
 import { useRombelsQuery } from "@/queries/useRombelQuery";
-import { IconCalendarMonth, IconUsers } from "@tabler/icons-react";
+import { IconUsers } from "@tabler/icons-react";
 import { User } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -141,35 +139,6 @@ function RombelApelCard({
 	month: number;
 	year: number;
 }) {
-	const { data: monthlyData } = useMonthlyApelAttendanceQuery({
-		rombel_id: rombel.id,
-		month,
-		year,
-	});
-
-	const studentAttendanceMap = monthlyData?.attendances ?? {};
-	const studentKeys = Object.keys(studentAttendanceMap);
-
-	const counts = useMemo(() => {
-		let countH = 0;
-		let countS = 0;
-		let countI = 0;
-		let countA = 0;
-
-		studentKeys.forEach((stId) => {
-			const records = studentAttendanceMap[stId] || [];
-			records.forEach((rec) => {
-				const status = (rec.attendance_status || "h").toLowerCase();
-				if (status === "h") countH++;
-				else if (status === "s") countS++;
-				else if (status === "i") countI++;
-				else if (status === "a") countA++;
-			});
-		});
-
-		return { countH, countS, countI, countA };
-	}, [studentKeys, studentAttendanceMap]);
-
 	const waliName =
 		typeof rombel.wali_kelas === "object"
 			? rombel.wali_kelas?.fullname
@@ -202,26 +171,7 @@ function RombelApelCard({
 						</div>
 						<div className="flex items-center gap-2 text-muted-foreground text-xs">
 							<IconUsers className="w-4 h-4" />
-							<span>{studentKeys.length > 0 ? `${studentKeys.length} siswa` : "Buka rekap kelas"}</span>
-						</div>
-
-						{/* Attendance Stats Badges on Card */}
-						<div className="mt-3 pt-2 border-t">
-							<div className="mb-2 font-medium text-xs text-muted-foreground">Hitungan Presensi Apel:</div>
-							<div className="grid grid-cols-4 gap-1">
-								<Badge variant="outline" className="flex flex-col items-center p-1 border-emerald-300 dark:border-emerald-700">
-									<span className="font-bold text-emerald-600 text-xs">H: {counts.countH}</span>
-								</Badge>
-								<Badge variant="outline" className="flex flex-col items-center p-1 border-sky-300 dark:border-sky-700">
-									<span className="font-bold text-sky-600 text-xs">S: {counts.countS}</span>
-								</Badge>
-								<Badge variant="outline" className="flex flex-col items-center p-1 border-indigo-300 dark:border-indigo-700">
-									<span className="font-bold text-indigo-600 text-xs">I: {counts.countI}</span>
-								</Badge>
-								<Badge variant="outline" className="flex flex-col items-center p-1 border-amber-300 dark:border-amber-700">
-									<span className="font-bold text-amber-600 text-xs">A: {counts.countA}</span>
-								</Badge>
-							</div>
+							<span>Buka rekap kelas</span>
 						</div>
 					</div>
 				</CardContent>
