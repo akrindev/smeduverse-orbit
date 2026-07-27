@@ -2,6 +2,7 @@ export interface ApelStudent {
 	student_id: string;
 	fullname: string;
 	nipd: string;
+	photo?: string;
 }
 
 export interface ApelRombel {
