@@ -1,9 +1,8 @@
 "use client";
 
-import { Scanner } from "@yudiel/react-qr-scanner";
+import { Scanner, useDevices } from "@yudiel/react-qr-scanner";
 import {
 	AlertCircle,
-	ArrowLeft,
 	Camera,
 	CheckCircle2,
 	Clock,
@@ -23,6 +22,7 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthQuery } from "@/hooks/useAuthQuery";
 import { useLatestApelAttendanceQuery, useStoreApelAttendanceMutation } from "@/queries/useApelAttendanceQuery";
@@ -40,12 +40,14 @@ interface ScanLog {
 export default function PresensiSiswaScanPage() {
 	const router = useRouter();
 	const { isAuthenticated, isLoading: authLoading } = useAuthQuery();
+	const devices = useDevices();
 
 	const [isMounted, setIsMounted] = useState<boolean>(false);
 	const [currentTime, setCurrentTime] = useState<Date>(new Date());
 	const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
 	const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 	const [isCameraActive, setIsCameraActive] = useState<boolean>(true);
+	const [selectedDeviceId, setSelectedDeviceId] = useState<string | undefined>(undefined);
 	const [rfidBuffer, setRfidBuffer] = useState<string>("");
 	const [scanLogs, setScanLogs] = useState<ScanLog[]>([]);
 	const [lastScannedResult, setLastScannedResult] = useState<{
@@ -165,13 +167,12 @@ export default function PresensiSiswaScanPage() {
 		}
 	};
 
-	// QR Code Handler from @yudiel/react-qr-scanner
+	// QR Code Handler
 	const handleQrScan = (result: Array<{ rawValue: string }>) => {
 		if (result && result.length > 0) {
 			const scannedText = result[0].rawValue;
 			const now = Date.now();
 
-			// Cooldown of 2 seconds for identical QR code scan
 			if (
 				scannedText === lastQrScanRef.current.code &&
 				now - lastQrScanRef.current.time < 2000
@@ -271,18 +272,32 @@ export default function PresensiSiswaScanPage() {
 					)}
 				</div>
 
-				{/* Right: Clock & Actions */}
+				{/* Right: Date, Live Clock & Actions */}
 				<div className="flex items-center gap-2">
 					<div className="hidden md:flex items-center gap-2 bg-muted/60 px-3 py-1.5 rounded-md text-xs font-mono">
 						<Clock className="w-3.5 h-3.5 text-primary" />
 						<span>
-							{isMounted
-								? currentTime.toLocaleTimeString("id-ID", {
-										hour: "2-digit",
-										minute: "2-digit",
-										second: "2-digit",
-									})
-								: "--:--:--"}
+							{isMounted ? (
+								<>
+									<span className="font-semibold mr-1.5">
+										{currentTime.toLocaleDateString("id-ID", {
+											weekday: "long",
+											day: "numeric",
+											month: "long",
+											year: "numeric",
+										})}
+									</span>
+									<span className="text-primary font-bold">
+										{currentTime.toLocaleTimeString("id-ID", {
+											hour: "2-digit",
+											minute: "2-digit",
+											second: "2-digit",
+										})}
+									</span>
+								</>
+							) : (
+								"--:--:--"
+							)}
 						</span>
 					</div>
 
@@ -296,94 +311,104 @@ export default function PresensiSiswaScanPage() {
 					<Button variant="outline" size="sm" onClick={toggleFullscreen}>
 						{isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
 					</Button>
-					<Link href="/presensi-siswa">
-						<Button size="sm" variant="default" className="font-medium">
-							<ArrowLeft className="w-4 h-4 mr-1.5" /> Kembalikan
-						</Button>
-					</Link>
 				</div>
 			</header>
 
 			{/* Main Layout Body */}
-			<main className="flex-1 p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-7xl w-full mx-auto">
-				{/* Left / Primary Hero Section: QR Code Scanner Card */}
-				<div className="lg:col-span-7 flex flex-col space-y-4">
-					<Card className="shadow-md border-primary/20 flex-1 flex flex-col">
-						<CardHeader className="pb-3 border-b">
-							<div className="flex items-center justify-between">
-								<div className="flex items-center gap-2">
-									<div className="p-2 bg-primary/10 rounded-lg text-primary">
-										<QrCode className="w-5 h-5" />
-									</div>
-									<div>
-										<CardTitle className="text-lg">Pemindai QR Code (@yudiel)</CardTitle>
-										<CardDescription className="text-xs">
-											Arahkan QR Code Kartu Siswa ke pemindai kamera di bawah ini
-										</CardDescription>
-									</div>
-								</div>
-								<div className="flex items-center gap-2">
-									<Button
-										variant={isCameraActive ? "outline" : "default"}
-										size="sm"
-										onClick={() => setIsCameraActive(!isCameraActive)}
-									>
-										<Camera className="w-4 h-4 mr-1.5" />
-										{isCameraActive ? "Nonaktifkan Kamera" : "Aktifkan Kamera"}
-									</Button>
-								</div>
-							</div>
-						</CardHeader>
-						<CardContent className="pt-4 flex-1 flex flex-col items-center justify-center">
-							{isCameraActive ? (
-								<div className="relative w-full aspect-video max-h-[400px] bg-black rounded-xl overflow-hidden shadow-inner border flex items-center justify-center">
-									<Scanner
-										onScan={handleQrScan}
-										onError={(err) => console.log("QR Scanner info:", err)}
-										scanDelay={2000}
-										allowMultiple={false}
-										components={{
-											finder: true,
-											torch: true,
-										}}
-										constraints={{
-											facingMode: "environment",
-										}}
-										styles={{
-											container: { width: "100%", height: "100%" },
-											video: { width: "100%", height: "100%", objectFit: "cover" },
-										}}
-									/>
-									<div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-xs text-white text-[11px] px-2.5 py-1 rounded-md flex items-center gap-1.5 z-10">
-										<span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-										<span>Kamera QR Ready</span>
-									</div>
-								</div>
-							) : (
-								<div className="w-full py-16 text-center border-2 border-dashed rounded-xl bg-muted/20 flex flex-col items-center justify-center">
-									<Camera className="w-12 h-12 text-muted-foreground/40 mb-3" />
-									<p className="font-semibold text-sm">Kamera QR Nonaktif</p>
-									<p className="text-xs text-muted-foreground mt-1 max-w-xs">
-										Klik tombol &quot;Aktifkan Kamera&quot; untuk menyalakan kamera QR Code.
-									</p>
-									<Button size="sm" className="mt-4" onClick={() => setIsCameraActive(true)}>
-										Nyalakan Kamera
-									</Button>
-								</div>
+			<main className="flex-1 p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-7xl w-full mx-auto items-start">
+				{/* Left / Primary QR Scanner Container (No Card wrapper, 1:1 Aspect Ratio) */}
+				<div className="lg:col-span-7 flex flex-col space-y-3">
+					{/* Toolbar: Camera Selection & Toggle */}
+					<div className="flex flex-wrap items-center justify-between gap-2 p-2 bg-card border rounded-lg">
+						<div className="flex items-center gap-2">
+							<QrCode className="w-4 h-4 text-primary" />
+							<span className="text-xs font-bold">Pemindai QR Code</span>
+						</div>
+
+						<div className="flex items-center gap-2">
+							{/* Camera Select Dropdown */}
+							{devices && devices.length > 0 && (
+								<Select
+									value={selectedDeviceId || "default"}
+									onValueChange={(val) => setSelectedDeviceId(val === "default" ? undefined : val)}
+								>
+									<SelectTrigger className="h-8 text-xs w-[180px]">
+										<SelectValue placeholder="Pilih Kamera" />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value="default">Kamera Default</SelectItem>
+										{devices.map((device, i) => (
+											<SelectItem key={device.deviceId} value={device.deviceId}>
+												{device.label || `Kamera ${i + 1}`}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
 							)}
 
-							{/* Footnote Badge info for RFID */}
-							<div className="mt-4 w-full p-3 bg-muted/40 rounded-lg border text-xs flex items-center justify-between text-muted-foreground">
-								<div className="flex items-center gap-2">
-									<Zap className="w-4 h-4 text-emerald-600" />
-									<span>Pembaca RFID USB aktif di latar belakang (tanpa perlu dipindah)</span>
-								</div>
-								<Badge variant="secondary" className="text-[10px]">
-									Auto Tap
-								</Badge>
+							<Button
+								variant={isCameraActive ? "outline" : "default"}
+								size="sm"
+								className="h-8 text-xs"
+								onClick={() => setIsCameraActive(!isCameraActive)}
+							>
+								<Camera className="w-3.5 h-3.5 mr-1" />
+								{isCameraActive ? "Nonaktifkan" : "Aktifkan"}
+							</Button>
+						</div>
+					</div>
+
+					{/* 1:1 Aspect Ratio Scanner Box Container (NO CARD) */}
+					<div className="w-full aspect-square max-h-[500px] bg-black rounded-2xl overflow-hidden shadow-lg border-2 border-primary/30 relative flex items-center justify-center mx-auto">
+						{isCameraActive ? (
+							<Scanner
+								onScan={handleQrScan}
+								onError={(err) => console.log("QR Scanner info:", err)}
+								scanDelay={2000}
+								allowMultiple={false}
+								components={{
+									finder: true,
+									torch: true,
+									zoom: true,
+								}}
+								constraints={{
+									deviceId: selectedDeviceId,
+									facingMode: selectedDeviceId ? undefined : "environment",
+								}}
+								styles={{
+									container: { width: "100%", height: "100%", aspectRatio: "1 / 1" },
+									video: { width: "100%", height: "100%", objectFit: "cover" },
+								}}
+							/>
+						) : (
+							<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-slate-400 bg-slate-950">
+								<Camera className="w-12 h-12 mb-3 text-slate-600" />
+								<p className="font-semibold text-sm text-slate-200">Kamera Nonaktif</p>
+								<p className="text-xs text-slate-500 mt-1 max-w-xs">
+									Klik tombol &quot;Aktifkan&quot; di atas untuk menyalakan kamera.
+								</p>
+								<Button size="sm" className="mt-4" onClick={() => setIsCameraActive(true)}>
+									Nyalakan Kamera
+								</Button>
 							</div>
-						</CardContent>
-					</Card>
+						)}
+
+						<div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-xs text-white text-[11px] px-2.5 py-1 rounded-md flex items-center gap-1.5 z-10 border border-white/10">
+							<span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+							<span>Scanner 1:1 Ready</span>
+						</div>
+					</div>
+
+					{/* Footnote info for RFID */}
+					<div className="p-3 bg-muted/40 rounded-lg border text-xs flex items-center justify-between text-muted-foreground">
+						<div className="flex items-center gap-2">
+							<Zap className="w-4 h-4 text-emerald-600 shrink-0" />
+							<span>Sensor RFID USB aktif di latar belakang (otomatis deteksi kartu tap)</span>
+						</div>
+						<Badge variant="secondary" className="text-[10px]">
+							Auto Tap
+						</Badge>
+					</div>
 				</div>
 
 				{/* Right Section: Student Scan Result Banner & Session Activity */}
