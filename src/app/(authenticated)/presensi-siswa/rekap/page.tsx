@@ -1,9 +1,8 @@
 "use client";
 
-import { Calendar, Filter, FileSpreadsheet } from "lucide-react";
+import { Calendar, Filter } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -32,7 +31,7 @@ export default function PresensiSiswaRekapPage() {
 	const [selectedMonth, setSelectedMonth] = useState<number>(currentDate.getMonth() + 1);
 	const [selectedYear, setSelectedYear] = useState<number>(currentDate.getFullYear());
 
-	const { data: rombels, isLoading: isRombelsLoading } = useRombelsQuery();
+	const { data: rombels } = useRombelsQuery();
 
 	const { data: monthlyData, isLoading: isMonthlyLoading } = useMonthlyApelAttendanceQuery({
 		rombel_id: selectedRombel,

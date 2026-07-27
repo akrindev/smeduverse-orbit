@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarCheck, History, LayoutDashboard, QrCode, Records, Settings, UserCheck } from "lucide-react";
+import { CalendarCheck, History, LayoutDashboard, QrCode, Settings, UserCheck } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 

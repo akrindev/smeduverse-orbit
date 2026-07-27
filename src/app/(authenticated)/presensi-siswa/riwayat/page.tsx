@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, History, Search, User } from "lucide-react";
+import { Calendar, Search, User } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

@@ -159,7 +159,7 @@ export default function PresensiSiswaScanPage() {
 				videoRef.current.srcObject = stream;
 			}
 			setIsCameraActive(true);
-		} catch (err) {
+		} catch (_err) {
 			toast.error("Tidak dapat membuka kamera. Pastikan izin kamera telah diberikan.");
 		}
 	};
