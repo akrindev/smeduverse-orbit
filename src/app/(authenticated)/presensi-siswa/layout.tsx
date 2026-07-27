@@ -1,15 +1,13 @@
 "use client";
 
-import { CalendarCheck, History, LayoutDashboard, QrCode, Settings, UserCheck } from "lucide-react";
+import { CalendarCheck, LayoutDashboard, Settings, UserCheck } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navItems = [
 	{ name: "Overview", href: "/presensi-siswa", icon: LayoutDashboard },
-	{ name: "Scan / Tap Presensi", href: "/presensi-siswa/scan", icon: QrCode },
 	{ name: "Presensi Harian", href: "/presensi-siswa/harian", icon: UserCheck },
 	{ name: "Rekap Bulanan", href: "/presensi-siswa/rekap", icon: CalendarCheck },
-	{ name: "Riwayat Siswa", href: "/presensi-siswa/riwayat", icon: History },
 	{ name: "Pengaturan", href: "/presensi-siswa/pengaturan", icon: Settings },
 ];
 
@@ -35,8 +33,8 @@ export default function PresensiSiswaLayout({ children }: { children: React.Reac
 				</div>
 			</div>
 
-			{/* Sub Navigation Bar */}
-			<div className="flex items-center gap-1 bg-muted/50 p-1 border rounded-lg overflow-x-auto">
+			{/* Sub Navigation Bar - Only visible on desktop (hidden on mobile) */}
+			<div className="hidden md:flex items-center gap-1 bg-muted/50 p-1 border rounded-lg overflow-x-auto">
 				{navItems.map((item) => {
 					const Icon = item.icon;
 					const active = isActive(item.href);
