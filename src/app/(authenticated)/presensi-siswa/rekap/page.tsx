@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useMonthlyApelAttendanceQuery, useStudentApelHistoryQuery } from "@/queries/useApelAttendanceQuery";
 import { useRombelsQuery } from "@/queries/useRombelQuery";
 import { IconArrowLeft, IconChevronRight, IconUsers } from "@tabler/icons-react";
@@ -219,7 +220,7 @@ export default function PresensiSiswaRekapPage() {
 				{isRombelsLoading ? (
 					<BaseLoading />
 				) : selectedStudentId ? (
-					/* INDIVIDUAL STUDENT DETAIL VIEW (MATCHING /rekap/bulanan/[rombelId]/siswa/[studentId]) */
+					/* INDIVIDUAL STUDENT DETAIL VIEW (FULL MATCH TO /rekap/bulanan/[rombelId]/siswa/[studentId]) */
 					<div className="space-y-6">
 						{/* Header Banner */}
 						<div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-card p-6 rounded-xl border shadow-xs">
@@ -300,12 +301,29 @@ export default function PresensiSiswaRekapPage() {
 							</Card>
 						</div>
 
+						{/* Kalender Kehadiran Card (EXACT MATCH TO /rekap/bulanan/[rombelId]/siswa/[studentId]) */}
+						<Card className="shadow-xs">
+							<CardHeader>
+								<CardTitle className="text-xl">Kalender Kehadiran Apel</CardTitle>
+								<CardDescription className="text-xs">
+									Riwayat visual kehadiran apel pagi siswa selama bulan {monthName} {year}
+								</CardDescription>
+							</CardHeader>
+							<CardContent>
+								<AttendanceCalendar
+									month={month}
+									year={year}
+									dayStatusMap={selectedStudentDetail?.dayStatusMap || {}}
+								/>
+							</CardContent>
+						</Card>
+
 						{/* History Log Table */}
 						<Card className="shadow-xs overflow-hidden">
 							<CardHeader className="bg-muted/30 pb-3">
-								<CardTitle className="text-lg">Riwayat Presensi Apel Harian</CardTitle>
+								<CardTitle className="text-lg">Rincian Log Presensi Apel</CardTitle>
 								<CardDescription className="text-xs">
-									Log pemindaian dan kehadiran apel per tanggal di bulan {monthName} {year}
+									Log pemindaian dan jam presensi apel per tanggal di bulan {monthName} {year}
 								</CardDescription>
 							</CardHeader>
 							<CardContent className="p-0">
@@ -635,5 +653,139 @@ export default function PresensiSiswaRekapPage() {
 				)}
 			</div>
 		</div>
+	);
+}
+
+// Attendance Calendar component matching /rekap/bulanan/[rombelId]/siswa/[studentId]
+function AttendanceCalendar({
+	month,
+	year,
+	dayStatusMap,
+}: {
+	month: number;
+	year: number;
+	dayStatusMap: Record<number, string>;
+}) {
+	const dayNames = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+
+	const calendarDays = useMemo(() => {
+		const firstDay = new Date(year, month - 1, 1);
+		const lastDay = new Date(year, month, 0);
+		const daysInMonth = lastDay.getDate();
+		const startDayOfWeek = firstDay.getDay(); // 0 = Sunday
+
+		const days: { key: string; day: number | null }[] = [];
+
+		for (let i = 0; i < startDayOfWeek; i++) {
+			days.push({ key: `empty-${i}`, day: null });
+		}
+
+		for (let day = 1; day <= daysInMonth; day++) {
+			days.push({ key: `day-${day}`, day });
+		}
+
+		return days;
+	}, [month, year]);
+
+	const getStatusColor = (status: string | undefined) => {
+		if (!status) return "bg-muted border text-muted-foreground";
+		switch (status.toLowerCase()) {
+			case "h":
+				return "bg-emerald-500 text-white font-bold";
+			case "s":
+				return "bg-sky-500 text-white font-bold";
+			case "i":
+				return "bg-indigo-500 text-white font-bold";
+			case "a":
+				return "bg-amber-500 text-white font-bold";
+			default:
+				return "bg-muted border text-muted-foreground";
+		}
+	};
+
+	const getStatusLabel = (status: string | undefined) => {
+		if (!status) return "Tidak ada data";
+		switch (status.toLowerCase()) {
+			case "h":
+				return "Hadir";
+			case "s":
+				return "Sakit";
+			case "i":
+				return "Izin";
+			case "a":
+				return "Alpa";
+			default:
+				return status;
+		}
+	};
+
+	return (
+		<TooltipProvider>
+			<div className="w-full">
+				<div className="gap-1 grid grid-cols-7 mb-2">
+					{dayNames.map((day) => (
+						<div key={day} className="p-2 font-medium text-muted-foreground text-sm text-center">
+							{day}
+						</div>
+					))}
+				</div>
+
+				<div className="gap-2 grid grid-cols-7">
+					{calendarDays.map(({ key, day }) => {
+						if (day === null) {
+							return <div key={key} className="p-2" />;
+						}
+
+						const status = dayStatusMap[day];
+						const statusColor = getStatusColor(status);
+						const statusLabel = getStatusLabel(status);
+
+						return (
+							<Tooltip key={key}>
+								<TooltipTrigger asChild>
+									<div
+										className={`p-2 md:p-3 rounded-lg text-center cursor-default duration-300 transition-all hover:scale-95 ${statusColor}`}
+									>
+										<div className="font-medium text-sm md:text-base">{day}</div>
+										<div className="hidden md:block opacity-90 mt-1 text-xs">
+											{status ? status.toUpperCase() : "-"}
+										</div>
+									</div>
+								</TooltipTrigger>
+								<TooltipContent>
+									<p className="text-xs">
+										Tanggal {day}: <span className="font-semibold">{statusLabel}</span>
+									</p>
+								</TooltipContent>
+							</Tooltip>
+						);
+					})}
+				</div>
+
+				{/* Legend */}
+				<div className="flex flex-wrap gap-4 mt-6 pt-4 border-t text-xs">
+					<div className="flex items-center gap-2">
+						<div className="bg-emerald-500 rounded w-4 h-4" />
+						<span>Hadir (H)</span>
+					</div>
+					<div className="flex items-center gap-2">
+						<div className="bg-sky-500 rounded w-4 h-4" />
+						<span>Sakit (S)</span>
+					</div>
+					<div className="flex items-center gap-2">
+						<div className="bg-indigo-500 rounded w-4 h-4" />
+						<span>Izin (I)</span>
+					</div>
+					<div className="flex items-center gap-2">
+						<div className="bg-amber-500 rounded w-4 h-4" />
+						<span>Alpa (A)</span>
+					</div>
+					<div className="flex items-center gap-2">
+						<div className="bg-muted border rounded w-4 h-4" />
+						<span>Tidak Ada Data</span>
+					</div>
+				</div>
+			</div>
+		</TooltipProvider>
 	);
 }
