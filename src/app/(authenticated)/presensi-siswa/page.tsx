@@ -136,18 +136,10 @@ export default function PresensiSiswaHubPage() {
 
 	return (
 		<div className="space-y-6">
-			{/* Header Action Bar: Primary Action Button for Halaman Scan */}
-			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-muted/30 p-4 rounded-xl border">
-				<div>
-					<h1 className="text-xl font-bold flex items-center gap-2">
-						<Users className="w-5 h-5 text-emerald-600 dark:text-emerald-400" /> Presensi Apel Siswa
-					</h1>
-					<p className="text-xs text-muted-foreground mt-0.5">
-						Kelola presensi apel pagi, grafik kehadiran, rekap bulanan, dan pemindaian kartu RFID
-					</p>
-				</div>
-				<Link href="/presensi-siswa/scan" className="shrink-0">
-					<Button size="lg" className="w-full sm:w-auto font-semibold gap-2 shadow-sm">
+			{/* Header Action Bar: Standalone Primary Action Button */}
+			<div className="flex items-center justify-end">
+				<Link href="/presensi-siswa/scan">
+					<Button size="lg" className="font-semibold gap-2 shadow-xs">
 						<QrCode className="w-5 h-5" /> Buka Halaman Scan / Tap RFID
 					</Button>
 				</Link>

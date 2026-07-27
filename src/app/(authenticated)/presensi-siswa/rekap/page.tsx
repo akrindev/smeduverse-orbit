@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, Filter } from "lucide-react";
+import { Calendar, Filter, Layers } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,6 +30,7 @@ export default function PresensiSiswaRekapPage() {
 	const [selectedRombel, setSelectedRombel] = useState<string>("");
 	const [selectedMonth, setSelectedMonth] = useState<number>(currentDate.getMonth() + 1);
 	const [selectedYear, setSelectedYear] = useState<number>(currentDate.getFullYear());
+	const [viewMode, setViewMode] = useState<"bulanan" | "mingguan">("bulanan");
 
 	const { data: rombels } = useRombelsQuery();
 
@@ -39,25 +40,43 @@ export default function PresensiSiswaRekapPage() {
 		year: selectedYear,
 	});
 
-	// Get total days in month
+	// Days calculation
 	const daysInMonth = new Date(selectedYear, selectedMonth, 0).getDate();
-	const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+	const fullDaysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+	// Mingguan view: days 1..7 (or current 7-day range)
+	const daysArray = viewMode === "mingguan" ? fullDaysArray.slice(0, 7) : fullDaysArray;
 
 	const studentAttendanceMap = monthlyData?.attendances ?? {};
 	const studentKeys = Object.keys(studentAttendanceMap);
 
 	return (
-		<div className="space-y-6">
+		<div className="space-y-6 max-w-full overflow-hidden">
 			{/* Filter Section */}
 			<Card className="shadow-xs">
 				<CardHeader className="pb-3">
-					<CardTitle className="text-base">Filter Rekap Bulanan</CardTitle>
+					<CardTitle className="text-base">Filter Rekap Presensi</CardTitle>
 					<CardDescription className="text-xs">
-						Pilih Rombongan Belajar, Bulan, dan Tahun untuk menampilkan matriks rekap kehadiran
+						Pilih Rombongan Belajar, Periode, dan Mode Tampilan (Mingguan / Bulanan)
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+						{/* Mode Tampilan Select */}
+						<div className="space-y-1.5">
+							<label htmlFor="view-mode-select" className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+								<Layers className="w-3.5 h-3.5" /> Mode Tampilan
+							</label>
+							<Select value={viewMode} onValueChange={(val: "bulanan" | "mingguan") => setViewMode(val)}>
+								<SelectTrigger id="view-mode-select">
+									<SelectValue placeholder="Pilih Mode" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="bulanan">Tampilan Bulanan (1-{daysInMonth})</SelectItem>
+									<SelectItem value="mingguan">Tampilan Mingguan (7 Hari)</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+
 						{/* Rombel Select */}
 						<div className="space-y-1.5">
 							<label htmlFor="rombel-select" className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
@@ -118,15 +137,15 @@ export default function PresensiSiswaRekapPage() {
 				</CardContent>
 			</Card>
 
-			{/* Matrix Table */}
-			<Card className="shadow-xs">
-				<CardHeader className="pb-3 flex flex-row items-center justify-between">
+			{/* Matrix Table with Responsive Inner Scrollbar */}
+			<Card className="shadow-xs overflow-hidden">
+				<CardHeader className="pb-3 flex flex-row items-center justify-between flex-wrap gap-2">
 					<div>
-						<CardTitle className="text-base">
-							Matriks Rekap Kehadiran Apel ({monthlyData?.rombel || "Rombel"})
+						<CardTitle className="text-base flex items-center gap-2">
+							Matriks Rekap ({viewMode === "bulanan" ? "Bulanan" : "Mingguan"}): {monthlyData?.rombel || "Rombel"}
 						</CardTitle>
 						<CardDescription className="text-xs">
-							Bulan: {monthsList.find((m) => m.value === selectedMonth)?.label} {selectedYear}
+							Periode: {monthsList.find((m) => m.value === selectedMonth)?.label} {selectedYear}
 						</CardDescription>
 					</div>
 					{selectedRombel && (
@@ -135,39 +154,40 @@ export default function PresensiSiswaRekapPage() {
 						</Badge>
 					)}
 				</CardHeader>
-				<CardContent>
+				<CardContent className="p-0 sm:p-6 sm:pt-0">
 					{!selectedRombel ? (
-						<div className="py-12 text-center text-muted-foreground text-sm border border-dashed rounded-md">
-							Silakan pilih Rombongan Belajar terlebih dahulu untuk menampilkan rekap bulanan.
+						<div className="m-4 py-12 text-center text-muted-foreground text-sm border border-dashed rounded-md">
+							Silakan pilih Rombongan Belajar terlebih dahulu untuk menampilkan rekap.
 						</div>
 					) : isMonthlyLoading ? (
-						<div className="space-y-3">
+						<div className="p-4 space-y-3">
 							<Skeleton className="w-full h-12" />
 							<Skeleton className="w-full h-12" />
 							<Skeleton className="w-full h-12" />
 						</div>
 					) : studentKeys.length === 0 ? (
-						<div className="py-12 text-center text-muted-foreground text-sm border border-dashed rounded-md">
-							Belum ada data presensi bulanan untuk Rombel terpilih.
+						<div className="m-4 py-12 text-center text-muted-foreground text-sm border border-dashed rounded-md">
+							Belum ada data presensi untuk Rombel terpilih pada periode ini.
 						</div>
 					) : (
-						<div className="border rounded-md overflow-x-auto">
-							<Table>
+						/* Scrollbar contained strictly inside CardContent for mobile responsiveness */
+						<div className="w-full max-w-full overflow-x-auto border-y sm:border sm:rounded-lg">
+							<Table className="min-w-max">
 								<TableHeader>
 									<TableRow className="bg-muted/50">
-										<TableHead className="w-[50px] sticky left-0 bg-muted/90 z-10">No</TableHead>
-										<TableHead className="min-w-[180px] sticky left-[50px] bg-muted/90 z-10 border-r">
+										<TableHead className="w-12.5 sticky left-0 bg-muted/90 z-10 text-xs">No</TableHead>
+										<TableHead className="min-w-45 sticky left-12.5 bg-muted/90 z-10 border-r text-xs">
 											Nama Siswa
 										</TableHead>
 										{daysArray.map((day) => (
-											<TableHead key={day} className="text-center w-[36px] min-w-[36px] px-1 text-xs">
+											<TableHead key={day} className="text-center w-9 min-w-9 px-1 text-xs">
 												{day}
 											</TableHead>
 										))}
-										<TableHead className="text-center w-[40px] px-1 font-semibold text-emerald-600">H</TableHead>
-										<TableHead className="text-center w-[40px] px-1 font-semibold text-amber-600">S</TableHead>
-										<TableHead className="text-center w-[40px] px-1 font-semibold text-blue-600">I</TableHead>
-										<TableHead className="text-center w-[40px] px-1 font-semibold text-red-600">A</TableHead>
+										<TableHead className="text-center w-10 px-1 font-semibold text-emerald-600 text-xs">H</TableHead>
+										<TableHead className="text-center w-10 px-1 font-semibold text-amber-600 text-xs">S</TableHead>
+										<TableHead className="text-center w-10 px-1 font-semibold text-blue-600 text-xs">I</TableHead>
+										<TableHead className="text-center w-10 px-1 font-semibold text-red-600 text-xs">A</TableHead>
 									</TableRow>
 								</TableHeader>
 								<TableBody>
@@ -200,33 +220,47 @@ export default function PresensiSiswaRekapPage() {
 												<TableCell className="font-medium text-xs sticky left-0 bg-background z-10">
 													{idx + 1}
 												</TableCell>
-												<TableCell className="font-semibold text-xs sticky left-[50px] bg-background z-10 border-r truncate max-w-[200px]">
-													{studentName}
+												<TableCell className="font-medium text-xs sticky left-12.5 bg-background z-10 border-r max-w-50 truncate">
+													<div>
+														<span className="block truncate">{studentName}</span>
+														<span className="text-[10px] text-muted-foreground font-mono">
+															NIS: {firstStudent?.nipd || "-"}
+														</span>
+													</div>
 												</TableCell>
-
 												{daysArray.map((day) => {
 													const status = dayStatusMap[day];
+													let badgeColor = "bg-muted text-muted-foreground";
+
+													if (status === "h") badgeColor = "bg-emerald-500 text-white font-bold";
+													else if (status === "s") badgeColor = "bg-amber-500 text-white font-bold";
+													else if (status === "i") badgeColor = "bg-blue-500 text-white font-bold";
+													else if (status === "a") badgeColor = "bg-red-500 text-white font-bold";
+
 													return (
-														<TableCell key={day} className="text-center px-1 text-xs py-2">
-															{status === "h" && <span className="font-bold text-emerald-600">H</span>}
-															{status === "s" && <span className="font-bold text-amber-600">S</span>}
-															{status === "i" && <span className="font-bold text-blue-600">I</span>}
-															{status === "a" && <span className="font-bold text-red-600">A</span>}
-															{!status && <span className="text-muted-foreground/30">-</span>}
+														<TableCell key={day} className="text-center p-1 text-xs">
+															{status ? (
+																<span
+																	className={`inline-flex items-center justify-center w-6 h-6 rounded-md text-[10px] ${badgeColor}`}
+																>
+																	{status.toUpperCase()}
+																</span>
+															) : (
+																<span className="text-muted-foreground/30 text-[10px]">•</span>
+															)}
 														</TableCell>
 													);
 												})}
-
-												<TableCell className="text-center font-bold text-emerald-600 text-xs px-1">
+												<TableCell className="text-center font-bold text-xs text-emerald-600 bg-emerald-50/30 dark:bg-emerald-950/20">
 													{countH}
 												</TableCell>
-												<TableCell className="text-center font-bold text-amber-600 text-xs px-1">
+												<TableCell className="text-center font-bold text-xs text-amber-600 bg-amber-50/30 dark:bg-amber-950/20">
 													{countS}
 												</TableCell>
-												<TableCell className="text-center font-bold text-blue-600 text-xs px-1">
+												<TableCell className="text-center font-bold text-xs text-blue-600 bg-blue-50/30 dark:bg-blue-950/20">
 													{countI}
 												</TableCell>
-												<TableCell className="text-center font-bold text-red-600 text-xs px-1">
+												<TableCell className="text-center font-bold text-xs text-red-600 bg-red-50/30 dark:bg-red-950/20">
 													{countA}
 												</TableCell>
 											</TableRow>
