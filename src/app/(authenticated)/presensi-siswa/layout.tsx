@@ -35,7 +35,7 @@ export default function PresensiSiswaLayout({ children }: { children: React.Reac
 				
 			{/* Header Action Bar: Standalone Primary Action Button */}
 			<div className="flex items-center justify-end">
-				<Link href="/presensi-siswa/scan">
+				<Link href="/presensi-siswa/scan" target="_blank" rel="noopener noreferrer">
 					<Button size="lg" className="font-semibold gap-2 shadow-xs">
 						<QrCode className="w-5 h-5" /> Buka Halaman Scan / Tap RFID
 					</Button>
