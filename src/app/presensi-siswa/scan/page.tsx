@@ -185,14 +185,43 @@ export default function PresensiSiswaScanPage() {
 		}
 	};
 
-	// Custom Green Canvas Tracker for detected barcode box
+	// Custom Green Canvas Tracker with Text Overlay for detected QR/barcode box
 	const customGreenTracker = (detectedCodes: any[], ctx: CanvasRenderingContext2D) => {
 		detectedCodes.forEach((code) => {
-			const { boundingBox } = code;
+			const { boundingBox, rawValue } = code;
 			if (boundingBox) {
-				ctx.strokeStyle = "#10b981"; // Emerald green
-				ctx.lineWidth = 4;
+				// 1. Draw Emerald Green Bounding Box
+				ctx.strokeStyle = "#10b981";
+				ctx.lineWidth = 3;
 				ctx.strokeRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
+
+				// 2. Draw Text Overlay Badge above the detected bounding box
+				if (rawValue) {
+					const text = `NIS / QR: ${rawValue}`;
+					ctx.font = "bold 13px sans-serif";
+					const textMetrics = ctx.measureText(text);
+					const textWidth = textMetrics.width;
+					const badgeHeight = 24;
+					const badgeWidth = textWidth + 18;
+					const badgeX = boundingBox.x + (boundingBox.width - badgeWidth) / 2;
+					const badgeY = Math.max(8, boundingBox.y - badgeHeight - 6);
+
+					// Draw rounded background pill
+					ctx.fillStyle = "rgba(16, 185, 129, 0.95)";
+					if (typeof ctx.roundRect === "function") {
+						ctx.beginPath();
+						ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 6);
+						ctx.fill();
+					} else {
+						ctx.fillRect(badgeX, badgeY, badgeWidth, badgeHeight);
+					}
+
+					// Draw White Text inside badge
+					ctx.fillStyle = "#ffffff";
+					ctx.textAlign = "center";
+					ctx.textBaseline = "middle";
+					ctx.fillText(text, badgeX + badgeWidth / 2, badgeY + badgeHeight / 2);
+				}
 			}
 		});
 	};
