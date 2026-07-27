@@ -1,5 +1,13 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAuthQuery } from "@/hooks/useAuthQuery";
+import { useLatestApelAttendanceQuery, useStoreApelAttendanceMutation } from "@/queries/useApelAttendanceQuery";
+import type { ApelStudent } from "@/types/apel-attendance";
 import { Scanner, useDevices } from "@yudiel/react-qr-scanner";
 import {
 	AlertCircle,
@@ -19,14 +27,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useAuthQuery } from "@/hooks/useAuthQuery";
-import { useLatestApelAttendanceQuery, useStoreApelAttendanceMutation } from "@/queries/useApelAttendanceQuery";
-import type { ApelStudent } from "@/types/apel-attendance";
 
 interface ScanLog {
 	id: string;
@@ -78,9 +78,28 @@ export default function PresensiSiswaScanPage() {
 		return () => clearInterval(timer);
 	}, []);
 
-	// Native Web Audio API Sound Synthesizer
+	// Audio Player for Success and Failed Notifications from /sounds/
 	const playSound = (type: "success" | "error") => {
 		if (!soundEnabled) return;
+		try {
+			const soundFile =
+				type === "success"
+					? "/sounds/success-notification.mp3"
+					: "/sounds/failed-notification.mp3";
+
+			const audio = new Audio(soundFile);
+			audio.currentTime = 0;
+			audio.play().catch(() => {
+				// Fallback to Web Audio Synth if autoplay is restricted
+				playSynthSound(type);
+			});
+		} catch (e) {
+			playSynthSound(type);
+		}
+	};
+
+	// Fallback Native Web Audio API Sound Synthesizer
+	const playSynthSound = (type: "success" | "error") => {
 		try {
 			const AudioContextClass =
 				window.AudioContext ||
@@ -197,7 +216,7 @@ export default function PresensiSiswaScanPage() {
 
 				// 2. Draw Text Overlay Badge above the detected bounding box
 				if (rawValue) {
-					const text = `NIS / QR: ${rawValue}`;
+					const text = `${rawValue}`;
 					ctx.font = "bold 13px sans-serif";
 					const textMetrics = ctx.measureText(text);
 					const textWidth = textMetrics.width;
