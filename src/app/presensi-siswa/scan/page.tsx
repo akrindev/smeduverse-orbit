@@ -250,16 +250,37 @@ export default function PresensiSiswaScanPage() {
 
 	return (
 		<div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
-			{/* CSS override to force scanner finder lines to emerald green */}
+			{/* CSS override for @yudiel/react-qr-scanner finder colors and animated laser beam */}
 			<style>{`
-				.green-qr-scanner-wrap svg path,
-				.green-qr-scanner-wrap svg line,
-				.green-qr-scanner-wrap svg rect,
-				.green-qr-scanner-wrap [class*="finder"],
-				.green-qr-scanner-wrap [data-qrcode-finder] {
-					stroke: #10b981 !important;
+				@keyframes greenLaserMove {
+					0% { top: 5%; opacity: 0.8; }
+					50% { top: 92%; opacity: 1; }
+					100% { top: 5%; opacity: 0.8; }
+				}
+
+				.green-qr-scanner-wrap div {
 					border-color: #10b981 !important;
-					color: #10b981 !important;
+				}
+
+				/* Animate laser beam inside finder box */
+				.green-qr-scanner-wrap div[style*="width: 70%"],
+				.green-qr-scanner-wrap div[style*="width:70%"] {
+					position: relative !important;
+				}
+
+				.green-qr-scanner-wrap div[style*="width: 70%"]::after,
+				.green-qr-scanner-wrap div[style*="width:70%"]::after {
+					content: '';
+					position: absolute;
+					left: 4%;
+					right: 4%;
+					height: 3px;
+					background: linear-gradient(90deg, transparent, #10b981, #34d399, #10b981, transparent);
+					box-shadow: 0 0 15px #10b981, 0 0 6px #34d399;
+					border-radius: 9999px;
+					animation: greenLaserMove 2.2s ease-in-out infinite;
+					z-index: 25;
+					pointer-events: none;
 				}
 			`}</style>
 
@@ -341,7 +362,7 @@ export default function PresensiSiswaScanPage() {
 
 			{/* Main Layout Body */}
 			<main className="flex-1 p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-7xl w-full mx-auto items-start">
-				{/* Left / Primary QR Scanner Section (With Margins & Green Finder Lines) */}
+				{/* Left / Primary QR Scanner Section (With Margins & Animated Green Laser Finder) */}
 				<div className="lg:col-span-7 flex flex-col space-y-4">
 					{/* Toolbar: Camera Selection & Toggle */}
 					<div className="flex flex-wrap items-center justify-between gap-2 p-3 bg-card border rounded-xl shadow-xs">
@@ -383,7 +404,7 @@ export default function PresensiSiswaScanPage() {
 						</div>
 					</div>
 
-					{/* Outer Padded Card Container for Margin & Clean Spacing */}
+					{/* Outer Padded Card Container for Margin & Spacing */}
 					<div className="p-4 sm:p-5 bg-card border rounded-2xl shadow-md">
 						{/* 1:1 Aspect Ratio Scanner Container */}
 						<div className="green-qr-scanner-wrap w-full aspect-square max-h-[480px] bg-black rounded-xl overflow-hidden shadow-inner border-2 border-emerald-500/30 relative flex items-center justify-center mx-auto">
@@ -395,7 +416,7 @@ export default function PresensiSiswaScanPage() {
 										scanDelay={2000}
 										allowMultiple={false}
 										components={{
-											finder: false,
+											finder: true,
 											torch: true,
 											zoom: true,
 											tracker: customGreenTracker,
@@ -410,21 +431,9 @@ export default function PresensiSiswaScanPage() {
 										}}
 									/>
 
-									{/* Custom Emerald Green Finder Corner Lines Overlay */}
-									<div className="absolute inset-10 sm:inset-14 border-2 border-emerald-500/60 rounded-xl pointer-events-none flex items-center justify-center">
-										{/* Emerald Corner Brackets */}
-										<div className="absolute -top-1 -left-1 w-6 h-6 border-t-4 border-l-4 border-emerald-400 rounded-tl-lg shadow-[0_0_8px_#10b981]" />
-										<div className="absolute -top-1 -right-1 w-6 h-6 border-t-4 border-r-4 border-emerald-400 rounded-tr-lg shadow-[0_0_8px_#10b981]" />
-										<div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-4 border-l-4 border-emerald-400 rounded-bl-lg shadow-[0_0_8px_#10b981]" />
-										<div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-4 border-r-4 border-emerald-400 rounded-br-lg shadow-[0_0_8px_#10b981]" />
-
-										{/* Emerald Scanning Beam */}
-										<div className="w-full h-0.5 bg-emerald-400/90 shadow-[0_0_12px_#10b981] animate-pulse" />
-									</div>
-
 									<div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-xs text-white text-[11px] px-2.5 py-1 rounded-md flex items-center gap-1.5 z-10 border border-white/10">
 										<span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-										<span>Scanner 1:1 Green Lines</span>
+										<span>Scanner Animated Green</span>
 									</div>
 								</>
 							) : (
