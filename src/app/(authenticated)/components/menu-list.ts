@@ -62,6 +62,13 @@ export const menuList: MenuItem[] = [
 		path: "/monitoring",
 	},
 	{
+		name: "Presensi Siswa",
+		title: "Presensi Siswa",
+		icon: IconUserCheck,
+		path: "/presensi-siswa",
+		roles: ["guru", "admin"],
+	},
+	{
 		name: "Jurnal Guru",
 		title: "Jurnal Guru",
 		icon: IconNotes,

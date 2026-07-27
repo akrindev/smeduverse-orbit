@@ -2,7 +2,6 @@
 
 import { api } from "@/lib/api";
 import type {
-	ApelAttendance,
 	LatestApelAttendanceResponse,
 	MonthlyApelAttendanceResponse,
 	OrbitSetting,
