@@ -88,6 +88,7 @@ export default function PresensiSiswaScanPage() {
 	const todayDate = new Date().toISOString().split("T")[0];
 	const { data: latestAttendanceData, refetch: refetchLatest } = useLatestApelAttendanceQuery({ date: todayDate });
 	const { data: settingData } = useOrbitSettingQuery("apel_time_start");
+	const { data: workdaysData } = useOrbitSettingQuery("apel_workdays_config");
 
 	// Authentication Gate
 	useEffect(() => {
@@ -165,7 +166,20 @@ export default function PresensiSiswaScanPage() {
 		const cleanTime = timeStr.replace(" WIB", "").replace(".", ":");
 		const [h, m] = cleanTime.split(":").map(Number);
 
-		const cutoffStr = (settingData?.value as string) || "07:00";
+		let cutoffStr = (settingData?.value as string) || "07:00";
+		if (workdaysData?.value) {
+			try {
+				const parsed = JSON.parse(String(workdaysData.value));
+				if (Array.isArray(parsed) && parsed.length > 0) {
+					const daysIndo = ["minggu", "senin", "selasa", "rabu", "kamis", "jumat", "sabtu"];
+					const todayKey = daysIndo[new Date().getDay()];
+					const found = parsed.find((item: any) => item.key === todayKey);
+					if (found && found.openTime) {
+						cutoffStr = found.openTime;
+					}
+				}
+			} catch (_) {}
+		}
 		const cleanCutoff = cutoffStr.replace(".", ":");
 		const [cutH, cutM] = cleanCutoff.split(":").map(Number);
 

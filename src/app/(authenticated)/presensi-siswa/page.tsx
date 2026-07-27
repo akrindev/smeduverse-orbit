@@ -1,5 +1,15 @@
 "use client";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+	useLatestApelAttendanceQuery,
+	useOrbitSettingQuery,
+	useWeeklyApelTrendQuery,
+} from "@/queries/useApelAttendanceQuery";
 import {
 	Activity,
 	AlertTriangle,
@@ -30,17 +40,6 @@ import {
 	XAxis,
 	YAxis,
 } from "recharts";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-	useLatestApelAttendanceQuery,
-	useOrbitSettingQuery,
-	useWeeklyApelTrendQuery,
-} from "@/queries/useApelAttendanceQuery";
 
 const COLORS = ["#10b981", "#f59e0b", "#ef4444", "#3b82f6"];
 
@@ -136,14 +135,6 @@ export default function PresensiSiswaHubPage() {
 
 	return (
 		<div className="space-y-6">
-			{/* Header Action Bar: Standalone Primary Action Button */}
-			<div className="flex items-center justify-end">
-				<Link href="/presensi-siswa/scan">
-					<Button size="lg" className="font-semibold gap-2 shadow-xs">
-						<QrCode className="w-5 h-5" /> Buka Halaman Scan / Tap RFID
-					</Button>
-				</Link>
-			</div>
 
 			{/* Metric Summary Cards (Clean shadow-xs without colored side borders) */}
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

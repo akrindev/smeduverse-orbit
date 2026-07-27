@@ -1,6 +1,7 @@
 "use client";
 
-import { CalendarCheck, LayoutDashboard, Settings, UserCheck } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CalendarCheck, LayoutDashboard, QrCode, Settings, UserCheck } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -31,6 +32,15 @@ export default function PresensiSiswaLayout({ children }: { children: React.Reac
 						Sistem pencatatan dan pengelolaan presensi apel harian siswa
 					</p>
 				</div>
+				
+			{/* Header Action Bar: Standalone Primary Action Button */}
+			<div className="flex items-center justify-end">
+				<Link href="/presensi-siswa/scan">
+					<Button size="lg" className="font-semibold gap-2 shadow-xs">
+						<QrCode className="w-5 h-5" /> Buka Halaman Scan / Tap RFID
+					</Button>
+				</Link>
+			</div>
 			</div>
 
 			{/* Sub Navigation Bar - Only visible on desktop (hidden on mobile) */}
