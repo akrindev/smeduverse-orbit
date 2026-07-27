@@ -137,7 +137,7 @@ export default function PresensiSiswaRekapPage() {
 				</CardContent>
 			</Card>
 
-			{/* Matrix Table with Responsive Inner Scrollbar */}
+			{/* Matrix Table with Non-Overlapping Sticky Positions & Contained Inner Scrollbar */}
 			<Card className="shadow-xs overflow-hidden">
 				<CardHeader className="pb-3 flex flex-row items-center justify-between flex-wrap gap-2">
 					<div>
@@ -172,22 +172,24 @@ export default function PresensiSiswaRekapPage() {
 					) : (
 						/* Scrollbar contained strictly inside CardContent for mobile responsiveness */
 						<div className="w-full max-w-full overflow-x-auto border-y sm:border sm:rounded-lg">
-							<Table className="min-w-max">
+							<Table className="min-w-max border-collapse">
 								<TableHeader>
-									<TableRow className="bg-muted/50">
-										<TableHead className="w-12.5 sticky left-0 bg-muted/90 z-10 text-xs">No</TableHead>
-										<TableHead className="min-w-45 sticky left-12.5 bg-muted/90 z-10 border-r text-xs">
+									<TableRow className="bg-muted/60">
+										<TableHead className="w-[48px] min-w-[48px] sticky left-0 bg-muted z-20 text-xs font-semibold text-center">
+											No
+										</TableHead>
+										<TableHead className="w-[200px] min-w-[200px] max-w-[200px] sticky left-[48px] bg-muted z-20 border-r text-xs font-semibold">
 											Nama Siswa
 										</TableHead>
 										{daysArray.map((day) => (
-											<TableHead key={day} className="text-center w-9 min-w-9 px-1 text-xs">
+											<TableHead key={day} className="text-center w-9 min-w-9 px-1 text-xs font-semibold">
 												{day}
 											</TableHead>
 										))}
-										<TableHead className="text-center w-10 px-1 font-semibold text-emerald-600 text-xs">H</TableHead>
-										<TableHead className="text-center w-10 px-1 font-semibold text-amber-600 text-xs">S</TableHead>
-										<TableHead className="text-center w-10 px-1 font-semibold text-blue-600 text-xs">I</TableHead>
-										<TableHead className="text-center w-10 px-1 font-semibold text-red-600 text-xs">A</TableHead>
+										<TableHead className="text-center w-10 px-1 font-semibold text-emerald-600 text-xs bg-muted">H</TableHead>
+										<TableHead className="text-center w-10 px-1 font-semibold text-amber-600 text-xs bg-muted">S</TableHead>
+										<TableHead className="text-center w-10 px-1 font-semibold text-blue-600 text-xs bg-muted">I</TableHead>
+										<TableHead className="text-center w-10 px-1 font-semibold text-red-600 text-xs bg-muted">A</TableHead>
 									</TableRow>
 								</TableHeader>
 								<TableBody>
@@ -216,13 +218,13 @@ export default function PresensiSiswaRekapPage() {
 										});
 
 										return (
-											<TableRow key={stId}>
-												<TableCell className="font-medium text-xs sticky left-0 bg-background z-10">
+											<TableRow key={stId} className="hover:bg-muted/40 transition-colors">
+												<TableCell className="font-medium text-xs text-center sticky left-0 bg-background z-10 w-[48px] min-w-[48px]">
 													{idx + 1}
 												</TableCell>
-												<TableCell className="font-medium text-xs sticky left-12.5 bg-background z-10 border-r max-w-50 truncate">
+												<TableCell className="font-medium text-xs sticky left-[48px] bg-background z-10 border-r w-[200px] min-w-[200px] max-w-[200px] truncate">
 													<div>
-														<span className="block truncate">{studentName}</span>
+														<span className="block truncate font-semibold">{studentName}</span>
 														<span className="text-[10px] text-muted-foreground font-mono">
 															NIS: {firstStudent?.nipd || "-"}
 														</span>
@@ -230,12 +232,12 @@ export default function PresensiSiswaRekapPage() {
 												</TableCell>
 												{daysArray.map((day) => {
 													const status = dayStatusMap[day];
-													let badgeColor = "bg-muted text-muted-foreground";
+													let badgeColor = "bg-muted text-muted-foreground/40";
 
-													if (status === "h") badgeColor = "bg-emerald-500 text-white font-bold";
-													else if (status === "s") badgeColor = "bg-amber-500 text-white font-bold";
-													else if (status === "i") badgeColor = "bg-blue-500 text-white font-bold";
-													else if (status === "a") badgeColor = "bg-red-500 text-white font-bold";
+													if (status === "h") badgeColor = "bg-emerald-500 text-white font-bold shadow-2xs";
+													else if (status === "s") badgeColor = "bg-amber-500 text-white font-bold shadow-2xs";
+													else if (status === "i") badgeColor = "bg-blue-500 text-white font-bold shadow-2xs";
+													else if (status === "a") badgeColor = "bg-red-500 text-white font-bold shadow-2xs";
 
 													return (
 														<TableCell key={day} className="text-center p-1 text-xs">
@@ -246,21 +248,21 @@ export default function PresensiSiswaRekapPage() {
 																	{status.toUpperCase()}
 																</span>
 															) : (
-																<span className="text-muted-foreground/30 text-[10px]">•</span>
+																<span className="text-muted-foreground/20 text-[10px]">•</span>
 															)}
 														</TableCell>
 													);
 												})}
-												<TableCell className="text-center font-bold text-xs text-emerald-600 bg-emerald-50/30 dark:bg-emerald-950/20">
+												<TableCell className="text-center font-bold text-xs text-emerald-600 bg-emerald-50/40 dark:bg-emerald-950/20">
 													{countH}
 												</TableCell>
-												<TableCell className="text-center font-bold text-xs text-amber-600 bg-amber-50/30 dark:bg-amber-950/20">
+												<TableCell className="text-center font-bold text-xs text-amber-600 bg-amber-50/40 dark:bg-amber-950/20">
 													{countS}
 												</TableCell>
-												<TableCell className="text-center font-bold text-xs text-blue-600 bg-blue-50/30 dark:bg-blue-950/20">
+												<TableCell className="text-center font-bold text-xs text-blue-600 bg-blue-50/40 dark:bg-blue-950/20">
 													{countI}
 												</TableCell>
-												<TableCell className="text-center font-bold text-xs text-red-600 bg-red-50/30 dark:bg-red-950/20">
+												<TableCell className="text-center font-bold text-xs text-red-600 bg-red-50/40 dark:bg-red-950/20">
 													{countA}
 												</TableCell>
 											</TableRow>
