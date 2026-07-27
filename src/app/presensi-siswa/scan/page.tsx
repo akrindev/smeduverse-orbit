@@ -9,7 +9,7 @@ import {
 	Maximize,
 	Minimize,
 	QrCode,
-	Sparkles,
+	RefreshCw,
 	Volume2,
 	VolumeX,
 	Wifi,
@@ -38,14 +38,14 @@ interface ScanLog {
 	message: string;
 }
 
-export default function PresensiSiswaStandaloneScanPage() {
+export default function PresensiSiswaScanPage() {
 	const router = useRouter();
 	const { isAuthenticated, isLoading: authLoading } = useAuthQuery();
 
 	const [currentTime, setCurrentTime] = useState<Date>(new Date());
 	const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
 	const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
-	const [isCameraActive, setIsCameraActive] = useState<boolean>(false);
+	const [isCameraActive, setIsCameraActive] = useState<boolean>(true);
 	const [rfidBuffer, setRfidBuffer] = useState<string>("");
 	const [scanLogs, setScanLogs] = useState<ScanLog[]>([]);
 	const [lastScannedResult, setLastScannedResult] = useState<{
@@ -59,7 +59,7 @@ export default function PresensiSiswaStandaloneScanPage() {
 	const mediaStreamRef = useRef<MediaStream | null>(null);
 	const storeMutation = useStoreApelAttendanceMutation();
 
-	// Today's summary count
+	// Today's summary data
 	const todayDate = new Date().toISOString().split("T")[0];
 	const { data: latestAttendanceData, refetch: refetchLatest } = useLatestApelAttendanceQuery({ date: todayDate });
 
@@ -76,7 +76,7 @@ export default function PresensiSiswaStandaloneScanPage() {
 		return () => clearInterval(timer);
 	}, []);
 
-	// Web Audio API Sound Synthesizer
+	// Native Web Audio API Sound Synthesizer
 	const playSound = (type: "success" | "error") => {
 		if (!soundEnabled) return;
 		try {
@@ -99,7 +99,7 @@ export default function PresensiSiswaStandaloneScanPage() {
 				osc.stop(ctx.currentTime + 0.3);
 			} else {
 				osc.type = "square";
-				osc.frequency.setValueAtTime(250, ctx.currentTime);
+				osc.frequency.setValueAtTime(260, ctx.currentTime);
 				gain.gain.setValueAtTime(0.2, ctx.currentTime);
 				gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.4);
 				osc.start(ctx.currentTime);
@@ -110,7 +110,7 @@ export default function PresensiSiswaStandaloneScanPage() {
 		}
 	};
 
-	// Process Scan Submission
+	// Process Scan Submission (RFID or QR)
 	const handleScanSubmit = async (nisCode: string) => {
 		const cleanNis = nisCode.trim();
 		if (!cleanNis || storeMutation.isPending) return;
@@ -165,7 +165,7 @@ export default function PresensiSiswaStandaloneScanPage() {
 		}
 	};
 
-	// RFID USB Reader Keyboard Listener
+	// RFID USB Reader Listener (Continuous background keystrokes)
 	useEffect(() => {
 		let buffer = "";
 		let timeoutId: NodeJS.Timeout;
@@ -200,7 +200,7 @@ export default function PresensiSiswaStandaloneScanPage() {
 		};
 	}, [storeMutation.isPending]);
 
-	// Camera Management for QR Scanning
+	// Camera Management
 	const startCamera = async () => {
 		try {
 			const stream = await navigator.mediaDevices.getUserMedia({
@@ -212,7 +212,8 @@ export default function PresensiSiswaStandaloneScanPage() {
 			}
 			setIsCameraActive(true);
 		} catch (_err) {
-			toast.error("Tidak dapat mengakses kamera. Pastikan izin telah diberikan.");
+			toast.error("Tidak dapat mengakses kamera. Pastikan izin kamera telah diberikan.");
+			setIsCameraActive(false);
 		}
 	};
 
@@ -226,6 +227,13 @@ export default function PresensiSiswaStandaloneScanPage() {
 		}
 		setIsCameraActive(false);
 	};
+
+	useEffect(() => {
+		startCamera();
+		return () => {
+			stopCamera();
+		};
+	}, []);
 
 	const toggleFullscreen = () => {
 		if (!document.fullscreenElement) {
@@ -244,230 +252,215 @@ export default function PresensiSiswaStandaloneScanPage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-blue-600">
-			{/* Kiosk Header */}
-			<header className="px-6 py-4 border-b border-slate-800 bg-slate-900/90 backdrop-blur-md flex items-center justify-between sticky top-0 z-50">
-				<div className="flex items-center gap-4">
+		<div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
+			{/* Top Header Bar */}
+			<header className="px-6 py-3.5 border-b bg-card shadow-xs flex items-center justify-between sticky top-0 z-50">
+				<div className="flex items-center gap-3">
 					<Link href="/presensi-siswa" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-						<Image src="/orbit.png" width={36} height={36} alt="Orbit Logo" />
-						<div className="hidden sm:block">
-							<h1 className="font-bold text-lg leading-tight tracking-wide text-white">SMEDUVERSE ORBIT</h1>
-							<p className="text-xs text-blue-400 font-medium">Stasiun Presensi Apel Siswa</p>
+						<Image src="/orbit.png" width={32} height={32} alt="Orbit Logo" />
+						<div>
+							<h1 className="font-bold text-base leading-tight tracking-tight">Presensi Apel Siswa</h1>
+							<p className="text-[11px] text-muted-foreground">Smeduverse Orbit Station</p>
 						</div>
 					</Link>
 				</div>
 
-				{/* Center Live Clock */}
-				<div className="flex items-center gap-2 bg-slate-800/80 px-4 py-2 rounded-full border border-slate-700">
-					<Clock className="w-4 h-4 text-blue-400 animate-pulse" />
-					<span className="font-mono text-sm sm:text-base font-semibold text-slate-100">
-						{currentTime.toLocaleDateString("id-ID", { weekday: "short", day: "numeric", month: "short" })}
-					</span>
-					<span className="font-mono text-sm sm:text-base font-bold text-blue-400 ml-1">
-						{currentTime.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
-					</span>
+				{/* Center: RFID Status Badge / Bubble Indicator */}
+				<div className="flex items-center gap-3">
+					<div className="flex items-center gap-2 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 px-3 py-1.5 rounded-full text-xs text-emerald-700 dark:text-emerald-300">
+						<span className="relative flex h-2 w-2">
+							<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+							<span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+						</span>
+						<span className="font-medium">RFID Active</span>
+						<Zap className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 ml-0.5" />
+					</div>
+
+					{/* Live RFID Buffer Pill */}
+					{rfidBuffer && (
+						<Badge variant="outline" className="bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 text-xs animate-pulse">
+							<Wifi className="w-3 h-3 mr-1" /> Tap: {rfidBuffer}
+						</Badge>
+					)}
 				</div>
 
-				{/* Header Actions */}
+				{/* Right: Clock & Actions */}
 				<div className="flex items-center gap-2">
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={() => setSoundEnabled(!soundEnabled)}
-						className="border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700"
-					>
-						{soundEnabled ? <Volume2 className="w-4 h-4 text-emerald-400" /> : <VolumeX className="w-4 h-4 text-slate-400" />}
+					<div className="hidden md:flex items-center gap-2 bg-muted/60 px-3 py-1.5 rounded-md text-xs font-mono">
+						<Clock className="w-3.5 h-3.5 text-primary" />
+						<span>{currentTime.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</span>
+					</div>
+
+					<Button variant="outline" size="sm" onClick={() => setSoundEnabled(!soundEnabled)}>
+						{soundEnabled ? <Volume2 className="w-4 h-4 text-emerald-600" /> : <VolumeX className="w-4 h-4 text-muted-foreground" />}
 					</Button>
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={toggleFullscreen}
-						className="border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700"
-					>
+					<Button variant="outline" size="sm" onClick={toggleFullscreen}>
 						{isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
 					</Button>
 					<Link href="/presensi-siswa">
-						<Button size="sm" className="bg-blue-600 hover:bg-blue-500 text-white font-medium">
-							<ArrowLeft className="w-4 h-4 mr-1.5" /> Dashboard
+						<Button size="sm" variant="default" className="font-medium">
+							<ArrowLeft className="w-4 h-4 mr-1.5" /> Kembalikan
 						</Button>
 					</Link>
 				</div>
 			</header>
 
-			{/* Main Kiosk Content Body */}
-			<main className="flex-1 p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-[1600px] w-full mx-auto">
-				{/* Left Column: Big RFID & QR Scanner Station */}
-				<div className="lg:col-span-7 flex flex-col space-y-6">
-					{/* Big Interactive Tap Zone */}
-					<div className="relative bg-gradient-to-br from-blue-950/60 via-slate-900 to-indigo-950/40 border-2 border-blue-500/30 rounded-2xl p-8 flex flex-col items-center justify-center text-center shadow-2xl overflow-hidden min-h-[340px]">
-						{/* Animated Background Ring */}
-						<div className="absolute w-72 h-72 rounded-full border border-blue-500/20 animate-ping pointer-events-none" />
-						<div className="absolute w-96 h-96 rounded-full border border-indigo-500/10 pointer-events-none" />
-
-						<div className="relative z-10 space-y-4">
-							<div className="w-20 h-20 mx-auto rounded-full bg-blue-600/20 border-2 border-blue-400 flex items-center justify-center shadow-lg shadow-blue-500/20 animate-pulse">
-								<Zap className="w-10 h-10 text-blue-400" />
-							</div>
-
-							<div className="space-y-1">
-								<h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-									TEMPELKAN KARTU RFID SISWA
-								</h2>
-								<p className="text-slate-400 text-sm max-w-md mx-auto">
-									Dekatkan Kartu Tanda Siswa pada alat pembaca RFID USB. Sistem otomatis mencatat presensi tanpa input manual.
-								</p>
-							</div>
-
-							{/* Active Buffer Status */}
-							{rfidBuffer ? (
-								<div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-500/20 border border-blue-400/40 rounded-full text-blue-300 font-mono text-sm animate-pulse">
-									<Wifi className="w-4 h-4 text-blue-400" />
-									<span>Membaca RFID: <strong className="text-white">{rfidBuffer}</strong></span>
+			{/* Main Layout Body */}
+			<main className="flex-1 p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-7xl w-full mx-auto">
+				{/* Left / Primary Hero Section: QR Code Scanner Card */}
+				<div className="lg:col-span-7 flex flex-col space-y-4">
+					<Card className="shadow-md border-primary/20 flex-1 flex flex-col">
+						<CardHeader className="pb-3 border-b">
+							<div className="flex items-center justify-between">
+								<div className="flex items-center gap-2">
+									<div className="p-2 bg-primary/10 rounded-lg text-primary">
+										<QrCode className="w-5 h-5" />
+									</div>
+									<div>
+										<CardTitle className="text-lg">Pemindai QR Code Utama</CardTitle>
+										<CardDescription className="text-xs">
+											Arahkan QR Code Kartu Siswa ke kotak pemindai kamera
+										</CardDescription>
+									</div>
 								</div>
-							) : (
-								<div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-950/50 border border-emerald-500/30 text-emerald-400 rounded-full text-xs">
-									<span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-									<span>Sensor RFID Siap Melayani Scan</span>
-								</div>
-							)}
-						</div>
-					</div>
-
-					{/* QR Code Scanner Toggle Section */}
-					<Card className="bg-slate-900 border-slate-800 text-slate-100 shadow-lg">
-						<CardHeader className="pb-3 flex flex-row items-center justify-between">
-							<div className="flex items-center gap-2">
-								<QrCode className="w-5 h-5 text-blue-400" />
-								<div>
-									<CardTitle className="text-base text-white">Pemindai QR Code Kamera</CardTitle>
-									<CardDescription className="text-xs text-slate-400">
-										Gunakan kamera jika siswa membawa cetakan/aplikasi QR Code
-									</CardDescription>
+								<div className="flex items-center gap-2">
+									<Button
+										variant={isCameraActive ? "outline" : "default"}
+										size="sm"
+										onClick={isCameraActive ? stopCamera : startCamera}
+									>
+										<Camera className="w-4 h-4 mr-1.5" />
+										{isCameraActive ? "Nonaktifkan Camera" : "Aktifkan Camera"}
+									</Button>
 								</div>
 							</div>
-							<Button
-								variant={isCameraActive ? "destructive" : "outline"}
-								size="sm"
-								onClick={isCameraActive ? stopCamera : startCamera}
-								className={isCameraActive ? "" : "border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700"}
-							>
-								{isCameraActive ? "Tutup Kamera" : "Buka Kamera QR"}
-							</Button>
 						</CardHeader>
-						<CardContent>
+						<CardContent className="pt-4 flex-1 flex flex-col items-center justify-center">
 							{isCameraActive ? (
-								<div className="relative aspect-video bg-black rounded-lg overflow-hidden border border-slate-700 flex items-center justify-center">
+								<div className="relative w-full aspect-video max-h-[400px] bg-black rounded-xl overflow-hidden shadow-inner border flex items-center justify-center">
 									<video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover" />
-									<div className="absolute inset-0 border-2 border-blue-400/60 border-dashed m-10 rounded-lg pointer-events-none flex items-center justify-center">
-										<div className="w-full h-0.5 bg-red-500/80 animate-ping" />
+									{/* Scanning Frame Overlay */}
+									<div className="absolute inset-0 border-2 border-primary/80 border-dashed m-8 sm:m-12 rounded-xl pointer-events-none flex items-center justify-center">
+										<div className="w-full h-0.5 bg-red-500/80 animate-pulse shadow-sm" />
+									</div>
+									<div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-xs text-white text-[11px] px-2.5 py-1 rounded-md flex items-center gap-1.5">
+										<span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+										<span>Kamera Memindai...</span>
 									</div>
 								</div>
 							) : (
-								<div className="py-6 text-center text-slate-500 text-xs border border-dashed border-slate-800 rounded-lg">
-									Kamera nonaktif. Klik &quot;Buka Kamera QR&quot; untuk mengaktifkan pemindaian berbasis kamera.
+								<div className="w-full py-16 text-center border-2 border-dashed rounded-xl bg-muted/20 flex flex-col items-center justify-center">
+									<Camera className="w-12 h-12 text-muted-foreground/40 mb-3" />
+									<p className="font-semibold text-sm">Kamera QR Nonaktif</p>
+									<p className="text-xs text-muted-foreground mt-1 max-w-xs">
+										Klik tombol &quot;Aktifkan Camera&quot; untuk menyalakan kamera QR Code.
+									</p>
+									<Button size="sm" className="mt-4" onClick={startCamera}>
+										Nyalakan Kamera
+									</Button>
 								</div>
 							)}
+
+							{/* Footnote Badge info for RFID */}
+							<div className="mt-4 w-full p-3 bg-muted/40 rounded-lg border text-xs flex items-center justify-between text-muted-foreground">
+								<div className="flex items-center gap-2">
+									<Zap className="w-4 h-4 text-emerald-600" />
+									<span>Pembaca RFID USB aktif di latar belakang (tanpa perlu dipindah)</span>
+								</div>
+								<Badge variant="secondary" className="text-[10px]">Auto Tap</Badge>
+							</div>
 						</CardContent>
 					</Card>
 				</div>
 
-				{/* Right Column: Instant Student Result & Live Session Log */}
+				{/* Right Section: Student Scan Result Banner & Session Activity */}
 				<div className="lg:col-span-5 flex flex-col space-y-6">
-					{/* Instant Popup / Banner Card */}
-					<Card className="bg-slate-900 border-slate-800 text-slate-100 shadow-xl overflow-hidden">
-						<CardHeader className="bg-slate-800/50 pb-3 border-b border-slate-800">
-							<div className="flex items-center justify-between">
-								<CardTitle className="text-sm font-semibold text-slate-300">Hasil Scan Terakhir</CardTitle>
-								{lastScannedResult && (
-									<span className="text-xs font-mono text-slate-400">{lastScannedResult.timestamp}</span>
-								)}
-							</div>
+					{/* Result Banner Card */}
+					<Card className="shadow-md">
+						<CardHeader className="pb-3 border-b flex flex-row items-center justify-between">
+							<CardTitle className="text-base">Hasil Scan Terakhir</CardTitle>
+							{lastScannedResult && (
+								<span className="text-xs font-mono text-muted-foreground">{lastScannedResult.timestamp}</span>
+							)}
 						</CardHeader>
-						<CardContent className="pt-6">
+						<CardContent className="pt-4">
 							{lastScannedResult ? (
 								<div
-									className={`p-6 rounded-xl border flex flex-col items-center text-center space-y-4 ${
+									className={`p-4 rounded-lg border ${
 										lastScannedResult.status === "success"
-											? "bg-emerald-950/30 border-emerald-500/40 text-emerald-100"
-											: "bg-red-950/30 border-red-500/40 text-red-100"
+											? "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800"
+											: "bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800"
 									}`}
 								>
-									{lastScannedResult.status === "success" ? (
-										<div className="w-16 h-16 rounded-full bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center text-emerald-400 shadow-lg shadow-emerald-500/20">
-											<CheckCircle2 className="w-10 h-10" />
+									<div className="flex items-start gap-3">
+										{lastScannedResult.status === "success" ? (
+											<CheckCircle2 className="w-8 h-8 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+										) : (
+											<AlertCircle className="w-8 h-8 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+										)}
+										<div className="flex-1">
+											<h3
+												className={`font-bold text-base ${
+													lastScannedResult.status === "success"
+														? "text-emerald-900 dark:text-emerald-100"
+														: "text-red-900 dark:text-red-100"
+												}`}
+											>
+												{lastScannedResult.message}
+											</h3>
+											{lastScannedResult.student && (
+												<div className="mt-2 text-xs space-y-1 text-muted-foreground border-t pt-2">
+													<p><span className="font-semibold text-foreground">Siswa:</span> {lastScannedResult.student.fullname}</p>
+													<p><span className="font-semibold text-foreground">NIPD / NIS:</span> {lastScannedResult.student.nipd}</p>
+													<p><span className="font-semibold text-foreground">ID Siswa:</span> {lastScannedResult.student.student_id}</p>
+												</div>
+											)}
 										</div>
-									) : (
-										<div className="w-16 h-16 rounded-full bg-red-500/20 border-2 border-red-400 flex items-center justify-center text-red-400 shadow-lg shadow-red-500/20">
-											<AlertCircle className="w-10 h-10" />
-										</div>
-									)}
-
-									<div className="space-y-1">
-										<h3 className="text-xl font-extrabold tracking-tight">
-											{lastScannedResult.student?.fullname || lastScannedResult.message}
-										</h3>
-										<p className="text-sm text-slate-300 font-medium">{lastScannedResult.message}</p>
 									</div>
-
-									{lastScannedResult.student && (
-										<div className="w-full bg-slate-900/80 p-3 rounded-lg border border-slate-800 text-xs grid grid-cols-2 gap-2 text-left">
-											<div>
-												<span className="text-slate-500 block">NIPD / NIS</span>
-												<span className="font-semibold text-white">{lastScannedResult.student.nipd}</span>
-											</div>
-											<div>
-												<span className="text-slate-500 block">ID Siswa</span>
-												<span className="font-semibold text-white">{lastScannedResult.student.student_id}</span>
-											</div>
-										</div>
-									)}
 								</div>
 							) : (
-								<div className="py-12 text-center text-slate-500 text-sm border border-dashed border-slate-800 rounded-lg">
-									Belum ada data scan pada sesi stasiun ini
+								<div className="py-10 text-center text-muted-foreground text-sm border border-dashed rounded-md">
+									Belum ada data scan pada sesi pemindaian ini
 								</div>
 							)}
 						</CardContent>
 					</Card>
 
-					{/* Live Session Activity Log */}
-					<Card className="bg-slate-900 border-slate-800 text-slate-100 shadow-lg flex-1">
-						<CardHeader className="pb-3 border-b border-slate-800 flex flex-row items-center justify-between">
+					{/* Live Session Log List */}
+					<Card className="shadow-xs flex-1">
+						<CardHeader className="pb-3 border-b flex flex-row items-center justify-between">
 							<div>
-								<CardTitle className="text-sm font-semibold text-slate-300">Aktivitas Scan Sesi Ini</CardTitle>
-								<CardDescription className="text-xs text-slate-500">
-									Total Hadir Hari Ini: {latestAttendanceData?.attendances?.total ?? 0} Siswa
+								<CardTitle className="text-base">Aktivitas Sesi Presensi</CardTitle>
+								<CardDescription className="text-xs">
+									Total Terdaftar Hari Ini: {latestAttendanceData?.attendances?.total ?? 0} Siswa
 								</CardDescription>
 							</div>
-							<Badge variant="outline" className="border-slate-700 text-slate-300 text-xs">
-								{scanLogs.length} Entri
+							<Badge variant="outline" className="text-xs">
+								{scanLogs.length} Scan
 							</Badge>
 						</CardHeader>
 						<CardContent className="pt-4">
 							{scanLogs.length === 0 ? (
-								<div className="py-8 text-center text-slate-500 text-xs">Riwayat pemindaian kosong.</div>
+								<div className="py-8 text-center text-muted-foreground text-xs">Belum ada aktivitas scan.</div>
 							) : (
 								<div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
 									{scanLogs.map((log) => (
 										<div
 											key={log.id}
-											className="p-3 bg-slate-950 border border-slate-800 rounded-lg text-xs flex items-center justify-between"
+											className="p-3 border rounded-lg text-xs flex items-center justify-between bg-card"
 										>
 											<div>
-												<p className="font-bold text-slate-200">{log.student?.fullname || `NIS: ${log.nis}`}</p>
-												<p className="text-slate-400 text-[11px]">{log.message}</p>
+												<p className="font-bold">{log.student?.fullname || `NIS: ${log.nis}`}</p>
+												<p className="text-muted-foreground text-[11px]">{log.message}</p>
 											</div>
-											<div className="text-right">
+											<div className="text-right shrink-0 ml-2">
 												<Badge
-													className={
-														log.status === "success"
-															? "bg-emerald-950 text-emerald-300 border-emerald-800 text-[10px]"
-															: "bg-red-950 text-red-300 border-red-800 text-[10px]"
-													}
+													variant={log.status === "success" ? "default" : "destructive"}
+													className="text-[10px]"
 												>
 													{log.status === "success" ? "Hadir" : "Gagal"}
 												</Badge>
-												<p className="text-slate-500 text-[10px] mt-1">{log.timestamp}</p>
+												<p className="text-muted-foreground text-[10px] mt-1">{log.timestamp}</p>
 											</div>
 										</div>
 									))}
